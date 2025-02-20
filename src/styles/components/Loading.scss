@@ -1,0 +1,46 @@
+.pl {
+    display: block;
+    margin: auto;
+    width: 12em;
+    height: auto;
+  
+    &__worm1,
+    &__worm2 {
+      animation: worm1-move 1.5s cubic-bezier(0.37,0,0.63,1) infinite;
+    }
+    
+    &__worm1 {
+      color: lightblue;
+    }
+    &__worm2 {
+      animation-name: worm2-move;   color: lightblue;
+  
+    }
+  }
+  
+  /* Dark theme */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: hsl(var(--hue),10%,10%);
+      --fg: hsl(var(--hue),10%,90%);
+    }
+  }
+  
+  /* Animation */
+  @keyframes worm1-move {
+    from {
+      stroke-dashoffset: -2.355;
+    }
+    to {
+      // move by both worm circumferences (78.54)
+      stroke-dashoffset: 76.185;
+    }
+  }
+  @keyframes worm2-move {
+    from {
+      stroke-dashoffset: 16.492;
+    }
+    to {
+      stroke-dashoffset: -62.045;
+    }
+  }

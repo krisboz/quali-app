@@ -1,0 +1,117 @@
+.login-container {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    height: 100vh;
+    background: linear-gradient(135deg, #0b3d91, #1e5bbf); // Soft gradient background
+    color: white;
+}
+
+.login-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+
+    h1 {
+        font-size: 2rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+}
+
+.login-right {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+
+    .deco-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+    width: 100%;
+    max-width: 350px;
+    padding: 2.5rem;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px); // Glassmorphism effect
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.login-title {
+    text-align: center;
+
+    h2 {
+        font-size: 1.8rem;
+        font-weight: 600;
+    }
+}
+
+.login-error {
+    color: #ff4d4d;
+    font-size: 0.9rem;
+    background: rgba(255, 77, 77, 0.1);
+    padding: 0.5rem;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.login-input {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+
+    label {
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    input {
+        padding: 0.5rem;
+        border-radius: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        font-size: 1rem;
+
+        &:focus {
+            outline: none;
+            border-color: white;
+            background: rgba(255, 255, 255, 0.2);
+        }
+    }
+}
+
+.login-btn-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+
+    button {
+        width: 100%;
+        padding: 0.7rem;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 6px;
+        border: none;
+        color: white;
+        background: #007bff;
+        cursor: pointer;
+        transition: background 0.3s ease;
+
+        &:hover {
+            background: #0056b3;
+        }
+    }
+}
