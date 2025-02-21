@@ -9,6 +9,7 @@ import { MdLogout } from "react-icons/md";
 import "../styles/components/Sidebar.scss";
 
 
+
 const Sidebar = ({ setIsAuthenticated }) => {
   const navigate = useNavigate();
 
@@ -18,7 +19,6 @@ const Sidebar = ({ setIsAuthenticated }) => {
     try {
       const decodedToken = jwtDecode(token); // Decode the token
        username = decodedToken.username || "User"; // Extract username (adjust the key based on your JWT structure)
-      console.log(username)
     } catch (error) {
       console.error("Invalid token:", error);
     }
@@ -57,11 +57,11 @@ const Sidebar = ({ setIsAuthenticated }) => {
         </ul>
       </nav>
       <div className='bottom-controls'>
-        <div className='username-container'>
+        <NavLink to="/app/profile" className='username-container'>
         <FaUserCircle/>
         <p>{username}</p>
 
-        </div>
+        </NavLink>
         <button className='logout-button' onClick={handleLogout} >
         <MdLogout/>
       </button>

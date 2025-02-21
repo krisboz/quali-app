@@ -6,6 +6,7 @@ import AppLayout from './components/AppLayout';
 import Dashboard from './components/Dashboard';
 import QualityInput from './components/QualityInput';
 import PrivateRoute from './components/PrivateRoute';
+import UserProfile from './components/UserProfile';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -49,6 +50,7 @@ function App() {
         >
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="quality-input" element={<QualityInput />} />
+          <Route path="profile" element={<UserProfile />} /> {/* New profile route */}
           {/* Redirect base /app to dashboard */}
           <Route path="" element={<Navigate to="dashboard" replace />} />
         </Route>

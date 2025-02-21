@@ -2,11 +2,14 @@ import { useState } from 'react';
 import axios from 'axios';
 import "../styles/components/LoginForm.scss"
 import { useNavigate } from 'react-router-dom';
+import { login } from '../api/api';
+import Loading from "./Loading";
 
 
 const LoginForm = ({setIsAuthenticated}) => {
   const [credentials, setCredentials] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate();
 
   const handleChange = ({ target: { name, value } }) => {
@@ -17,20 +20,20 @@ const LoginForm = ({setIsAuthenticated}) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setError('');
+    setLoading(true);
+    setError("");
 
     try {
-      const response = await axios.post('https://reimagined-journey-5r599v49g9r2577-5000.app.github.dev/login', credentials);
-      // Store the token (in production, secure this appropriately)
-      localStorage.setItem('token', response.data.token);
+      const data = await login(credentials); // Call API function
+      localStorage.setItem("token", data.token);
       setIsAuthenticated(true);
-      navigate('/dashboard');
-    } catch (err) {
-      console.error('Login error:', err);
-      setError(err.response?.data?.message || 'Login failed');
+      setLoading(false)
+      navigate("/app/dashboard");
+    } catch (errorMessage) {
+      setError(errorMessage);
+      setLoading(false)
     }
   };
-
 
   return (
     <div className="login-container">
@@ -66,7 +69,8 @@ const LoginForm = ({setIsAuthenticated}) => {
         />
       </div>
      <div className='login-btn-container'>
-     <button type="submit">Login</button>
+   {loading?   <Loading/>:
+     <button type="submit">Login</button>}
 
      </div>
     </form>
