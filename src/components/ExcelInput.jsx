@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import * as XLSX from 'xlsx';
 
-const ExcelInput = () => {
+const ExcelInput = ({setAuswertungen}) => {
   const [data, setData] = useState(null);
 
   const handleFileUpload = (e) => {
@@ -15,6 +15,7 @@ const ExcelInput = () => {
       const sheetData = XLSX.utils.sheet_to_json(sheet);
 
       setData(sheetData);
+      setAuswertungen(sheetData)
     };
 
     reader.readAsBinaryString(file);

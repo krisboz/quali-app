@@ -53,6 +53,14 @@ const Sidebar = ({ setIsAuthenticated }) => {
               Quality Input
             </NavLink>
           </li>
+          <li style={{ marginBottom: '10px' }}>
+            <NavLink
+              to="/app/auswertungen"
+              style={({ isActive }) => ({ fontWeight: isActive ? 'bold' : 'normal' })}
+            >
+              Auswertungen
+            </NavLink>
+          </li>
           {/* Add more sidebar options here as needed */}
         </ul>
       </nav>

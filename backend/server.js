@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const authenticateToken = require("./middleware/auth"); // Import middleware
 const multer = require("multer");
 const path = require("path");
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3'); // Import from AWS SDK
 
 const sqlite3 = require('sqlite3').verbose(); // Import SQLite3
 require('dotenv').config();
@@ -13,18 +14,9 @@ require('dotenv').config();
 // Initialize express app
 const app = express();
 const db = new sqlite3.Database('./database.sqlite'); // Saves to a file
-// Configure Multer
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-      cb(null, "uploads/"); // Directory to save uploaded files
-  },
-  filename: (req, file, cb) => {
-      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1E9);
-      cb(null, file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname)); // Unique file name
-  }
-});
-
-const upload = multer({ storage });
+// Configure multer to store files in memory
+const storage = multer.memoryStorage(); // Use in-memory storage
+const upload = multer({ storage: storage });
 
 app.use(cors());
 app.use(express.json()); // Parses JSON body
@@ -69,6 +61,17 @@ db.serialize(() => {
     fotos TEXT
   )`)
 });
+
+// Cloudflare R2 configuration
+const s3Client = new S3Client({
+  endpoint: process.env.R2_URL, // Use the R2_URL from your.env file
+  region: 'auto',
+  credentials: {
+      accessKeyId: process.env.R2_ACCESS_KEY_ID,
+      secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+  },
+});
+
   
 
 
@@ -130,19 +133,37 @@ app.get('/quality-reports', authenticateToken, (req, res) => {
     res.json(rows); // Send the retrieved rows as a response
   });
 });
-
-app.post("/quality-reports", authenticateToken, upload.array("fotos"), (req, res) => {
+// Quality report submission endpoint
+app.post("/quality-reports", authenticateToken, upload.array("fotos"), async (req, res) => {
   console.log("Backend called")
   const { liefertermin, lieferant, auftragsnummer, artikelnr, produkt, mangel, mangelgrad, mangelgrund, mitarbeiter, lieferantInformiertAm, loesung } = req.body;
 
-  // Extract the file paths from req.files
-  const fotoPaths = req.files.map(file => file.path);
-  console.log("ich bins",{liefertermin, lieferant, auftragsnummer, artikelnr, produkt, mangel, mangelgrad, mangelgrund, mitarbeiter, lieferantInformiertAm, loesung})
+  const imageUrls = [];
+  try {
+      // Upload each image to R2
+      for (const file of req.files) {
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+          const filename = file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname);
+          const uploadParams = {
+              Bucket: process.env.R2_BUCKET_NAME,
+              Key: filename,
+              Body: file.buffer,
+              ContentType: file.mimetype,
+          };
 
-  // Save report data to the database, including the file paths
-  db.run(`INSERT INTO quality_reports (liefertermin, lieferant, auftragsnummer, artikelnr, produkt, mangel, mangelgrad, mangelgrund, mitarbeiter, lieferantInformiertAm, loesung, fotos) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
-      [liefertermin, lieferant, auftragsnummer, artikelnr, produkt, mangel, mangelgrad, mangelgrund, mitarbeiter, lieferantInformiertAm, loesung, JSON.stringify(fotoPaths)], 
-      function(err) {
+          await s3Client.send(new PutObjectCommand(uploadParams));
+          const imageUrl = `${process.env.R2_PUBLIC_BUCKET_URL}/${filename}`; // Construct the image URL
+          imageUrls.push(imageUrl);
+      }
+  } catch (error) {
+      console.error('Error uploading to R2:', error);
+      return res.status(500).send({ message: 'Error uploading images.' });
+  }
+
+  // Save report data to the database, including the image URLs
+  db.run(`INSERT INTO quality_reports (liefertermin, lieferant, auftragsnummer, artikelnr, produkt, mangel, mangelgrad, mangelgrund, mitarbeiter, lieferantInformiertAm, loesung, fotos) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`,
+      [liefertermin, lieferant, auftragsnummer, artikelnr, produkt, mangel, mangelgrad, mangelgrund, mitarbeiter, lieferantInformiertAm, loesung, JSON.stringify(imageUrls)],
+      function (err) {
           if (err) {
               return res.status(500).json({ message: "Database error" });
           }

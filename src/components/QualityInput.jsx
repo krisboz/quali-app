@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import "../styles/components/QualityInput.scss";
-import { IoMdRemoveCircleOutline as RemoveButton } from "react-icons/io";
+import { IoMdRemoveCircleOutline as RemoveButton, IoMdAddCircleOutline as AddButton, IoIosCloseCircleOutline as CloseButton } from "react-icons/io";
 import { submitQualityReport } from "../api/api"; // Import the new API function
 import QualityReports from "./QualityReports";
+
 
 const QualityInput = () => {
     const [formData, setFormData] = useState({
@@ -20,6 +21,26 @@ const QualityInput = () => {
         fotos: [],
         loesung: ""
     });
+    const [isExpanded, setIsExpanded] = useState(false)
+
+    const toggleExpanded = () => {
+        setIsExpanded(prev=>!prev)
+    }
+
+    const resetFormData = () => {
+        setFormData({liefertermin: "",
+        lieferant: "",
+        auftragsnummer: "",
+        artikelnr: "",
+        produkt: "",
+        mangel: "",
+        mangelgrad: "1",
+        mangelgrund: "",
+        mitarbeiter: "",
+        lieferantInformiertAm: "",
+        fotos: [],
+        loesung: ""})
+    }
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -72,15 +93,29 @@ const QualityInput = () => {
         try {
             const result = await submitQualityReport(formDataToSend);
             console.log(result.message); // Handle success response
+            resetFormData()
+            setIsExpanded(false)
         } catch (error) {
             console.error("Error saving quality report:", error);
         }
     };
 
+   
+
     return (
         <>
-                <div className="quality-input">
-            <h2>Quality Input</h2>
+        {isExpanded ?        <div className="quality-input">
+            <div className="quality-input-title-container">
+                <div></div>
+                <div>
+                <h2>Quality Input</h2>
+
+                </div>
+
+                <div className="close-input-button-container">
+                    <button className="close-input-button" onClick={toggleExpanded}><CloseButton/></button>
+                </div>
+            </div>
             <form onSubmit={handleSubmit} className="quality-input-form">
                 <label>
                     Datum Liefertermin:
@@ -138,6 +173,7 @@ const QualityInput = () => {
                         <option value="Falsche Länge">Falsche Länge</option>
                         <option value="Gold/Stein Toleranz">Gold/Stein Toleranz</option>
                         <option value="Andere">Andere</option>
+                    
                     </select>
                 </label>
 
@@ -176,7 +212,9 @@ const QualityInput = () => {
                 <button type="submit">Submit</button>
             </form>
 
-        </div>
+        </div>:<div className="add-report-button-container">
+            <button onClick={toggleExpanded} className="add-report-button"><AddButton/> Add new report</button>
+            </div>}
         <QualityReports/>
 
         </>

@@ -1,0 +1,25 @@
+.report-filter-container table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .report-filter-container th,
+  .report-filter-container td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .report-filter-container th {
+    background-color: #f2f2f2;
+  }
+  
+  .report-filter-container input,
+  .report-filter-container select {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .report-filter-container button {
+    margin-top: 10px;
+  }
