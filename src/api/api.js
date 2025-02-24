@@ -80,3 +80,32 @@ export const updateQualityReport = async (id, updatedData) => {
     throw error.response?.data?.message || "Failed to update quality report";
   }
 };
+
+
+//Submit Auswertung Excel Table
+export const submitAuswertungData = async (auswertungData) => {
+  try {
+      const token = localStorage.getItem("token");
+      const response = await axios.post(`${API_BASE_URL}/auswertungen`, auswertungData, {
+          headers: {
+              Authorization: `Bearer ${token}`, // Send JWT in headers
+          },
+      });
+      return response.data;
+  } catch (error) {
+      throw error.response?.data?.message || "Failed to submit Auswertung data";
+  }
+};
+
+export const searchAuswertungen = async (searchParams) => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await axios.get(`${API_BASE_URL}/auswertungen`, {
+      headers: { Authorization: `Bearer ${token}` },
+      params: searchParams, // Pass filters directly as query params
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data?.message || "Failed to fetch Auswertung data";
+  }
+};

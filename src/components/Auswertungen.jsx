@@ -1,5 +1,7 @@
 import { useState } from "react";
 import ExcelInput from "./ExcelInput";
+import AuswertungDisplay from "./AuswertungDisplay";
+
 const Auswertungen = () => {
     const [auswertungen, setAuswertungen] = useState([]);
 
@@ -12,6 +14,7 @@ const Auswertungen = () => {
         <div>
            <h2>Auswertungen</h2>
            <ExcelInput setAuswertungen={handleSetAuswertungen}/>
+           <AuswertungDisplay/>
         </div>
     )
 }

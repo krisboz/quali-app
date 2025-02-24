@@ -19,6 +19,8 @@ const storage = multer.memoryStorage(); // Use in-memory storage
 const upload = multer({ storage: storage });
 
 app.use(cors());
+app.use(express.json({ limit: '50mb' })); // Increase the limit
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.json()); // Parses JSON body
 
 // Create a User table if it doesn't exist
@@ -60,6 +62,25 @@ db.serialize(() => {
     loesung TEXT,
     fotos TEXT
   )`)
+   // Create Auswertungen table
+   db.run(`CREATE TABLE IF NOT EXISTS auswertungen (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    "Beleg" TEXT,
+    "Firma" TEXT,
+    " Werkauftrag" TEXT,
+    "Termin" TEXT,
+    "Artikel-Nr." TEXT,
+    " Artikel-Nr. fertig" TEXT,
+    "Beschreibung" TEXT,
+    " Beschreibung 2" TEXT,
+    "urspr. Menge" INTEGER,
+    "Menge offen" INTEGER,
+    "Einzelpreis" REAL,
+    "G-Preis" REAL,
+    "Farbe" TEXT,
+    "Größe" TEXT,
+    UNIQUE("Beleg", "Artikel-Nr.")
+)`);
 });
 
 // Cloudflare R2 configuration
@@ -191,6 +212,100 @@ app.put('/quality-reports/:id', authenticateToken, (req, res) => {
       res.json({ message: "Report updated successfully" });
     }
   );
+});
+
+// POST endpoint for Auswertungen data
+app.post('/auswertungen', authenticateToken, (req, res) => {
+  try {
+    const data = req.body; // Get data from request body
+    console.log("Received data:", data); // Debugging line
+
+    if (!Array.isArray(data) || data.length === 0) {
+      return res.status(400).json({ message: "Invalid or empty data received" });
+    }
+
+    const stmt = db.prepare(`
+      INSERT OR IGNORE INTO auswertungen 
+      ("Beleg", "Firma", " Werkauftrag", "Termin", "Artikel-Nr.", " Artikel-Nr. fertig", "Beschreibung", " Beschreibung 2", 
+      "urspr. Menge", "Menge offen", "Einzelpreis", "G-Preis", "Farbe", "Größe") 
+      VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+    `);
+
+    data.forEach(row => {
+      try {
+        stmt.run(
+          row["Beleg"],
+          row["Firma"],
+          row[" Werkauftrag"],
+          row["Termin"],
+          row["Artikel-Nr."],
+          row[" Artikel-Nr. fertig"],
+          row["Beschreibung"],
+          row[" Beschreibung 2"],
+          row["urspr. Menge"],
+          row["Menge offen"],
+          row["Einzelpreis"],
+          row["G-Preis"],
+          row["Farbe"],
+          row["Größe"]
+        );
+      } catch (error) {
+        console.error("Error inserting row:", row, error);
+      }
+    });
+
+    stmt.finalize();
+    res.json({ message: 'Auswertungen data uploaded successfully.' });
+
+  } catch (error) {
+    console.error("Server error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+
+// GET endpoint for Auswertungen data with filtering
+app.get('/auswertungen', authenticateToken, (req, res) => {
+  const { beleg, firma, artikelnr, termin } = req.query;
+
+  let whereClause = '';
+  let params = [];
+
+  if (beleg) {
+      whereClause += '"Beleg" LIKE? AND ';
+      params.push(`%${beleg}%`);
+  }
+  if (firma) {
+      whereClause += '"Firma" LIKE? AND ';
+      params.push(`%${firma}%`);
+  } 
+  if (artikelnr) {
+      whereClause += '"Artikel-Nr." LIKE? AND ';
+      params.push(`%${artikelnr}%`);
+  }
+  if (termin) {
+      whereClause += '"Termin" LIKE? AND ';
+      params.push(`%${termin}%`);
+  }
+
+  if (whereClause) {
+      whereClause = whereClause.slice(0, -5); // Remove trailing ' AND '
+      const sql = `SELECT * FROM auswertungen WHERE ${whereClause}`;
+      db.all(sql, params, (err, rows) => {
+          if (err) {
+              return res.status(500).json({ message: "Database error" });
+          }
+          res.json(rows);
+      });
+  } else {
+      // No filters provided, fetch all data
+      db.all(`SELECT * FROM auswertungen`, (err, rows) => {
+          if (err) {
+              return res.status(500).json({ message: "Database error" });
+          }
+          res.json(rows);
+      });
+  }
 });
 
 // Start the server

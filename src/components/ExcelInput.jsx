@@ -1,5 +1,6 @@
 import {useState} from 'react';
 import * as XLSX from 'xlsx';
+import { submitAuswertungData } from '../api/api';
 
 const ExcelInput = ({setAuswertungen}) => {
   const [data, setData] = useState(null);
@@ -21,16 +22,29 @@ const ExcelInput = ({setAuswertungen}) => {
     reader.readAsBinaryString(file);
   };
 
+  const handleSubmit = async () => {
+    if (data) {
+        try {
+            await submitAuswertungData(data);
+            // Optionally clear the data state or show a success message
+            setData(null);
+            alert('Auswertung data submitted successfully!');
+        } catch (error) {
+            console.error('Error submitting data:', error);
+            // Handle the error, e.g., show an error message to the user
+            alert('Error submitting data. Please try again.');
+        }
+    }
+};
+
   return (
     <div>
-      <input type="file" onChange={handleFileUpload} />
-      {data && (
-        <div>
-          <h2>Imported Data:</h2>
-          <pre>{JSON.stringify(data, null, 2)}</pre>
-        </div>
-      )}
-    </div>
+    <input type="file" onChange={handleFileUpload} />
+    <button onClick={handleSubmit} disabled={!data}>
+        Submit
+    </button>
+    {/*... (optional data preview)... */}
+</div>
   );
 }
 
