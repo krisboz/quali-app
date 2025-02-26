@@ -3,12 +3,12 @@ import { searchAuswertungen } from "../api/api";
 
 const AuswertungDisplay = () => {
     const [searchParams, setSearchParams] = useState({
-        Beleg: "",
-        Firma: "",
-        Werkauftrag: "",
-        Termin: "",
-        ArtikelNr: "",
-        ArtikelNrFertig: "",
+        beleg: "",
+        firma: "",
+        werkauftrag: "",
+        termin: "",
+        artikelnr: "",
+        artikelnrfertig: "",
     });
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -61,17 +61,16 @@ const AuswertungDisplay = () => {
         <div>
             <h2>Search Auswertungen</h2>
             <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-                {["Beleg", "Firma", "Werkauftrag", "Termin", "ArtikelNr", "ArtikelNrFertig"].map((field) => (
-                    <input
-                        key={field}
-                        type={field === "Termin" ? "date" : "text"}
-                        name={field}
-                        value={searchParams[field]}
-                        onChange={handleInputChange}
-                        placeholder={field}
-                        style={{ padding: "5px", borderRadius: "5px", border: "1px solid gray" }}
-                    />
-                ))}
+            {["beleg", "firma", "werkauftrag", "termin", "artikelnr", "artikelnrfertig"].map((field) => (
+  <input
+    key={field}
+    type={field === "termin" ? "date" : "text"}
+    name={field}
+    value={searchParams[field]}
+    onChange={handleInputChange}
+    placeholder={field.replace(/^\w/, c => c.toUpperCase())} // Optional: Uppercase first letter for display
+  />
+))}
                 <button onClick={handleSearch} disabled={loading}>
                     {loading ? "Searching..." : "Search"}
                 </button>

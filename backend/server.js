@@ -266,15 +266,17 @@ app.post('/auswertungen', authenticateToken, (req, res) => {
 
 // GET endpoint for Auswertungen data with filtering
 app.get('/auswertungen', authenticateToken, (req, res) => {
-  let { beleg, firma, werkauftrag, artikelnr, termin, page = 1, limit = 20 } = req.query; // Add pagination parameters
+  let { beleg, firma, werkauftrag, artikelnr, termin, artikelnrfertig, page = 1, limit = 100 } = req.query;  page = parseInt(page);
+  console.log(req.query)
+
   page = parseInt(page);
   limit = parseInt(limit);
   const offset = (page - 1) * limit;
-  console.log(req.query)
 
-  let whereClause = 'WHERE 1=1 '; // Start with a true condition
+  let whereClause = 'WHERE 1=1 ';
   let params = [];
 
+  // Add each search condition
   if (beleg) {
     whereClause += 'AND "Beleg" LIKE ? ';
     params.push(`%${beleg}%`);
@@ -291,10 +293,18 @@ app.get('/auswertungen', authenticateToken, (req, res) => {
     whereClause += 'AND "Artikel-Nr." LIKE ? ';
     params.push(`%${artikelnr}%`);
   }
-  if (termin) {
-    whereClause += 'AND "Termin" = ? '; // Exact date match
-    params.push(termin);
+  if (artikelnrfertig) {
+    whereClause += 'AND " Artikel-Nr. fertig" LIKE ? ';
+    params.push(`%${artikelnrfertig}%`);
   }
+  if (termin) {
+    // Convert YYYY-MM-DD to DD.MM.YYYY
+    const [year, month, day] = termin.split('-');
+    const formattedTermin = `${day}.${month}.${year}`;
+    whereClause += 'AND "Termin" = ? ';
+    params.push(formattedTermin);
+  }
+
 
   const sql = `SELECT * FROM auswertungen ${whereClause} LIMIT ? OFFSET ?`;
   const countSql = `SELECT COUNT(*) as total FROM auswertungen ${whereClause}`;
