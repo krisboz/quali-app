@@ -99,13 +99,13 @@ export const submitAuswertungData = async (auswertungData) => {
 
 export const searchAuswertungen = async (searchParams) => {
   try {
-    const token = localStorage.getItem("token");
-    const response = await axios.get(`${API_BASE_URL}/auswertungen`, {
-      headers: { Authorization: `Bearer ${token}` },
-      params: searchParams, // Pass filters directly as query params
-    });
-    return response.data;
+      const token = localStorage.getItem("token");
+      const response = await axios.get(`${API_BASE_URL}/auswertungen`, {
+          headers: { Authorization: `Bearer ${token}` },
+          params: searchParams,
+      });
+      return response.data;
   } catch (error) {
-    throw error.response?.data?.message || "Failed to fetch Auswertung data";
+      throw error.response?.data?.message || "Failed to fetch Auswertung data";
   }
 };

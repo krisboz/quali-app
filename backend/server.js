@@ -266,46 +266,56 @@ app.post('/auswertungen', authenticateToken, (req, res) => {
 
 // GET endpoint for Auswertungen data with filtering
 app.get('/auswertungen', authenticateToken, (req, res) => {
-  const { beleg, firma, artikelnr, termin } = req.query;
+  let { beleg, firma, werkauftrag, artikelnr, termin, page = 1, limit = 20 } = req.query; // Add pagination parameters
+  page = parseInt(page);
+  limit = parseInt(limit);
+  const offset = (page - 1) * limit;
+  console.log(req.query)
 
-  let whereClause = '';
+  let whereClause = 'WHERE 1=1 '; // Start with a true condition
   let params = [];
 
   if (beleg) {
-      whereClause += '"Beleg" LIKE? AND ';
-      params.push(`%${beleg}%`);
+    whereClause += 'AND "Beleg" LIKE ? ';
+    params.push(`%${beleg}%`);
   }
   if (firma) {
-      whereClause += '"Firma" LIKE? AND ';
-      params.push(`%${firma}%`);
-  } 
+    whereClause += 'AND "Firma" LIKE ? ';
+    params.push(`%${firma}%`);
+  }
+  if (werkauftrag) {
+    whereClause += 'AND " Werkauftrag" LIKE ? ';
+    params.push(`%${werkauftrag}%`);
+  }
   if (artikelnr) {
-      whereClause += '"Artikel-Nr." LIKE? AND ';
-      params.push(`%${artikelnr}%`);
+    whereClause += 'AND "Artikel-Nr." LIKE ? ';
+    params.push(`%${artikelnr}%`);
   }
   if (termin) {
-      whereClause += '"Termin" LIKE? AND ';
-      params.push(`%${termin}%`);
+    whereClause += 'AND "Termin" = ? '; // Exact date match
+    params.push(termin);
   }
 
-  if (whereClause) {
-      whereClause = whereClause.slice(0, -5); // Remove trailing ' AND '
-      const sql = `SELECT * FROM auswertungen WHERE ${whereClause}`;
-      db.all(sql, params, (err, rows) => {
-          if (err) {
-              return res.status(500).json({ message: "Database error" });
-          }
-          res.json(rows);
+  const sql = `SELECT * FROM auswertungen ${whereClause} LIMIT ? OFFSET ?`;
+  const countSql = `SELECT COUNT(*) as total FROM auswertungen ${whereClause}`;
+
+  db.all(sql, [...params, limit, offset], (err, rows) => {
+    if (err) {
+      return res.status(500).json({ message: "Database error" });
+    }
+    db.get(countSql, params, (countErr, countRow) => {
+      if (countErr) {
+        return res.status(500).json({ message: "Database error" });
+      }
+      const total = countRow.total;
+      res.json({
+        rows,
+        total,
+        page,
+        limit,
       });
-  } else {
-      // No filters provided, fetch all data
-      db.all(`SELECT * FROM auswertungen`, (err, rows) => {
-          if (err) {
-              return res.status(500).json({ message: "Database error" });
-          }
-          res.json(rows);
-      });
-  }
+    });
+  });
 });
 
 // Start the server

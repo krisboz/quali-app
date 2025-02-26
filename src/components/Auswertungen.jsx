@@ -15,6 +15,7 @@ const Auswertungen = () => {
            <h2>Auswertungen</h2>
            <ExcelInput setAuswertungen={handleSetAuswertungen}/>
            <AuswertungDisplay/>
+           
         </div>
     )
 }
