@@ -1,0 +1,111 @@
+.loading-container-overlay {
+    position: absolute;
+    top: 0%;
+    left:0%;
+    height: 100vh;
+    width: 100vw;
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+
+}
+
+.auswertung-display {
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    h2 {
+        margin-bottom: 15px;
+        font-size: 1.5rem;
+        color: #333;
+    }
+
+    input {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 14px;
+        width: 150px;
+
+        &:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+    }
+
+    button {
+        padding: 8px 12px;
+        background: #000000;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background 0.2s;
+
+        &:hover {
+            background: #0056b3;
+        }
+
+        &:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+    }
+
+    .pagination-controls-container {
+        margin: 10px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        button {
+            padding: 6px 10px;
+            font-size: 14px;
+        }
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 4px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-top: 10px;
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        thead {
+            background: #000000;
+            color: white;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #f2f2f2;
+        }
+
+        tbody tr:hover {
+            background: #e2e6ea;
+        }
+    }
+
+    .loading-container-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.8);
+    }
+}

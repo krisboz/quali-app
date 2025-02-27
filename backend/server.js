@@ -201,12 +201,54 @@ app.delete('/quality-reports/:id', authenticateToken, (req, res) => {
   });
 });
 
-// Update quality report
+// Update quality report (full update)
 app.put('/quality-reports/:id', authenticateToken, (req, res) => {
   const { id } = req.params;
-  const { liefertermin, lieferant } = req.body;
-  db.run(`UPDATE quality_reports SET liefertermin = ?, lieferant = ? WHERE id = ?`,
-    [liefertermin, lieferant, id],
+  const {
+    liefertermin,
+    lieferant,
+    auftragsnummer,
+    artikelnr,
+    produkt,
+    mangel,
+    mangelgrad,
+    mangelgrund,
+    mitarbeiter,
+    lieferantInformiertAm,
+    loesung,
+    fotos
+  } = req.body;
+
+  db.run(
+    `UPDATE quality_reports SET 
+      liefertermin = ?,
+      lieferant = ?,
+      auftragsnummer = ?,
+      artikelnr = ?,
+      produkt = ?,
+      mangel = ?,
+      mangelgrad = ?,
+      mangelgrund = ?,
+      mitarbeiter = ?,
+      lieferantInformiertAm = ?,
+      loesung = ?,
+      fotos = ?
+    WHERE id = ?`,
+    [
+      liefertermin,
+      lieferant,
+      auftragsnummer,
+      artikelnr,
+      produkt,
+      mangel,
+      mangelgrad,
+      mangelgrund,
+      mitarbeiter,
+      lieferantInformiertAm,
+      loesung,
+      fotos,
+      id
+    ],
     function(err) {
       if (err) return res.status(500).json({ message: "Database error" });
       res.json({ message: "Report updated successfully" });
@@ -327,6 +369,67 @@ app.get('/auswertungen', authenticateToken, (req, res) => {
     });
   });
 });
+
+  // New reports endpoint combining quality reports and auswertungen
+  app.get('/reports', authenticateToken, async (req, res) => {
+    const { date, lieferant } = req.query;
+  
+    if (!date || !lieferant) {
+      return res.status(400).json({ message: "Missing date or lieferant parameter" });
+    }
+  
+    try {
+      const isYear = date.length === 4;
+      const isMonth = date.length === 7;
+  
+      // 1. Get Quality Reports
+      let qualityWhere = 'LOWER(lieferant) LIKE LOWER(?)'; // Case-insensitive matching
+      let qualityParams = [`%${lieferant}%`]; // Partial string matching
+  
+      if (isMonth) {
+        qualityWhere += ' AND liefertermin LIKE ?';
+        qualityParams.push(`${date}%`);
+      } else if (isYear) {
+        qualityWhere += ' AND liefertermin LIKE ?';
+        qualityParams.push(`${date}%`);
+      }
+  
+      const qualityReports = await new Promise((resolve, reject) => {
+        db.all(`SELECT * FROM quality_reports WHERE ${qualityWhere}`, qualityParams, (err, rows) => {
+          if (err) reject(err);
+          else resolve(rows);
+        });
+      });
+  
+      // 2. Get Auswertungen
+      let ausWhere = 'LOWER("Firma") LIKE LOWER(?)'; // Case-insensitive matching
+      let ausParams = [`%${lieferant}%`]; // Partial string matching
+  
+      if (isMonth) {
+        const [year, month] = date.split('-');
+        ausWhere += ' AND "Termin" LIKE ?';
+        ausParams.push(`%${month}.${year}`);
+      } else if (isYear) {
+        ausWhere += ' AND "Termin" LIKE ?';
+        ausParams.push(`%.${date}`);
+      }
+  
+      const auswertungen = await new Promise((resolve, reject) => {
+        db.all(`SELECT * FROM auswertungen WHERE ${ausWhere}`, ausParams, (err, rows) => {
+          if (err) reject(err);
+          else resolve(rows);
+        });
+      });
+  
+      res.json({
+        qualityReports,
+        auswertungen,
+      });
+    } catch (error) {
+      console.error('Database error:', error);
+      res.status(500).json({ message: "Database error" });
+    }
+  });
 
 // Start the server
 const PORT = process.env.PORT || 5000;

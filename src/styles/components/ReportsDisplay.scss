@@ -1,0 +1,14 @@
+.report-param-input-container {
+    border: 1px solid rgba(0, 0, 0, 0.363);
+    border-radius: 6px;
+    padding: 2rem;
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.report-parameter-form {
+    display: flex;
+    gap: .5rem;
+}

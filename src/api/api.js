@@ -109,3 +109,16 @@ export const searchAuswertungen = async (searchParams) => {
       throw error.response?.data?.message || "Failed to fetch Auswertung data";
   }
 };
+
+export const fetchReports = async (params) => {
+  const token = localStorage.getItem('token');
+  console.log("Params", {params})
+  const response = await axios.get(`${API_BASE_URL}/reports`, {
+    params: {
+      date: params.termin,
+      lieferant: params.firma
+    },
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+};

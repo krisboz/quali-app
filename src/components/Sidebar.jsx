@@ -61,6 +61,14 @@ const Sidebar = ({ setIsAuthenticated }) => {
               Auswertungen
             </NavLink>
           </li>
+          <li>
+          <NavLink
+              to="/app/reports"
+              style={({ isActive }) => ({ fontWeight: isActive ? 'bold' : 'normal' })}
+            >
+              Reports
+            </NavLink>
+          </li>
           {/* Add more sidebar options here as needed */}
         </ul>
       </nav>

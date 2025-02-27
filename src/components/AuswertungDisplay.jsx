@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { searchAuswertungen } from "../api/api";
+import Loading from "./Loading";
+import "../styles/components/AuswertungDisplay.scss";
 
 const AuswertungDisplay = () => {
     const [searchParams, setSearchParams] = useState({
@@ -14,7 +16,7 @@ const AuswertungDisplay = () => {
     const [loading, setLoading] = useState(false);
     const [pagination, setPagination] = useState({
         page: 1,
-        limit: 20,
+        limit: 100,
         total: 0,
     });
 
@@ -23,11 +25,11 @@ const AuswertungDisplay = () => {
         setSearchParams({ ...searchParams, [name]: value });
     };
 
-    const handleSearch = async () => {
+    const handleSearch = async (e) => {
+        e.preventDefault();
         setLoading(true);
         try {
             const data = await searchAuswertungen({ ...searchParams, page: pagination.page, limit: pagination.limit });
-            console.log("DATA FROM BE", data);
             setResults(data.rows);
             setPagination({ ...pagination, total: data.total });
         } catch (error) {
@@ -38,12 +40,10 @@ const AuswertungDisplay = () => {
 
     const handlePageChange = async (newPage) => {
         setLoading(true);
-        // Create a new pagination object with the updated page
         const newPagination = { ...pagination, page: newPage };
         setPagination(newPagination);
         
         try {
-            // Use the new pagination values directly
             const data = await searchAuswertungen({ 
                 ...searchParams, 
                 page: newPage, 
@@ -57,26 +57,58 @@ const AuswertungDisplay = () => {
         setLoading(false);
     };
 
+    const handleLimitChange = async (e) => {
+        const newLimit = parseInt(e.target.value, 10);
+        setPagination((prev) => ({ ...prev, limit: newLimit, page: 1 }));
+        setLoading(true);
+        try {
+            const data = await searchAuswertungen({ ...searchParams, page: 1, limit: newLimit });
+            setResults(data.rows);
+            setPagination((prev) => ({ ...prev, total: data.total }));
+        } catch (error) {
+            console.error("Limit change error:", error);
+        }
+        setLoading(false);
+    };
+
     return (
-        <div>
-            <h2>Search Auswertungen</h2>
-            <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-            {["beleg", "firma", "werkauftrag", "termin", "artikelnr", "artikelnrfertig"].map((field) => (
-  <input
-    key={field}
-    type={field === "termin" ? "date" : "text"}
-    name={field}
-    value={searchParams[field]}
-    onChange={handleInputChange}
-    placeholder={field.replace(/^\w/, c => c.toUpperCase())} // Optional: Uppercase first letter for display
-  />
-))}
-                <button onClick={handleSearch} disabled={loading}>
+        <div className="auswertung-display">
+            <h2>Search Parameters</h2>
+            <form style={{ display: "flex", gap: "10px", marginBottom: "10px" }} onSubmit={handleSearch}>
+                {["beleg", "firma", "werkauftrag", "termin", "artikelnr", "artikelnrfertig"].map((field) => (
+                    <input
+                        key={field}
+                        type={field === "termin" ? "date" : "text"}
+                        name={field}
+                        value={searchParams[field]}
+                        onChange={handleInputChange}
+                        placeholder={field.replace(/^\w/, c => c.toUpperCase())}
+                    />
+                ))}
+                <button type="submit" disabled={loading}>
                     {loading ? "Searching..." : "Search"}
                 </button>
-            </div>
+            </form>
 
-            {/* Table rendering added here */}
+            {loading && <div className="loading-container-overlay"><Loading/></div>}
+
+            {pagination.total > 0 && (
+                <div className="pagination-controls-container"> 
+                    <button disabled={pagination.page === 1} onClick={() => handlePageChange(pagination.page - 1)}>
+                        Previous
+                    </button>
+                    <span>{pagination.page} / {Math.ceil(pagination.total/pagination.limit)}</span>
+                    <button disabled={pagination.page * pagination.limit >= pagination.total} onClick={() => handlePageChange(pagination.page + 1)}>
+                        Next
+                    </button>
+                    <select value={pagination.limit} onChange={handleLimitChange}>
+                        {[20, 50, 100, 200, 500].map(limit => (
+                            <option key={limit} value={limit}>{limit} results per page</option>
+                        ))}
+                    </select>
+                </div>
+            )}
+
             {results.length > 0 ? (
                 <table border="1" style={{ width: "100%", textAlign: "left", marginTop: "10px" }}>
                     <thead>
@@ -120,18 +152,6 @@ const AuswertungDisplay = () => {
                 </table>
             ) : (
                 <p>No results found.</p>
-            )}
-
-            {pagination.total > 0 && (
-                <div>
-                    <button disabled={pagination.page === 1} onClick={() => handlePageChange(pagination.page - 1)}>
-                        Previous
-                    </button>
-                    <span>Page {pagination.page}</span>
-                    <button disabled={pagination.page * pagination.limit >= pagination.total} onClick={() => handlePageChange(pagination.page + 1)}>
-                        Next
-                    </button>
-                </div>
             )}
         </div>
     );

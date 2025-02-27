@@ -8,6 +8,7 @@ import QualityInput from './components/QualityInput';
 import PrivateRoute from './components/PrivateRoute';
 import UserProfile from './components/UserProfile';
 import Auswertungen from './components/Auswertungen';
+import ReportsDisplay from "./components/ReportsDisplay"
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -52,6 +53,8 @@ function App() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="quality-input" element={<QualityInput />} />
           <Route path="auswertungen" element={<Auswertungen />} />
+          <Route path="reports" element={<ReportsDisplay />} />
+
 
           <Route path="profile" element={<UserProfile />} /> {/* New profile route */}
           {/* Redirect base /app to dashboard */}
