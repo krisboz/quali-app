@@ -11,9 +11,14 @@ const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3'); // Import 
 const sqlite3 = require('sqlite3').verbose(); // Import SQLite3
 require('dotenv').config();
 
+//Router import
+const inspectionRouter = require("./routes/inspection");  
+const auswertungRouter = require("./routes/auswertung"); 
+const db = require('./db');
+
+
 // Initialize express app
 const app = express();
-const db = new sqlite3.Database('./database.sqlite'); // Saves to a file
 // Configure multer to store files in memory
 const storage = multer.memoryStorage(); // Use in-memory storage
 const upload = multer({ storage: storage });
@@ -81,6 +86,27 @@ db.serialize(() => {
     "Größe" TEXT,
     UNIQUE("Beleg", "Artikel-Nr.")
 )`);
+
+
+db.serialize(() => {
+  db.run(`CREATE TABLE IF NOT EXISTS inspection (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    liefertermin TEXT,
+    lieferant TEXT,
+    auftragsnummer TEXT,
+    artikelnr TEXT,
+    produkt TEXT,
+    mangel TEXT,
+    mangelgrad INTEGER,
+    mangelgrund TEXT,
+    mitarbeiter TEXT,
+    lieferantInformiertAm TEXT,
+    loesung TEXT,
+    fotos TEXT
+  )`);
+
+
+});
 });
 
 // Cloudflare R2 configuration
@@ -93,8 +119,9 @@ const s3Client = new S3Client({
   },
 });
 
-  
 
+app.use("/api/inspection", inspectionRouter);
+app.use("/api/auswertungen", auswertungRouter);
 
 // Simple GET route to check if the server is working
 app.get('/', (req, res) => {

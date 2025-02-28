@@ -9,6 +9,8 @@ import PrivateRoute from './components/PrivateRoute';
 import UserProfile from './components/UserProfile';
 import Auswertungen from './components/Auswertungen';
 import ReportsDisplay from "./components/ReportsDisplay"
+//New ones
+import Inspection from './pages/inspection/Inspection';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -54,6 +56,7 @@ function App() {
           <Route path="quality-input" element={<QualityInput />} />
           <Route path="auswertungen" element={<Auswertungen />} />
           <Route path="reports" element={<ReportsDisplay />} />
+          <Route path="inspection" element={<Inspection />} />
 
 
           <Route path="profile" element={<UserProfile />} /> {/* New profile route */}

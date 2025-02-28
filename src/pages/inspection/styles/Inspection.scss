@@ -1,0 +1,23 @@
+.order-input-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2rem;
+}
+
+.inspection-order-form {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+
+    label {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+
+        input{
+            padding: .5rem;
+            font-size: 1rem;
+        }
+    }
+}

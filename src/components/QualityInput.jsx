@@ -136,8 +136,8 @@ const QualityInput = () => {
                 </label>
 
                 <label>
-                    Auftragsnummer:
-                    <input type="text" name="auftragsnummer" value={formData.auftragsnummer} onChange={handleChange} pattern="B-\d{2}-\d{4}" required />
+                    Auftragsnummer:                                                                                           
+                    <input type="text" name="auftragsnummer" value={formData.auftragsnummer} onChange={handleChange} pattern="[B|S]-\d{2}-\d{4}" required />
                 </label>
 
                 <label>
