@@ -1,6 +1,6 @@
 import { useState } from "react"
 import "../styles/OrderPreviewBlocks.scss";
-import { BsHandIndexFill } from "react-icons/bs";
+import OrderDetails from "./OrderDetails";
 
 const OrderPreviewBlocks = ({groupedResults}) => {
     const [chosenOrder, setChosenOrder] = useState(null)
@@ -10,14 +10,17 @@ const OrderPreviewBlocks = ({groupedResults}) => {
         setChosenOrder(groupedResults[index])
     }
 
-return (
+return (<>
     <div className="grouped-results-container">
-    {groupedResults.map((result, index)=><div className="order-preview-block" key={index} onClick={e=>handleBlockClick(e, index)}>
+    {!chosenOrder && groupedResults.map((result, index)=><div className="order-preview-block" key={index} onClick={e=>handleBlockClick(e, index)}>
         <h2>{result.orderNumber}</h2>
         <h3>{result.firma}</h3>
         <p> Items: {result.items.length}</p>
     </div>)}
-</div>)
+</div> 
+{chosenOrder && <OrderDetails chosenOrder={chosenOrder} setChosenOrder={setChosenOrder}/>}
+</>) 
+
 }
 
 export default OrderPreviewBlocks

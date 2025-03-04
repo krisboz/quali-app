@@ -1,0 +1,161 @@
+/* General Overlay */
+.quality-input-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    z-index: 9999; /* Make sure it stays above everything */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  /* Quality Input Form */
+  .quality-input {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 900px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  /* Title and Close Button */
+  .quality-input-title-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .quality-input-title-container h2 {
+    font-size: 24px;
+    color: #333;
+  }
+  
+  .close-input-button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #333;
+    cursor: pointer;
+  }
+  
+  .close-input-button:hover {
+    color: #e74c3c;
+  }
+  
+  /* Form Input Styles */
+  .quality-input-form label {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .quality-input-form input,
+  .quality-input-form select,
+  .quality-input-form textarea {
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 100%;
+    margin-bottom: 15px;
+  }
+  
+  .quality-input-form textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+  
+  .quality-input-form input[type="date"],
+  .quality-input-form input[type="text"],
+  .quality-input-form select {
+    max-width: 400px;
+  }
+  
+  .quality-input-form input[type="file"] {
+    max-width: 100%;
+  }
+  
+  .quality-input-form input[type="text"]:focus,
+  .quality-input-form select:focus,
+  .quality-input-form textarea:focus {
+    outline: none;
+    border-color: #3498db;
+  }
+  
+  /* Foto input container */
+  .foto-input-container {
+    margin-top: 10px;
+  }
+  
+  .uploaded-foto-preview {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 5px;
+  }
+  
+  .remove-foto-button {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #e74c3c;
+    cursor: pointer;
+  }
+  
+  .remove-foto-button:hover {
+    color: #c0392b;
+  }
+  
+  /* Submit Button */
+  .quality-input-form button[type="submit"] {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .quality-input-form button[type="submit"]:hover {
+    background-color: #2980b9;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .quality-input {
+      padding: 20px;
+    }
+  
+    .quality-input-form input[type="date"],
+    .quality-input-form input[type="text"],
+    .quality-input-form select {
+      max-width: 100%;
+    }
+  
+    .quality-input-form textarea {
+      min-height: 100px;
+    }
+  
+    .quality-input-form label {
+      font-size: 12px;
+    }
+  }
+  
