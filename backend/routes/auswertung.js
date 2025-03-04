@@ -8,28 +8,32 @@ const db = require('../db');
 router.post('/', authenticateToken, (req, res) => {
   try {
     const data = req.body;
+
     if (!Array.isArray(data) || data.length === 0) {
       return res.status(400).json({ message: "Invalid or empty data received" });
     }
 
     const stmt = db.prepare(
-      `INSERT OR IGNORE INTO auswertungen 
-      ("Beleg", "Firma", " Werkauftrag", "Termin", "Artikel-Nr.", " Artikel-Nr. fertig", "Beschreibung", " Beschreibung 2", 
-      "urspr. Menge", "Menge offen", "Einzelpreis", "G-Preis", "Farbe", "Größe") 
+      `INSERT INTO auswertungen 
+      ("Beleg", "Firma", "Werkauftrag", "Termin", "Artikel-Nr.", "Artikel-Nr. fertig", 
+       "Beschreibung", "Beschreibung 2", "urspr. Menge", "Menge offen", "Einzelpreis", 
+       "G-Preis", "Farbe", "Größe") 
       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`
     );
 
     data.forEach(row => {
       try {
+        if (!row["Artikel-Nr."]?.startsWith("01")) return; // Filter out non-"01" rows
+
         stmt.run(
           row["Beleg"],
-          row["Firma"],
-          row[" Werkauftrag"],
+          row["Firma"]?.trim(),
+          row["Werkauftrag"]?.trim(),
           row["Termin"],
           row["Artikel-Nr."],
-          row[" Artikel-Nr. fertig"],
+          row["Artikel-Nr. fertig"],
           row["Beschreibung"],
-          row[" Beschreibung 2"],
+          row["Beschreibung 2"],
           row["urspr. Menge"],
           row["Menge offen"],
           row["Einzelpreis"],

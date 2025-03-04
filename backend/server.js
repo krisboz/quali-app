@@ -67,6 +67,10 @@ db.serialize(() => {
     loesung TEXT,
     fotos TEXT
   )`)
+  
+  //Delete function for testing TODO delete it all together
+  //db.run("DROP TABLE IF EXISTS auswertungen");
+
    // Create Auswertungen table
    db.run(`CREATE TABLE IF NOT EXISTS auswertungen (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -84,7 +88,7 @@ db.serialize(() => {
     "G-Preis" REAL,
     "Farbe" TEXT,
     "Größe" TEXT,
-    UNIQUE("Beleg", "Artikel-Nr.")
+  UNIQUE("Beleg", " Artikel-Nr. fertig") 
 )`);
 
 

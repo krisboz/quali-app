@@ -1,6 +1,39 @@
 import { useEffect, useState } from "react"
 import "./styles/Inspection.scss";
 import { searchAuswertungen } from "../../api/auswertung";
+import OrderPreviewBlocks from "./components/OrderPreviewBlocks";
+
+const groupResultsByOrderNumber = (results) => {
+    const grouped = {};
+
+    results.forEach((entry) => {
+        const orderNumber = entry.Beleg;
+        
+        if (!grouped[orderNumber]) {
+            grouped[orderNumber] = {
+                orderNumber,
+                firma: entry.Firma,
+                items: []
+            };
+        }
+
+        grouped[orderNumber].items.push({
+            "Artikel-Nr. fertig": entry[" Artikel-Nr. fertig"],
+            "Werkauftrag": entry[" Werkauftrag"],
+            Einzelpreis: entry.Einzelpreis,
+            Farbe: entry.Farbe,
+            "G-Preis": entry["G-Preis"],
+            Größe: entry.Größe,
+            "Menge offen": entry["Menge offen"],
+            Termin: entry.Termin,
+            id: entry.id,
+            "urspr. Menge": entry["urspr. Menge"]
+        });
+    });
+
+    return Object.values(grouped);
+};
+
 
 const Inspection = () => {
     const [orderNumber, setOrderNumber] = useState("");
@@ -13,8 +46,9 @@ const Inspection = () => {
 
         try {
             const result = await searchAuswertungen({beleg})
-            console.log(result)
-            setSearchResults(result.rows)
+            const groupedResults = groupResultsByOrderNumber(result.rows);
+console.log({groupedResults});
+            setSearchResults(groupedResults)
         }catch(error) {
             console.log("ERROr", error)
         }
@@ -34,7 +68,7 @@ const Inspection = () => {
                 </form>
             </div>
 
-            {searchResults.length>0 && <p>{searchResults.length}</p>}
+            {searchResults.length>0 && <OrderPreviewBlocks groupedResults={searchResults}/>}
 
 
     </div>)
