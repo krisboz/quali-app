@@ -58,6 +58,15 @@
 
 /* OrderDetails.scss */
 
+.inspected-row {
+  background-color: #faa4a4 !important;
+  cursor: not-allowed !important;
+  
+  &:hover {
+    background-color: #eeeeee !important;
+  }
+}
+
 /* Specific styles for the table inside the OrderDetails component */
 .detailed-order-preview {
     .detailed-items-table {

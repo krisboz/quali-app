@@ -185,6 +185,25 @@ app.get('/quality-reports', authenticateToken, (req, res) => {
     res.json(rows); // Send the retrieved rows as a response
   });
 });
+
+app.get('/quality-reports/search', authenticateToken, (req, res) => {
+  const { auftragsnummer } = req.query;
+
+  if (!auftragsnummer) {
+    return res.status(400).json({ message: 'auftragsnummer is required' });
+  }
+
+  db.all(
+    'SELECT * FROM quality_reports WHERE auftragsnummer LIKE ?',
+    [`%${auftragsnummer}%`], // Allows partial matching
+    (err, rows) => {
+      if (err) {
+        return res.status(500).json({ message: 'Database error' });
+      }
+      res.json(rows);
+    }
+  );
+});
 // Quality report submission endpoint
 app.post("/quality-reports", authenticateToken, upload.array("fotos"), async (req, res) => {
   console.log("Backend called")
@@ -287,6 +306,8 @@ app.put('/quality-reports/:id', authenticateToken, (req, res) => {
   );
 });
 
+
+
 // POST endpoint for Auswertungen data
 app.post('/auswertungen', authenticateToken, (req, res) => {
   try {
@@ -335,6 +356,7 @@ app.post('/auswertungen', authenticateToken, (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
 
 
 // GET endpoint for Auswertungen data with filtering

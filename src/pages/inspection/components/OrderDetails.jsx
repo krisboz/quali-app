@@ -1,36 +1,79 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "../styles/OrderDetails.scss";
 import { IoClose } from "react-icons/io5";
 import InspectionInput from "./InspectionInput";
+import { searchQualityReportsByAuftragsnummer } from "../../../api/api";
 
 const OrderDetails = ({ chosenOrder, setChosenOrder }) => {
   const [clickedItem, setClickedItem] = useState(null);
+  const [inspections, setInspections] = useState(null);
 
+  useEffect(() => {
+    if (chosenOrder && chosenOrder.orderNumber) {
+      const loadInspections = async (orderNumber) => {
+        try {
+          const inspections = await searchQualityReportsByAuftragsnummer(chosenOrder.orderNumber);
+          console.log({inspections})
+          setInspections(inspections);
+        } catch (err) {
+          console.log("Error", err);
+        }
+      };
+      loadInspections(chosenOrder.orderNumber);
+    }
+  }, [chosenOrder]);
 
-  const handleRowClick  = (e, index) => {
-    console.log(chosenOrder.items[index])
-    const clickedItem = chosenOrder.items[index]
-    setClickedItem(clickedItem)
-  }
-  // Render the table rows based on chosenOrder.items
-  const renderTableRows = () => {
-    return chosenOrder.items.map((item, index) => (
-      <tr
-        key={item.id || index}
-        onClick={(e) => handleRowClick(e, index)} // log the index of the item clicked
-      >
-        <td>{item["Artikel-Nr. fertig"] || ""}</td>
-        <td>{item["Einzelpreis"] || ""}</td>
-        <td>{item["Farbe"] || ""}</td>
-        <td>{item["G-Preis"] || ""}</td>
-        <td>{item["Größe"] || ""}</td>
-        <td>{item["Menge offen"] || ""}</td>
-        <td>{item["Termin"] || ""}</td>
-        <td>{item["Werkauftrag"] || ""}</td>
-        <td>{item["urspr. Menge"] || ""}</td>
-      </tr>
-    ));
+  const handleRowClick = (e, index) => {
+    const clickedItem = chosenOrder.items[index];
+    
+    // Check if item is already inspected
+    const isInspected = inspections?.some(inspection => 
+      inspection.artikelnr === clickedItem["Artikel-Nr. fertig"]
+    );
+    
+    if (!isInspected) {
+      setClickedItem(clickedItem);
+    }
   };
+
+  // Check if specific item is inspected
+  const isItemInspected = (item) => {
+    return inspections?.some(inspection => 
+      inspection.artikelnr === item["Artikel-Nr. fertig"]
+    );
+  };
+
+  const renderTableRows = () => {
+    return chosenOrder.items.map((item, index) => {
+      const isInspected = isItemInspected(item);
+      
+      return (
+        <tr
+          key={item.id || index}
+          onClick={(e) => handleRowClick(e, index)}
+          className={isInspected ? "inspected-row" : ""}
+          style={{ 
+            cursor: isInspected ? "not-allowed" : "pointer",
+            backgroundColor: isInspected ? "#f5f5f5" : "transparent"
+          }}
+        >
+          <td>{item["Artikel-Nr. fertig"] || ""}</td>
+          <td>{item["Einzelpreis"] || ""}</td>
+          <td>{item["Farbe"] || ""}</td>
+          <td>{item["G-Preis"] || ""}</td>
+          <td>{item["Größe"] || ""}</td>
+          <td>{item["Menge offen"] || ""}</td>
+          <td>{item["Termin"] || ""}</td>
+          <td>{item["Werkauftrag"] || ""}</td>
+          <td>{item["urspr. Menge"] || ""}</td>
+        </tr>
+      );
+    });
+  };
+
+  const setInspectionsOptimistically = (newEntry) => {
+    setInspections(prev=>[...prev, newEntry])
+  }
 
   return (
     <div className="detailed-order-preview">
@@ -71,9 +114,16 @@ const OrderDetails = ({ chosenOrder, setChosenOrder }) => {
         </div>
       </div>
 
-      {clickedItem && <div className="inspection-input-container">
-        
-        <InspectionInput chosenOrder={chosenOrder} clickedItem={clickedItem} setClickedItem={setClickedItem}/></div>}
+      {clickedItem && (
+        <div className="inspection-input-container">
+          <InspectionInput 
+            chosenOrder={chosenOrder} 
+            clickedItem={clickedItem} 
+            setClickedItem={setClickedItem}
+            setInspectionsOptimistically={setInspectionsOptimistically}
+          />
+        </div>
+      )}
     </div>
   );
 };

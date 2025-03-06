@@ -93,4 +93,21 @@ router.delete('/:id', authenticateToken, (req, res) => {
   });
 });
 
+router.get('/by-auftragsnummer/:auftragsnummer', authenticateToken, (req, res) => {
+  const { auftragsnummer } = req.params;
+  console.log("HEREEE I GOOOO", auftragsnummer)
+
+  if (!auftragsnummer) {
+    return res.status(400).json({ message: "Missing auftragsnummer parameter." });
+  }
+
+  db.all(`SELECT * FROM inspection WHERE auftragsnummer = ?`, [auftragsnummer], (err, rows) => {
+    if (err) {
+      return res.status(500).json({ message: "Database error", error: err });
+    }
+    res.json(rows);
+  });
+});
+
+
 module.exports = router;

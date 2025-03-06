@@ -1,0 +1,32 @@
+.graphs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 10px; /* Adjust as needed */
+}
+
+.graph-container {
+    border: 1px solid rgba(0, 0, 0, 0.445);
+
+    width: fit-content;
+    border-radius: 12px;
+}
+
+.graph-title {
+    border: 1px solid blue;
+    width:100%;
+    padding: 1rem .5rem;
+    border-radius: 12px 12px 0 0;
+    background-color: rgb(23, 23, 111);
+    color: white;
+
+    p {
+        font-weight: bold;
+    }
+}
+
+.graph-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+}

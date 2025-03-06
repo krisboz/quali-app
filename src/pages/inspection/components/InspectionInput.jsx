@@ -4,8 +4,9 @@ import "../styles/InspectionInput.scss";
 import { IoMdRemoveCircleOutline as RemoveButton, IoMdAddCircleOutline as AddButton, IoIosCloseCircleOutline as CloseButton } from "react-icons/io";
 import { submitQualityReport } from "../../../api/api"; // Import the new API function
 import Loading from "../../../components/Loading"; // Import loading component
+import { toast } from "react-toastify";
 
-const InspectionInput = ({ chosenOrder, clickedItem, setClickedItem }) => {
+const InspectionInput = ({ chosenOrder, clickedItem, setClickedItem, setInspectionsOptimistically }) => {
   const [formData, setFormData] = useState({
     liefertermin: "",
     lieferant: chosenOrder.firma,
@@ -91,7 +92,8 @@ const InspectionInput = ({ chosenOrder, clickedItem, setClickedItem }) => {
     // Send data to the backend using the new API function
     try {
       const result = await submitQualityReport(formDataToSend);
-      console.log(result.message); // Handle success response
+      toast.success(`Report for ${formData.artikelnr} submitted successfully`)
+      setInspectionsOptimistically(formData);
       resetFormData();
       setLoading(false); // Stop the loading spinner
       setClickedItem(null); // Reset the clicked item when closing

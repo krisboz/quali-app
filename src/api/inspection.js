@@ -53,3 +53,20 @@ export const updateInspectionReport = async (id, updatedData) => {
     throw error.response?.data?.message || "Failed to update inspection report";
   }
 };
+
+export const getInspectionsByAuftragsnummer = async (auftragsnummer) => {
+  try {
+    const response = await axios.get(
+      `/api/inspection/by-auftragsnummer/${encodeURIComponent(auftragsnummer)}`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching inspections:', error);
+    throw error; // Or handle error as needed
+  }
+};

@@ -57,6 +57,19 @@ export const fetchQualityReports = async () => {
   }
 };
 
+export const searchQualityReportsByAuftragsnummer = async (auftragsnummer) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await axios.get(`${API_BASE_URL}/quality-reports/search`, {
+      headers: { Authorization: `Bearer ${token}` },
+      params: { auftragsnummer },
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data?.message || 'Failed to search quality reports';
+  }
+};
+
 // Function to delete a quality report
 export const deleteQualityReport = async (id) => {
   try {
@@ -103,6 +116,20 @@ export const searchAuswertungen = async (searchParams) => {
       const response = await axios.get(`${API_BASE_URL}/auswertungen`, {
           headers: { Authorization: `Bearer ${token}` },
           params: searchParams,
+      });
+      return response.data;
+  } catch (error) {
+      throw error.response?.data?.message || "Failed to fetch Auswertung data";
+  }
+};
+
+export const fetchAllAuswertungen = async () => {
+  try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(`${API_BASE_URL}/auswertungen`, {
+          headers: { Authorization: `Bearer ${token}` },
+          params: {limit: 10000}
+         
       });
       return response.data;
   } catch (error) {

@@ -3,14 +3,16 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import LoginForm from './components/Login';
 import AppLayout from './components/AppLayout';
-import Dashboard from './components/Dashboard';
+import Dashboard from './pages/dashboard/Dashboard';
 import QualityInput from './components/QualityInput';
 import PrivateRoute from './components/PrivateRoute';
 import UserProfile from './components/UserProfile';
 import Auswertungen from './components/Auswertungen';
 import ReportsDisplay from "./components/ReportsDisplay"
-//New ones
+
 import Inspection from './pages/inspection/Inspection';
+
+
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
