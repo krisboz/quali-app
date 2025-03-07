@@ -2,6 +2,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 10px; /* Adjust as needed */
+    margin: 2rem 0;
 }
 
 .graph-container {
@@ -29,4 +30,12 @@
     flex-direction: column;
     align-items: center;
     padding: 1rem;
+}
+
+
+
+//Special styles for bar graphs
+.mangelgrund-graphs {
+
+    place-items: center;
 }

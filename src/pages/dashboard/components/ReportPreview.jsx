@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { fetchAllAuswertungen, fetchQualityReports, searchAuswertungen } from "../../../api/api";
-import { PieChart, Pie, Cell, Tooltip } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, BarChart, XAxis, YAxis, Bar } from 'recharts';
 import "../styles/ReportPreview.scss"
 
 
@@ -10,6 +10,8 @@ const ReportPreview = () => {
         const [inspections, setInspections] = useState([]);
         const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() );
         const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+        const suppliers = ["Adoma", "Breuning", "Rösch", "Schofer", "Sisti"];
+        const [selectedSupplier, setSelectedSupplier] = useState(null);
         
         useEffect(() => {
             const fetchAndSetData = async () => {
@@ -18,6 +20,7 @@ const ReportPreview = () => {
                         fetchQualityReports(),
                         fetchAllAuswertungen()
                     ]);
+                    console.log({inspectionsRes, auswertungenRes})
                     setInspections(inspectionsRes);
                     setAuswertungen(auswertungenRes.rows);
                 } catch (err) {
@@ -154,7 +157,6 @@ const ReportPreview = () => {
                     new Date(a.Termin.split(".").reverse().join("-")).getFullYear() === selectedYear
                 );
         
-                console.log(`Supplier: ${supplier}`, { filteredInspections, filteredAuswertungen });
         
                 const noInspected = filteredInspections.length;
                 const noRecieved = filteredAuswertungen.length;
@@ -197,16 +199,316 @@ const ReportPreview = () => {
                 );
             });
         };
+        const renderBasedOnMangelgrund = (selectedMonth, selectedYear) => {
+            const mangelTypes = [
+                "Oberfläche verkratzt/Poren",
+                "Stein Defekt",
+                "Falsche Teile / Zusammensetzung",
+                "Falsche Länge",
+                "Gold/Stein Toleranz",
+                "Andere"
+            ];
         
-    
-        const thisMonthAuswertungen = useMemo(() => {
-            const now = new Date();
-            return auswertungen.filter(a => {
-                const date = new Date(a.Termin);  // Assuming `date` exists
-                return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
-            });
-        }, [auswertungen]);
+            const allTimeData = mangelTypes.map((mangel) => ({
+                name: mangel,
+                value: inspections.filter(i => i.mangelgrund === mangel).length
+            }));
+        
+            const monthlyData = mangelTypes.map((mangel) => ({
+                name: mangel,
+                value: inspections.filter(i =>
+                    i.mangelgrund === mangel &&
+                    new Date(i.liefertermin).getMonth() + 1 === selectedMonth &&
+                    new Date(i.liefertermin).getFullYear() === selectedYear
+                ).length
+            }));
+        
+            return (
+                <div className="mangelgrund-section">
+                    <div className="mangelgrund-graphs graphs">
+                        <div className="graph-container">
+                            <div className="graph-title">
+                                <h3>Defect Statistics by Mangelgrund (All Time)</h3>
+                            </div>
+                            <BarChart
+                                width={900}
+                                height={400}
+                                data={allTimeData}
+                                layout="vertical"
+                                margin={{ left: 120, right: 20 }}
+                            >
+                                <YAxis type="category" dataKey="name" />
+                                <XAxis type="number" />
+                                <Tooltip />
+                                <Bar dataKey="value" fill="#dc3545" />
+                            </BarChart>
+                        </div>
+                        <div className="graph-container">
+                            <div className="graph-title">
+                                <h3>Defect Statistics by Mangelgrund ({selectedMonth}/{selectedYear})</h3>
+                            </div>
+                            <BarChart
+                                width={900}
+                                height={400}
+                                data={monthlyData}
+                                layout="vertical"
+                                margin={{ left: 120, right: 20 }}
+                            >
+                                <YAxis type="category" dataKey="name" />
+                                <XAxis type="number" />
+                                <Tooltip />
+                                <Bar dataKey="value" fill="#28a745" />
+                            </BarChart>
+                        </div>
+                    </div>
+        
+                    <div className="supplier-buttons">
+                        {suppliers.map((supplier) => (
+                            <button 
+                                key={supplier} 
+                                onClick={() => setSelectedSupplier(selectedSupplier === supplier ? null : supplier)}
+                            >
+                                {supplier}
+                            </button>
+                        ))}
+                    </div>
+        
+                    {selectedSupplier && (() => {
+                        const normalizedSupplier = selectedSupplier.toLowerCase();
+                        
+                        const supplierAllTimeData = mangelTypes.map((mangel) => ({
+                            name: mangel,
+                            value: inspections.filter(i =>
+                                i.mangelgrund === mangel &&
+                                i.lieferant.toLowerCase().includes(normalizedSupplier)
+                            ).length
+                        }));
+        
+                        const supplierMonthlyData = mangelTypes.map((mangel) => ({
+                            name: mangel,
+                            value: inspections.filter(i =>
+                                i.mangelgrund === mangel &&
+                                i.lieferant.toLowerCase().includes(normalizedSupplier) &&
+                                new Date(i.liefertermin).getMonth() + 1 === selectedMonth &&
+                                new Date(i.liefertermin).getFullYear() === selectedYear
+                            ).length
+                        }));
+        
+                        return (
+                            <div className="mangelgrund-graphs graphs">
+                                <div className="graph-container">
+                                    <div className="graph-title">
+                                        <h3>{selectedSupplier} - Defect Statistics (All Time)</h3>
+                                    </div>
+                                    <BarChart
+                                        width={900}
+                                        height={400}
+                                        data={supplierAllTimeData}
+                                        layout="vertical"
+                                        margin={{ left: 120, right: 20 }}
+                                    >
+                                        <YAxis type="category" dataKey="name" />
+                                        <XAxis type="number" />
+                                        <Tooltip />
+                                        <Bar dataKey="value" fill="#dc3545" />
+                                    </BarChart>
+                                </div>
+                                <div className="graph-container">
+                                    <div className="graph-title">
+                                        <h3>{selectedSupplier} - Defect Statistics ({selectedMonth}/{selectedYear})</h3>
+                                    </div>
+                                    <BarChart
+                                        width={900}
+                                        height={400}
+                                        data={supplierMonthlyData}
+                                        layout="vertical"
+                                        margin={{ left: 120, right: 20 }}
+                                    >
+                                        <YAxis type="category" dataKey="name" />
+                                        <XAxis type="number" />
+                                        <Tooltip />
+                                        <Bar dataKey="value" fill="#28a745" />
+                                    </BarChart>
+                                </div>
+                            </div>
+                        );
+                    })()}
+                </div>
+            );
+        };
+        
+        const renderDefectsByItem = (selectedMonth, selectedYear, selectedSupplier) => {
+            const groupDefectsByItem = (inspectionsToConsider) => {
+                return inspectionsToConsider.reduce((acc, inspection) => {
+                    const itemParts = inspection.artikelnr.split("-");
+                    const itemId = `${itemParts[0]}-${itemParts[1]}`;
+                    acc[itemId] = (acc[itemId] || 0) + 1;
+                    return acc;
+                }, {});
+            };
+        
+            const allTimeGrouped = groupDefectsByItem(inspections);
+            const monthYearGrouped = groupDefectsByItem(
+                inspections.filter(i => 
+                    new Date(i.liefertermin).getMonth() + 1 === selectedMonth &&
+                    new Date(i.liefertermin).getFullYear() === selectedYear
+                )
+            );
+            const supplierGrouped = selectedSupplier ? groupDefectsByItem(
+                inspections.filter(i => i.lieferant.toLowerCase() === selectedSupplier.toLowerCase())
+            ) : {};
+        
+            const convertToChartData = (groupedData) => {
+                return Object.entries(groupedData)
+                    .map(([item, count]) => ({ name: item, value: count }))
+                    .sort((a, b) => b.value - a.value); // Sort descending by value
+            };
+        
+            return (
+                <div className="defects-by-item-graphs graphs">
+                    <div className="graph-container">
+                        <div className="graph-title"><h3>Defects by Item (All Time)</h3></div>
+                        <BarChart
+                            width={600}
+                            height={500}
+                            data={convertToChartData(allTimeGrouped)}
+                            layout="vertical"
+                            margin={{ left: 120, right: 20 }}
+                        >
+                            <YAxis type="category" dataKey="name" />
+                            <XAxis type="number" />
+                            <Tooltip />
+                            <Bar dataKey="value" fill="#dc3545" />
+                        </BarChart>
+                    </div>
+                    <div className="graph-container">
+                        <div className="graph-title">
+                        <h3>Defects by Item ({selectedMonth}/{selectedYear})</h3>
 
+                        </div>
+                        <BarChart
+                            width={600}
+                            height={400}
+                            data={convertToChartData(monthYearGrouped)}
+                            layout="vertical"
+                            margin={{ left: 120, right: 20 }}
+                        >
+                            <YAxis type="category" dataKey="name" />
+                            <XAxis type="number" />
+                            <Tooltip />
+                            <Bar dataKey="value" fill="#28a745" />
+                        </BarChart>
+                    </div>
+                    {selectedSupplier && (
+                        <div className="graph-container">
+                            <div className="graph-title">
+                            <h3>{selectedSupplier} - Defects by Item</h3>
+
+                            </div>
+                            <BarChart
+                                width={600}
+                                height={300}
+                                data={convertToChartData(supplierGrouped)}
+                                layout="vertical"
+                                margin={{ left: 120, right: 20 }}
+                            >
+                                <YAxis type="category" dataKey="name" />
+                                <XAxis type="number" />
+                                <Tooltip />
+                                <Bar dataKey="value" fill="#ff5733" />
+                            </BarChart>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+        
+        const renderDefectsByDetailedItem = (selectedMonth, selectedYear, selectedSupplier) => {
+            const groupDefectsByItem = (inspectionsToConsider) => {
+                return inspectionsToConsider.reduce((acc, inspection) => {
+                    const itemNumber = inspection.artikelnr;
+                    acc[itemNumber] = (acc[itemNumber] || 0) + 1;
+                    return acc;
+                }, {});
+            };
+        
+            const allTimeGrouped = groupDefectsByItem(inspections);
+            const monthYearGrouped = groupDefectsByItem(
+                inspections.filter(i => 
+                    new Date(i.liefertermin).getMonth() + 1 === selectedMonth &&
+                    new Date(i.liefertermin).getFullYear() === selectedYear
+                )
+            );
+            const supplierGrouped = selectedSupplier ? groupDefectsByItem(
+                inspections.filter(i => i.lieferant.toLowerCase() === selectedSupplier.toLowerCase())
+            ) : {};
+        
+            const convertToChartData = (groupedData) => {
+                return Object.entries(groupedData)
+                    .map(([item, count]) => ({ name: item, value: count }))
+                    .sort((a, b) => b.value - a.value); // Sort descending by value
+            };
+        
+            return (
+                <div className="defects-by-detailed-item-graphs graphs">
+                    <div className="graph-container">
+                        <div className="graph-title">
+                        <h3>Defects by Detailed Item (All Time)</h3>
+                        </div>
+                        <BarChart
+                            width={500}
+                            height={300}
+                            data={convertToChartData(allTimeGrouped)}
+                            layout="vertical"
+                            margin={{ left: 150, right: 20 }}
+                        >
+                            <YAxis type="category" dataKey="name" />
+                            <XAxis type="number" />
+                            <Tooltip />
+                            <Bar dataKey="value" fill="#dc3545" />
+                        </BarChart>
+                    </div>
+                    <div className="graph-container">
+                        <div className="graph-title">
+                        <h3>Defects by Detailed Item ({selectedMonth}/{selectedYear})</h3>
+
+                        </div>
+                        <BarChart
+                            width={500}
+                            height={300}
+                            data={convertToChartData(monthYearGrouped)}
+                            layout="vertical"
+                            margin={{ left: 150, right: 20 }}
+                        >
+                            <YAxis type="category" dataKey="name" />
+                            <XAxis type="number" />
+                            <Tooltip />
+                            <Bar dataKey="value" fill="#28a745" />
+                        </BarChart>
+                    </div>
+                    {selectedSupplier && (
+                        <div className="graph-container">
+                            <div className="graph-title">
+                            <h3>{selectedSupplier} - Defects by Detailed Item</h3>
+
+                            </div>
+                            <BarChart
+                                width={500}
+                                height={300}
+                                data={convertToChartData(supplierGrouped)}
+                                layout="vertical"
+                                margin={{ left: 150, right: 20 }}
+                            >
+                                <YAxis type="category" dataKey="name" />
+                                <XAxis type="number" />
+                                <Tooltip />
+                                <Bar dataKey="value" fill="#ff5733" />
+                            </BarChart>
+                        </div>
+                    )}
+                </div>
+            );
+        };
 
         return (
             <div>
@@ -242,6 +544,18 @@ const ReportPreview = () => {
         <div className="monthly-graphs graphs">
             {renderMonthlyBasedOnLieferant(selectedMonth, selectedYear)}
         </div>
+        <h2>Defect Statistics by Mangelgrund</h2>
+
+    {renderBasedOnMangelgrund(selectedMonth, selectedYear)}
+    <div className="defects-by-item-graphs graphs">
+    {renderDefectsByItem(selectedMonth, selectedYear, selectedSupplier)}
+</div>
+
+    <div className="defects-by-item-graphs graphs">
+    {renderDefectsByDetailedItem(selectedMonth, selectedYear, selectedSupplier)}
+</div>
+  
+
             </div>
         )
 
