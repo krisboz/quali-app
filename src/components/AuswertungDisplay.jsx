@@ -34,6 +34,7 @@ const AuswertungDisplay = () => {
             setPagination({ ...pagination, total: data.total });
         } catch (error) {
             console.error("Search error:", error);
+            toast.error(`Error searching: ${error.message}`)
         }
         setLoading(false);
     };
@@ -53,6 +54,7 @@ const AuswertungDisplay = () => {
             setPagination(prev => ({ ...prev, total: data.total }));
         } catch (error) {
             console.error("Page change error:", error);
+            toast.error(`Error changing page: ${error.message}`)
         }
         setLoading(false);
     };

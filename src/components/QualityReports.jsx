@@ -4,6 +4,7 @@ import { fetchQualityReports, deleteQualityReport, updateQualityReport } from ".
 import Loading from "./Loading";
 import QualityReportImage from "./QualityReportImages";
 import { jwtDecode } from "jwt-decode";
+import "../styles/components/QualityReports.scss";
 
 const QualityReports = () => {
   const [reports, setReports] = useState([]);
@@ -14,7 +15,6 @@ const QualityReports = () => {
   const [filters, setFilters] = useState({});
   const token = localStorage.getItem('token');
   const decoded = jwtDecode(token);
-  
 
   useEffect(() => {
     loadReports();
@@ -76,13 +76,12 @@ const QualityReports = () => {
   });
 
   const uniqueLieferanten = [...new Set(reports.map(report => report.lieferant))];
-  console.log({uniqueLieferanten, reports})
 
   if (loading) return <Loading />;
   if (error) return <p>Error: {error}</p>;
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="quality-reports-container">
       <h2>Quality Reports</h2>
       <QualityReportsFilter 
         filters={filters} 
@@ -90,15 +89,14 @@ const QualityReports = () => {
         uniqueLieferanten={uniqueLieferanten}
       />
       
-      <div style={{ overflowX: "auto", marginTop: "20px" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <div className="scroll-container">
+        <table className="reports-table">
           <thead>
-            <tr style={{ backgroundColor: "#f0f0f0" }}>
+            <tr className="table-header">
               <th>Liefertermin</th>
               <th>Lieferant</th>
               <th>Auftragsnummer</th>
               <th>Artikelnummer</th>
-              <th>Produkt</th>
               <th>Mangel</th>
               <th>Mangelgrad</th>
               <th>Mangelgrund</th>
@@ -111,8 +109,7 @@ const QualityReports = () => {
           </thead>
           <tbody>
             {filteredReports.map((report) => (
-              <tr key={report.id} style={{ borderBottom: "1px solid #ddd" }}>
-                {/* Liefertermin */}
+              <tr key={report.id} className="table-row">
                 <td>
                   {editingReport === report.id ? (
                     <input
@@ -120,21 +117,20 @@ const QualityReports = () => {
                       name="liefertermin"
                       value={editedData.liefertermin || ""}
                       onChange={handleChange}
-                      style={{ padding: "4px" }}
+                      className="editable-input"
                     />
                   ) : (
                     report.liefertermin
                   )}
                 </td>
 
-                {/* Lieferant */}
                 <td>
                   {editingReport === report.id ? (
                     <select
                       name="lieferant"
                       value={editedData.lieferant || ""}
                       onChange={handleChange}
-                      style={{ padding: "4px" }}
+                      className="select-input"
                     >
                       {uniqueLieferanten.map((lieferant) => (
                         <option key={lieferant} value={lieferant}>
@@ -147,7 +143,6 @@ const QualityReports = () => {
                   )}
                 </td>
 
-                {/* Auftragsnummer */}
                 <td>
                   {editingReport === report.id ? (
                     <input
@@ -155,14 +150,13 @@ const QualityReports = () => {
                       name="auftragsnummer"
                       value={editedData.auftragsnummer || ""}
                       onChange={handleChange}
-                      style={{ width: "120px", padding: "4px" }}
+                      className="auftragsnummer-input"
                     />
                   ) : (
                     report.auftragsnummer
                   )}
                 </td>
 
-                {/* Artikelnummer */}
                 <td>
                   {editingReport === report.id ? (
                     <input
@@ -170,84 +164,59 @@ const QualityReports = () => {
                       name="artikelnr"
                       value={editedData.artikelnr || ""}
                       onChange={handleChange}
-                      style={{ width: "120px", padding: "4px" }}
+                      className="artikelnr-input"
                     />
                   ) : (
                     report.artikelnr
                   )}
                 </td>
 
-                {/* Produkt */}
-                <td>
-                  {editingReport === report.id ? (
-                    <input
-                      type="text"
-                      name="produkt"
-                      value={editedData.produkt || ""}
-                      onChange={handleChange}
-                      style={{ padding: "4px" }}
-                    />
-                  ) : (
-                    report.produkt
-                  )}
-                </td>
-
-                {/* Mangel */}
                 <td>
                   {editingReport === report.id ? (
                     <textarea
                       name="mangel"
                       value={editedData.mangel || ""}
                       onChange={handleChange}
-                      style={{ padding: "4px", minWidth: "150px" }}
+                      className="textarea-input"
                     />
                   ) : (
                     report.mangel
                   )}
                 </td>
 
-                {/* Mangelgrad */}
-                <td>
+                <td className="center-content">
                   {editingReport === report.id ? (
                     <select
                       name="mangelgrad"
                       value={editedData.mangelgrad || ""}
                       onChange={handleChange}
-                      style={{ padding: "4px" }}
+                      className="select-input"
                     >
                       <option value="1">1</option>
                       <option value="Major">2</option>
-                    
                     </select>
                   ) : (
                     report.mangelgrad
                   )}
                 </td>
 
-                {/* Mangelgrund */}
                 <td>
                   {editingReport === report.id ? (
                     <textarea
                       name="mangelgrund"
                       value={editedData.mangelgrund || ""}
                       onChange={handleChange}
-                      style={{ padding: "4px", minWidth: "150px" }}
+                      className="textarea-input"
                     />
                   ) : (
                     report.mangelgrund
                   )}
                 </td>
 
-                {/* Mitarbeiter */}
                 <td>
-                  {editingReport === report.id ? (
-                    decoded.username
-                  ) : (
-                    report.mitarbeiter
-                  )}
+                  {editingReport === report.id ? decoded.username : report.mitarbeiter}
                 </td>
 
-                {/* Lieferant informiert am */}
                 <td>
                   {editingReport === report.id ? (
                     <input
@@ -255,28 +224,26 @@ const QualityReports = () => {
                       name="lieferantInformiertAm"
                       value={editedData.lieferantInformiertAm || ""}
                       onChange={handleChange}
-                      style={{ padding: "4px" }}
+                      className="editable-input"
                     />
                   ) : (
                     report.lieferantInformiertAm
                   )}
                 </td>
 
-                {/* Lösung */}
                 <td>
                   {editingReport === report.id ? (
                     <textarea
                       name="loesung"
                       value={editedData.loesung || ""}
                       onChange={handleChange}
-                      style={{ padding: "4px", minWidth: "150px" }}
+                      className="textarea-input"
                     />
                   ) : (
                     report.loesung
                   )}
                 </td>
 
-                {/* Fotos */}
                 <td>
                   {report.fotos ? (
                     <QualityReportImage images={JSON.parse(report.fotos)} />
@@ -285,21 +252,24 @@ const QualityReports = () => {
                   )}
                 </td>
 
-                {/* Actions */}
                 <td>
                   {editingReport === report.id ? (
-                    <div style={{ display: "flex", gap: "8px" }}>
-                      <button onClick={handleSave} style={{ background: "#4CAF50", color: "white" }}>
+                    <div className="actions-container">
+                      <button className="save-button" onClick={handleSave}>
                         Save
                       </button>
-                      <button onClick={handleCancel} style={{ background: "#f44336", color: "white" }}>
+                      <button className="cancel-button" onClick={handleCancel}>
                         Cancel
                       </button>
                     </div>
                   ) : (
-                    <div style={{ display: "flex", gap: "8px" }}>
-                      <button onClick={() => handleEdit(report)}>Edit</button>
-                      <button onClick={() => handleDelete(report.id)}>Delete</button>
+                    <div className="actions-container">
+                      <button className="edit-delete-button" onClick={() => handleEdit(report)}>
+                        Edit
+                      </button>
+                      <button className="edit-delete-button" onClick={() => handleDelete(report.id)}>
+                        Delete
+                      </button>
                     </div>
                   )}
                 </td>

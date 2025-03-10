@@ -4,6 +4,7 @@ import "../styles/components/LoginForm.scss"
 import { useNavigate } from 'react-router-dom';
 import { login } from '../api/api';
 import Loading from "./Loading";
+import { toast } from 'react-toastify';
 
 
 const LoginForm = ({setIsAuthenticated}) => {
@@ -28,6 +29,7 @@ const LoginForm = ({setIsAuthenticated}) => {
       localStorage.setItem("token", data.token);
       setIsAuthenticated(true);
       setLoading(false)
+      toast.success("Successfully logged in!")
       navigate("/app/dashboard");
     } catch (errorMessage) {
       setError(errorMessage);

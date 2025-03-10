@@ -2,6 +2,8 @@ import { useEffect, useState } from "react"
 import "./styles/Inspection.scss";
 import { searchAuswertungen } from "../../api/auswertung";
 import OrderPreviewBlocks from "./components/OrderPreviewBlocks";
+import { toast } from "react-toastify";
+import Loading from "../../components/Loading";
 
 const groupResultsByOrderNumber = (results) => {
     const grouped = {};
@@ -38,19 +40,25 @@ const groupResultsByOrderNumber = (results) => {
 const Inspection = () => {
     const [orderNumber, setOrderNumber] = useState("");
     const [searchResults, setSearchResults] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const handleOrderLookUp = async (e) => {
         e.preventDefault();
         console.log(orderNumber)
         const beleg = orderNumber
+        setLoading(true)
+        setSearchResults([]);
 
         try {
             const result = await searchAuswertungen({beleg})
             const groupedResults = groupResultsByOrderNumber(result.rows);
 console.log({groupedResults});
             setSearchResults(groupedResults)
+            setLoading(false)
+            toast.info(`${groupedResults.length>1?`${groupedResults.length} orders`: `${groupedResults.length} order`}  found.`)
         }catch(error) {
             console.log("ERROr", error)
+            toast.error(error.message)
         }
 
     }
@@ -67,6 +75,8 @@ console.log({groupedResults});
                     <button type="submit">Submit</button>
                 </form>
             </div>
+
+            {loading && <Loading/>}
 
             {searchResults.length>0 && <OrderPreviewBlocks groupedResults={searchResults}/>}
 

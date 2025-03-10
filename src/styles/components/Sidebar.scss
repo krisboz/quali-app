@@ -18,6 +18,46 @@
 
 nav {
     height: 80vh;
+
+    li {
+
+        a {
+            border: 1px solid var(--primary-color);
+            padding: .5rem .6rem;
+            border-radius: 12px;
+            width: 180px;
+            display: flex;
+            align-items: center;
+            gap:.5rem;
+            color: var(--primary-color);
+            box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.483);
+            transition: .1s ease-in-out;
+
+
+            &:hover {
+                box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.483);
+                color: black;
+
+                svg {
+                    color: blue;
+                }
+
+            }
+        }
+    }
+}
+
+.active {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: normal;
+
+    &:hover {
+        color: white;
+         svg {
+            color: white;
+         }
+    }
 }
 
 .username-container {

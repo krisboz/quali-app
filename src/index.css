@@ -12,6 +12,14 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  --primary-color: #2c3e50;
+  --secondary-color: #3498db;
+  --success-color: #27ae60;
+  --danger-color: #e74c3c;
+  --hover-color: #f8f9fa;
+  --border-color: #ecf0f1;
+  --text-color: #2c3e50;
+  --shadow-color: rgba(0, 0, 0, 0.1);
 }
 
 /* Default dark mode */
@@ -43,7 +51,7 @@ button {
   font-weight: 500;
   color: white;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: var(--primary-color);
   cursor: pointer;
   transition: border-color 0.25s;
 }

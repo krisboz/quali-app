@@ -8,6 +8,15 @@ import { CiLogout } from "react-icons/ci";
 import { MdLogout } from "react-icons/md";
 import "../styles/components/Sidebar.scss";
 
+import { LuLayoutDashboard as DashboardIcon} from "react-icons/lu";
+import { FaMagnifyingGlass as InspectionIcon} from "react-icons/fa6";
+import { TbReportSearch as QualityReportsIcon} from "react-icons/tb";
+import { LiaTruckLoadingSolid as OrdersIcon} from "react-icons/lia";
+
+
+
+
+
 
 
 const Sidebar = ({ setIsAuthenticated }) => {
@@ -42,15 +51,17 @@ const Sidebar = ({ setIsAuthenticated }) => {
               to="/app/dashboard"
               style={({ isActive }) => ({ fontWeight: isActive ? 'bold' : 'normal' })}
             >
+              <DashboardIcon/>
               Dashboard
             </NavLink>
           </li>
           <li style={{ marginBottom: '10px' }}>
             <NavLink
-              to="/app/quality-input"
+              to="/app/quality-reports"
               style={({ isActive }) => ({ fontWeight: isActive ? 'bold' : 'normal' })}
             >
-              Quality Input
+              <QualityReportsIcon/>
+              Quality Reports
             </NavLink>
           </li>
           <li style={{ marginBottom: '10px' }}>
@@ -58,23 +69,18 @@ const Sidebar = ({ setIsAuthenticated }) => {
               to="/app/auswertungen"
               style={({ isActive }) => ({ fontWeight: isActive ? 'bold' : 'normal' })}
             >
-              Auswertungen
+              <OrdersIcon/>
+              Orders
             </NavLink>
           </li>
-          <li>
-          <NavLink
-              to="/app/reports"
-              style={({ isActive }) => ({ fontWeight: isActive ? 'bold' : 'normal' })}
-            >
-              Reports
-            </NavLink>
-          </li>
+        
 
           <li>
           <NavLink
               to="/app/inspection"
               style={({ isActive }) => ({ fontWeight: isActive ? 'bold' : 'normal' })}
             >
+              <InspectionIcon/>
               Inspection
             </NavLink>
           </li>

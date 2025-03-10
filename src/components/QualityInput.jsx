@@ -4,6 +4,7 @@ import "../styles/components/QualityInput.scss";
 import { IoMdRemoveCircleOutline as RemoveButton, IoMdAddCircleOutline as AddButton, IoIosCloseCircleOutline as CloseButton } from "react-icons/io";
 import { submitQualityReport } from "../api/api";
 import QualityReports from "./QualityReports";
+import { toast } from "react-toastify";
 
 const QualityInput = () => {
     const [formData, setFormData] = useState({
@@ -21,7 +22,7 @@ const QualityInput = () => {
         loesung: ""
     });
     const [isExpanded, setIsExpanded] = useState(false);
-    const inputRef = useRef(null); // Reference to quality-input container
+    const inputRef = useRef(null);
 
     const toggleExpanded = () => {
         setIsExpanded((prev) => !prev);
@@ -43,14 +44,6 @@ const QualityInput = () => {
             loesung: ""
         });
     };
-
-    useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (token) {
-            const decoded = jwtDecode(token);
-            setFormData((prevData) => ({ ...prevData, mitarbeiter: decoded.username }));
-        }
-    }, []);
 
     const handleChange = (e) => {
         const { name, value, type, files } = e.target;
@@ -82,56 +75,26 @@ const QualityInput = () => {
         });
 
         try {
-            const result = await submitQualityReport(formDataToSend);
-            console.log(result.message);
+            await submitQualityReport(formDataToSend);
             resetFormData();
             setIsExpanded(false);
+            toast.success("Report successfully submitted");
         } catch (error) {
             console.error("Error saving quality report:", error);
+            toast.error(`Error saving report: ${error.message}`)
         }
     };
-
-    // Handle clicks outside of quality-input and overlay
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (
-                inputRef.current &&
-                !inputRef.current.contains(event.target) &&
-                !event.target.classList.contains("quality-input-overlay")
-            ) {
-                setIsExpanded(false);
-            }
-        };
-
-        if (isExpanded) {
-            document.addEventListener("mousedown", handleClickOutside);
-        } else {
-            document.removeEventListener("mousedown", handleClickOutside);
-        }
-
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [isExpanded]);
 
     return (
         <>
             {isExpanded ? (
-                <>
-                    {/* Overlay to detect clicks outside */}
-                    <div className="quality-input-overlay" onClick={toggleExpanded}></div>
-
+                <div className="quality-input-overlay">
                     <div ref={inputRef} className="quality-input">
                         <div className="quality-input-title-container">
-                            <div></div>
-                            <div>
-                                <h2>Quality Input</h2>
-                            </div>
-                            <div className="close-input-button-container">
-                                <button className="close-input-button" onClick={toggleExpanded}>
-                                    <CloseButton />
-                                </button>
-                            </div>
+                            <h2>Quality Input</h2>
+                            <button className="close-input-button" onClick={toggleExpanded}>
+                                <CloseButton />
+                            </button>
                         </div>
                         <form onSubmit={handleSubmit} className="quality-input-form">
                             <label>
@@ -154,7 +117,7 @@ const QualityInput = () => {
 
                             <label>
                                 Auftragsnummer:
-                                <input type="text" name="auftragsnummer" value={formData.auftragsnummer} onChange={handleChange} pattern="[B|S]-\d{2}-\d{4}" required />
+                                <input type="text" name="auftragsnummer" value={formData.auftragsnummer} onChange={handleChange} pattern="(B|S)-\d{2}-\d{4}" required />
                             </label>
 
                             <label>
@@ -173,16 +136,45 @@ const QualityInput = () => {
                             </label>
 
                             <label>
+                                Mangelgrad:
+                                <select name="mangelgrad" value={formData.mangelgrad} onChange={handleChange} required>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                </select>
+                            </label>
+
+                            <label>
+                                Mangel Grund:
+                                <select name="mangelgrund" value={formData.mangelgrund} onChange={handleChange} required>
+                                    <option value="">Select</option>
+                                    <option value="Oberfläche verkratzt/Poren">Oberfläche verkratzt/Poren</option>
+                                    <option value="Stein Defekt">Stein Defekt</option>
+                                    <option value="Falsche Teile / Zusammensetzung">Falsche Teile / Zusammensetzung</option>
+                                    <option value="Falsche Länge">Falsche Länge</option>
+                                    <option value="Gold/Stein Toleranz">Gold/Stein Toleranz</option>
+                                    <option value="Andere">Andere</option>
+                                </select>
+                            </label>
+
+                            <label>
+                                Lieferant informiert am:
+                                <input type="date" name="lieferantInformiertAm" value={formData.lieferantInformiertAm} onChange={handleChange} />
+                            </label>
+
+                            <label>
+                                Fotos:
+                                <input type="file" name="fotos" onChange={handleChange} multiple />
+                            </label>
+
+                            <label>
                                 Lösung:
                                 <textarea name="loesung" value={formData.loesung} onChange={handleChange}></textarea>
                             </label>
 
-                            <p>Mitarbeiter: {formData.mitarbeiter}</p>
-
                             <button type="submit">Submit</button>
                         </form>
                     </div>
-                </>
+                </div>
             ) : (
                 <div className="add-report-button-container">
                     <button onClick={toggleExpanded} className="add-report-button">

@@ -15,15 +15,31 @@
     padding: 1rem;
     margin: .5rem;
     border-radius: 8px;
-    background-color: rgb(246, 246, 246);
+    background-color: var(--primary-color);
+    color: white;
     box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.236);
     transition: .1s linear;
     cursor: pointer;
+    animation: popIn .2s ease-in-out;
 
     &:hover {
         border: 1px solid rgb(160, 160, 160);
         box-shadow: 1px 2px 2px 2px rgba(0, 0, 0, 0.236);
 
 
+    }
+}
+
+@keyframes popIn {
+    from {
+        transform: scale(0);
+    }
+
+    90% {
+        transform: scale(1.1);
+    }
+
+    to {
+        transform:scale(1)
     }
 }

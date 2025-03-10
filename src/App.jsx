@@ -8,8 +8,7 @@ import QualityInput from './components/QualityInput';
 import PrivateRoute from './components/PrivateRoute';
 import UserProfile from './components/UserProfile';
 import Auswertungen from './components/Auswertungen';
-import ReportsDisplay from "./components/ReportsDisplay"
-
+import { toast } from 'react-toastify';
 import Inspection from './pages/inspection/Inspection';
 
 
@@ -24,10 +23,12 @@ function App() {
         const decoded = jwtDecode(token);
         if (decoded.username) {
           setIsAuthenticated(true);
+          toast.success("Welcome back!");
         }
       } catch (error) {
         console.error('Invalid token:', error);
         localStorage.removeItem('token');
+        toast.error("Invalid token")
       }
     }
   }, []);
@@ -55,10 +56,10 @@ function App() {
           }
         >
           <Route path="dashboard" element={<Dashboard />} />
-          <Route path="quality-input" element={<QualityInput />} />
+          <Route path="quality-reports" element={<QualityInput />} />
           <Route path="auswertungen" element={<Auswertungen />} />
-          <Route path="reports" element={<ReportsDisplay />} />
           <Route path="inspection" element={<Inspection />} />
+
 
 
           <Route path="profile" element={<UserProfile />} /> {/* New profile route */}

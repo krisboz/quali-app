@@ -10,10 +10,10 @@
     }
     
     &__worm1 {
-      color: lightblue;
+      color: var(--primary-color);
     }
     &__worm2 {
-      animation-name: worm2-move;   color: lightblue;
+      animation-name: worm2-move;   color: var(--primary-color);
   
     }
   }

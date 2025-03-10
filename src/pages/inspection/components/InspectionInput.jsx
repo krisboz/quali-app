@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { jwtDecode } from "jwt-decode";
 import "../styles/InspectionInput.scss";
 import { IoMdRemoveCircleOutline as RemoveButton, IoMdAddCircleOutline as AddButton, IoIosCloseCircleOutline as CloseButton } from "react-icons/io";
@@ -22,6 +22,8 @@ const InspectionInput = ({ chosenOrder, clickedItem, setClickedItem, setInspecti
     loesung: ""
   });
   const [loading, setLoading] = useState(false);
+  const modalRef = useRef(null);
+
 
   const resetFormData = () => {
     setFormData({
@@ -103,6 +105,19 @@ const InspectionInput = ({ chosenOrder, clickedItem, setClickedItem, setInspecti
     }
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        setClickedItem(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [setClickedItem]);
+
   const handleClose = () => {
     setClickedItem(null); // Reset the clicked item when the close button is pressed
   };
@@ -114,7 +129,7 @@ const InspectionInput = ({ chosenOrder, clickedItem, setClickedItem, setInspecti
       
       {/* Form in background */}
       <div className="quality-input-overlay">
-        <div className="quality-input">
+        <div className="quality-input" ref={modalRef}>
           <div className="quality-input-title-container">
             <h2>Quality Input</h2>
             <button className="close-input-button" onClick={handleClose}>
@@ -146,7 +161,7 @@ const InspectionInput = ({ chosenOrder, clickedItem, setClickedItem, setInspecti
                 name="auftragsnummer"
                 value={formData.auftragsnummer}
                 onChange={handleChange}
-                pattern="[B|S]-\d{2}-\d{4}"
+                pattern="(B|S)-\d{2}-\d{4}"
                 required
               />
             </label>

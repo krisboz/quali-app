@@ -1,6 +1,7 @@
 import {useState} from 'react';
 import * as XLSX from 'xlsx';
 import { submitAuswertungData } from '../api/api';
+import { toast } from 'react-toastify';
 
 const ExcelInput = ({setAuswertungen}) => {
   const [data, setData] = useState(null);
@@ -28,11 +29,12 @@ const ExcelInput = ({setAuswertungen}) => {
             await submitAuswertungData(data);
             // Optionally clear the data state or show a success message
             setData(null);
-            alert('Auswertung data submitted successfully!');
+            toast.success("Auswertung table uploaded successfully!")
         } catch (error) {
             console.error('Error submitting data:', error);
             // Handle the error, e.g., show an error message to the user
             alert('Error submitting data. Please try again.');
+            toast.error(`Error submitting data: ${error.message}`)
         }
     }
 };
@@ -43,7 +45,6 @@ const ExcelInput = ({setAuswertungen}) => {
     <button onClick={handleSubmit} disabled={!data}>
         Submit
     </button>
-    {/*... (optional data preview)... */}
 </div>
   );
 }

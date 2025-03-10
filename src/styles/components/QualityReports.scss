@@ -1,0 +1,182 @@
+/***********************
+Quality Reports Styles 
+************************/
+
+
+  
+  .quality-reports-container {
+    padding: 2rem;
+    margin: 0 auto;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+  
+  .quality-reports-container h2 {
+    color: var(--primary-color);
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    padding-bottom: 0.5rem;
+  }
+  
+  .scroll-container {
+    overflow-x: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 15px var(--shadow-color);
+  }
+  
+  .reports-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    min-width: 1200px;
+  }
+  
+  .reports-table th,
+  .reports-table td {
+    padding: 1rem;
+    text-align: left;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+  }
+  
+  .table-header {
+    background-color: var(--primary-color);
+    color: white;
+  }
+  
+  .table-header th {
+    font-weight: 600;
+    padding: 1.2rem 1rem;
+  }
+  
+  .table-row:hover {
+    background-color: var(--hover-color);
+  }
+  
+  .table-row td {
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  /* Input and Select Styles */
+  .editable-input,
+  .select-input,
+  .textarea-input,
+  .auftragsnummer-input,
+  .artikelnr-input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-family: inherit;
+    transition: border-color 0.2s ease;
+  }
+  
+  .editable-input:focus,
+  .select-input:focus,
+  .textarea-input:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+  }
+  
+  .textarea-input {
+    min-height: 60px;
+    resize: vertical;
+  }
+  
+  /* Action Buttons */
+  .actions-container {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .save-button,
+  .cancel-button,
+  .edit-delete-button {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: transform 0.1s ease, opacity 0.2s ease;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+  }
+  
+  .save-button {
+    background: var(--success-color);
+    color: white;
+  }
+  
+  .cancel-button {
+    background: var(--danger-color);
+    color: white;
+  }
+  
+  .edit-delete-button {
+    background: var(--primary-color);
+    color: white;
+  }
+  
+  .save-button:hover,
+  .cancel-button:hover,
+  .edit-delete-button:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+  
+  /* Image Preview */
+  .quality-report-image-container {
+    max-width: 120px;
+  }
+  
+  .quality-report-image-container img {
+    border-radius: 4px;
+    transition: transform 0.2s ease;
+    cursor: zoom-in;
+  }
+  
+  .quality-report-image-container img:hover {
+    transform: scale(1.05);
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 1600px) {
+    .quality-reports-container {
+      padding: 1.5rem;
+    }
+    
+    .reports-table th,
+    .reports-table td {
+      padding: 0.8rem;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .quality-reports-container h2 {
+      font-size: 1.5rem;
+    }
+    
+    .save-button,
+    .cancel-button,
+    .edit-delete-button {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.7rem;
+    }
+  }
+  
+  /* Loading and Error States */
+  .loading-container {
+    padding: 2rem;
+    text-align: center;
+    color: var(--secondary-color);
+  }
+  
+  .error-message {
+    color: var(--danger-color);
+    padding: 2rem;
+    text-align: center;
+    font-weight: 500;
+    border: 1px solid var(--danger-color);
+    border-radius: 4px;
+    margin: 2rem;
+  }
