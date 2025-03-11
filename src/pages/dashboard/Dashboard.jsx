@@ -1,7 +1,7 @@
-import ReportPreview from "./components/ReportPreview";
 import { jwtDecode } from "jwt-decode";
 import { useEffect, useState } from "react";
 import "./styles/Dashboard.scss"
+import ReportPreview from "./ReportPreview/ReportPreview";
 
 const Dashboard = () => {
     const [user, setUser] = useState(null);
