@@ -50,8 +50,10 @@ const initializeDB = () => {
       mitarbeiter TEXT,
       lieferantInformiertAm TEXT,
       loesung TEXT,
-      fotos TEXT
+      fotos TEXT,
+      dateOfInspection TEXT
     )`);
+
 
     // Create Auswertungen table
     db.run(`CREATE TABLE IF NOT EXISTS auswertungen (

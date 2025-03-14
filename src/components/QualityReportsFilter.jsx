@@ -15,7 +15,6 @@ const QualityReportsFilter = ({ filters, setFilters }) => {
             <th>Lieferant</th>
             <th>Auftragsnummer</th>
             <th>Artikelnummer</th>
-            <th>Produkt</th>
             <th>Mangel</th>
             <th>Mangelgrad</th>
             <th>Mangelgrund</th>
@@ -67,14 +66,7 @@ const QualityReportsFilter = ({ filters, setFilters }) => {
                 onChange={handleChange}
               />
             </td>
-            <td>
-              <input
-                type="text"
-                name="produkt"
-                value={filters.produkt || ""}
-                onChange={handleChange}
-              />
-            </td>
+          
             <td>
               <input
                 type="text"

@@ -38,10 +38,12 @@ router.get('/search', authenticateToken, (req, res) => {
     }
   );
 });
-
 router.post('/', authenticateToken, upload.array("fotos"), async (req, res) => {
   const { liefertermin, lieferant, auftragsnummer, artikelnr, produkt, mangel, mangelgrad, mangelgrund, mitarbeiter, lieferantInformiertAm, loesung } = req.body;
   const imageUrls = [];
+
+  // Get today's date from the user's system in YYYY-MM-DD format
+  const dateOfInspection = new Date().toISOString().split('T')[0];
 
   try {
     for (const file of req.files) {
@@ -63,13 +65,21 @@ router.post('/', authenticateToken, upload.array("fotos"), async (req, res) => {
     return res.status(500).send({ message: 'Error uploading images.' });
   }
 
-  db.run(`INSERT INTO quality_reports (liefertermin, lieferant, auftragsnummer, artikelnr, produkt, mangel, mangelgrad, mangelgrund, mitarbeiter, lieferantInformiertAm, loesung, fotos) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`,
-    [liefertermin, lieferant, auftragsnummer, artikelnr, produkt, mangel, mangelgrad, mangelgrund, mitarbeiter, lieferantInformiertAm, loesung, JSON.stringify(imageUrls)],
-    function(err) {
+  // Insert data, including the manually set dateOfInspection
+  db.run(
+    `INSERT INTO quality_reports (liefertermin, lieferant, auftragsnummer, artikelnr, produkt, mangel, mangelgrad, mangelgrund, mitarbeiter, lieferantInformiertAm, loesung, fotos, dateOfInspection) 
+     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+    [
+      liefertermin, lieferant, auftragsnummer, artikelnr, produkt, mangel, mangelgrad, mangelgrund, mitarbeiter, lieferantInformiertAm, loesung,
+      JSON.stringify(imageUrls), dateOfInspection
+    ],
+    function (err) {
       if (err) return res.status(500).json({ message: "Database error" });
       res.json({ message: "Quality report saved successfully", reportId: this.lastID });
-    });
+    }
+  );
 });
+
 
 router.delete('/:id', authenticateToken, (req, res) => {
   const { id } = req.params;

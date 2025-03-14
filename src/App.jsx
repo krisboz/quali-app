@@ -21,17 +21,24 @@ function App() {
     if (token) {
       try {
         const decoded = jwtDecode(token);
-        if (decoded.username) {
+        const isExpired = decoded.exp * 1000 < Date.now(); // Convert expiry time to milliseconds
+        if (isExpired) {
+          localStorage.removeItem('token');
+          setIsAuthenticated(false);
+          toast.error("Session expired. Please log in again.");
+        } else {
           setIsAuthenticated(true);
           toast.success("Welcome back!");
         }
       } catch (error) {
         console.error('Invalid token:', error);
         localStorage.removeItem('token');
-        toast.error("Invalid token")
+        setIsAuthenticated(false);
+        toast.error("Invalid token");
       }
     }
   }, []);
+  
 
   return (
     <BrowserRouter>

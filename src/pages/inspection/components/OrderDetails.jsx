@@ -3,6 +3,7 @@ import "../styles/OrderDetails.scss";
 import { IoClose } from "react-icons/io5";
 import InspectionInput from "./InspectionInput";
 import { searchQualityReportsByAuftragsnummer } from "../../../api/api";
+import { toast } from "react-toastify";
 
 const OrderDetails = ({ chosenOrder, setChosenOrder }) => {
   const [clickedItem, setClickedItem] = useState(null);
@@ -13,10 +14,10 @@ const OrderDetails = ({ chosenOrder, setChosenOrder }) => {
       const loadInspections = async (orderNumber) => {
         try {
           const inspections = await searchQualityReportsByAuftragsnummer(chosenOrder.orderNumber);
-          console.log({inspections})
           setInspections(inspections);
         } catch (err) {
           console.log("Error", err);
+          toast.error(err.message)
         }
       };
       loadInspections(chosenOrder.orderNumber);

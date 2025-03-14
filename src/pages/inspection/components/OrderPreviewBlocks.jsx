@@ -6,7 +6,6 @@ const OrderPreviewBlocks = ({groupedResults}) => {
     const [chosenOrder, setChosenOrder] = useState(null)
 
     const handleBlockClick = (e, index) => {
-        console.log(groupedResults[index])
         setChosenOrder(groupedResults[index])
     }
 

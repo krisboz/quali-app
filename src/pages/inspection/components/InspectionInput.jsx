@@ -7,14 +7,15 @@ import Loading from "../../../components/Loading"; // Import loading component
 import { toast } from "react-toastify";
 
 const InspectionInput = ({ chosenOrder, clickedItem, setClickedItem, setInspectionsOptimistically }) => {
+  console.log({chosenOrder, clickedItem})
   const [formData, setFormData] = useState({
-    liefertermin: "",
+    liefertermin: clickedItem.Termin.split(".").reverse().join("-") || "",
     lieferant: chosenOrder.firma,
     auftragsnummer: chosenOrder.orderNumber,
     artikelnr: clickedItem["Artikel-Nr. fertig"],
     produkt: "",
     mangel: "",
-    mangelgrad: "1",
+    mangelgrad: "",
     mangelgrund: "",
     mitarbeiter: "",
     lieferantInformiertAm: "",
@@ -131,13 +132,33 @@ const InspectionInput = ({ chosenOrder, clickedItem, setClickedItem, setInspecti
       <div className="quality-input-overlay">
         <div className="quality-input" ref={modalRef}>
           <div className="quality-input-title-container">
-            <h2>Quality Input</h2>
+            <h2>Quality Report Input</h2>
             <button className="close-input-button" onClick={handleClose}>
               <CloseButton />
             </button>
           </div>
 
           <form onSubmit={handleSubmit} className="quality-input-form">
+       
+
+<div className="inspection-input-unchangeable-data">
+<label>
+              Lieferant:
+              <p>{formData.lieferant}</p>
+            </label>
+
+            <label>
+              Auftragsnummer:
+              <p>{formData.auftragsnummer}</p>
+            </label>
+
+            <label>
+              Artikelnr:
+              <p>{formData.artikelnr}</p>
+            </label>
+
+</div>
+      
             <label>
               Datum Liefertermin:
               <input
@@ -150,51 +171,13 @@ const InspectionInput = ({ chosenOrder, clickedItem, setClickedItem, setInspecti
             </label>
 
             <label>
-              Lieferant:
-              <p>{formData.lieferant}</p>
-            </label>
-
-            <label>
-              Auftragsnummer:
-              <input
-                type="text"
-                name="auftragsnummer"
-                value={formData.auftragsnummer}
-                onChange={handleChange}
-                pattern="(B|S)-\d{2}-\d{4}"
-                required
-              />
-            </label>
-
-            <label>
-              Artikelnr:
-              <input
-                type="text"
-                name="artikelnr"
-                value={formData.artikelnr}
-                onChange={handleChange}
-                required
-              />
-            </label>
-
-            <label>
-              Produkt:
-              <textarea
-                name="produkt"
-                value={formData.produkt}
-                onChange={handleChange}
-                placeholder="Optional"
-              ></textarea>
-            </label>
-
-            <label>
               Mangel:
               <input
                 type="text"
                 name="mangel"
                 value={formData.mangel}
                 onChange={handleChange}
-                required
+                autoComplete="off"
               />
             </label>
 
@@ -206,6 +189,8 @@ const InspectionInput = ({ chosenOrder, clickedItem, setClickedItem, setInspecti
                 onChange={handleChange}
                 required
               >
+                    {formData.mangelgrad === "" && <option value="">Choose Mangelgrad</option>}
+
                 <option value="1">1</option>
                 <option value="2">2</option>
               </select>

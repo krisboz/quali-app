@@ -26,6 +26,7 @@
     gap: 20px;
   }
   
+
   /* Title and Close Button */
   .quality-input-title-container {
     display: flex;
@@ -136,6 +137,37 @@
   
   .quality-input-form button[type="submit"]:hover {
     background-color: #2980b9;
+  }
+
+  .inspection-input-unchangeable-data {
+    background-color:rgb(228, 228, 228);
+    border: 1px solid rgba(94, 93, 93, 0.295);
+    display: flex;
+    justify-content: space-evenly;
+    border-radius: 16px;
+    padding: 1rem 0;
+
+    label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: white;
+      border: 1px solid rgba(0, 0, 0, 0.277);
+      gap:1rem;
+      margin-top: .7rem;
+      padding: .5rem 1rem;
+      border-radius: 12px;
+      transition: .2s ease-in-out;
+  
+
+      p {
+        font-size: 1.2rem;
+      }
+
+      &:hover {
+        border: 1px solid rgba(0, 0, 0, 0.634);
+      }
+    }
   }
   
   /* Responsive Design */
