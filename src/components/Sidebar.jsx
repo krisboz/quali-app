@@ -55,6 +55,17 @@ const Sidebar = ({ setIsAuthenticated }) => {
               Dashboard
             </NavLink>
           </li>
+          
+          <li style={{ marginBottom: '10px' }}>
+          <NavLink
+              to="/app/inspection"
+              style={({ isActive }) => ({ fontWeight: isActive ? 'bold' : 'normal' })}
+            >
+              <InspectionIcon/>
+              Inspection
+            </NavLink>
+          </li>
+          
           <li style={{ marginBottom: '10px' }}>
             <NavLink
               to="/app/quality-reports"
@@ -75,16 +86,6 @@ const Sidebar = ({ setIsAuthenticated }) => {
           </li>
         
 
-          <li>
-          <NavLink
-              to="/app/inspection"
-              style={({ isActive }) => ({ fontWeight: isActive ? 'bold' : 'normal' })}
-            >
-              <InspectionIcon/>
-              Inspection
-            </NavLink>
-          </li>
-          
           {/* Add more sidebar options here as needed */}
         </ul>
       </nav>

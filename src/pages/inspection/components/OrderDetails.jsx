@@ -57,6 +57,7 @@ const OrderDetails = ({ chosenOrder, setChosenOrder }) => {
             cursor: isInspected ? "not-allowed" : "pointer",
             backgroundColor: isInspected ? "#f5f5f5" : "transparent"
           }}
+          title={isInspected?"Already inspected":null}
         >
           <td>{item["Artikel-Nr. fertig"] || ""}</td>
           <td>{item["Einzelpreis"] || ""}</td>
