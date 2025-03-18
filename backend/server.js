@@ -12,7 +12,6 @@ const sqlite3 = require('sqlite3').verbose(); // Import SQLite3
 require('dotenv').config();
 
 //Router import
-const inspectionRouter = require("./routes/inspection");  
 const auswertungRouter = require("./routes/auswertung"); 
 //The next two were inside of server.js and moved to outside files
 const qualityReportsRouter = require('./routes/qualityReports');
@@ -26,14 +25,13 @@ const app = express();
 
 
 app.use(cors());
-app.use(express.json({ limit: '50mb' })); // Increase the limit
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(express.json({ limit: '10mb' })); // Increase the limit
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(express.json()); // Parses JSON body
 
 
 app.use('/quality-reports', qualityReportsRouter);
 app.use('/auswertungen', auswertungenRouter);
-app.use("/api/inspection", inspectionRouter);
 app.use("/api/auswertungen", auswertungRouter);
 
 // Simple GET route to check if the server is working
