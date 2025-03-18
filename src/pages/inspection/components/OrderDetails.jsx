@@ -64,7 +64,7 @@ const OrderDetails = ({ chosenOrder, setChosenOrder }) => {
           <td>{item["Farbe"] || ""}</td>
           <td>{item["G-Preis"] || ""}</td>
           <td>{item["Größe"] || ""}</td>
-          <td>{item["Menge offen"] || ""}</td>
+          <td>{item["Menge offen"] || 0}</td>
           <td>{item["Termin"] || ""}</td>
           <td>{item["Werkauftrag"] || ""}</td>
           <td>{item["urspr. Menge"] || ""}</td>

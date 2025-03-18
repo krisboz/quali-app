@@ -125,7 +125,7 @@ const QualityReportsFilter = ({ filters, setFilters }) => {
                 onChange={handleChange}
               />
             </td>
-            <td></td> {/* Empty cell for Fotos */}
+            <td></td> 
             <td>
               <button onClick={(e) => setFilters({})}>Clear</button> 
             </td>

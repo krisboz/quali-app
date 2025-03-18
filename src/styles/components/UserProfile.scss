@@ -1,0 +1,153 @@
+.user-profile-container {
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+  background-color: #f8f9fa; // Light background for the overall container
+  min-height: 100vh; // Ensure it takes up at least the full viewport height
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.user-profile-inner-container {
+  display: grid;
+  grid-template-columns: 1fr; // Stack elements vertically on smaller screens
+  gap: 20px;
+  max-width: 800px; // Limit width for better readability on larger screens
+  width: 100%;
+  padding: 20px;
+  background-color: white; // White background for the inner container
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+
+  @media (min-width: 768px) { // Adjust layout for larger screens
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "username password"
+      "report report";
+  }
+}
+
+.profile-username-container {
+  font-size: 2.5rem; // Slightly reduced font size
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  justify-content: flex-start;
+  margin: 1rem;
+  grid-area: username;
+  border-bottom: 1px solid #eee; // Add a subtle divider
+  padding-bottom: 1rem;
+}
+
+.profile-report-container {
+  background-color: #f4f6f9;
+  padding: 25px; // Increased padding
+  border-radius: 12px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.08);
+  margin: 0; // Remove default margins
+  font-family: 'Arial', sans-serif;
+  grid-area: report;
+  display: flex; // Use flexbox for layout
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.profile-report-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.profile-report-header h3 {
+  font-size: 28px; // Increased font size
+  color: #333;
+  font-weight: 600;
+  margin: 0;
+}
+
+.report-details {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.report-text {
+  font-size: 18px;
+  color: #555;
+}
+
+.report-count {
+  font-size: 40px; // Further increased font size
+  font-weight: bold;
+  color: #e74c3c;
+  margin: 15px 0;
+}
+
+.report-footer {
+  text-align: center;
+}
+
+.additional-info {
+  font-size: 16px;
+  color: #16a085;
+  font-style: italic;
+  margin-top: 15px;
+}
+
+.change-password-container {
+  max-width: 100%; // Make it responsive
+  margin: 1rem;
+  padding: 25px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  animation: slideUpFadeIn .2s ease-in-out;
+  grid-area: password;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .password-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+    gap:.5rem;
+
+    .password-submit-container {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 1rem 0 0 0 ;
+    }
+
+  }
+
+  button {
+    padding: 10px 15px;
+    background-color: var(--primary-color, #007bff);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: var(--primary-color, #007bff), 50%;
+      border: 1px solid rgba(0, 0, 0, 0.171);
+      color: black;
+    }
+  }
+}
+
+@keyframes slideUpFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

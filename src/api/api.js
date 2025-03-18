@@ -70,6 +70,20 @@ export const searchQualityReportsByAuftragsnummer = async (auftragsnummer) => {
   }
 };
 
+export const searchQualityReportsByUsername = async (username) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await axios.get(`${API_BASE_URL}/quality-reports/search-by-username`, {
+      headers: { Authorization: `Bearer ${token}` },
+      params: { mitarbeiter: username },
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data?.message || 'Failed to search quality reports by username';
+  }
+};
+
+
 // Function to delete a quality report
 export const deleteQualityReport = async (id) => {
   try {

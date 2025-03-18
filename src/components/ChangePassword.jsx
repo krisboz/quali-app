@@ -1,29 +1,27 @@
 import { useState } from "react";
 import { changePassword } from "../api/api";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const ChangePassword = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage("");
-    setError("");
+
 
     // Validate passwords match
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      toast.error("Passwords don't match")
       return;
     }
 
     // Call API function
     try {
       const response = await changePassword(password);
-      setMessage(response.message);
+      toast.success(response.message)
       setPassword("");
       setConfirmPassword("");
 
@@ -32,16 +30,15 @@ const ChangePassword = () => {
         navigate("/app/dashboard");
       }, 2000);
     } catch (err) {
-      setError(err);
+      toast.error(err.message)
     }
   };
 
   return (
     <div className="change-password-container">
       <h2>Change Password</h2>
-      {message && <p style={{ color: "green" }}>{message}</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
+
+      <form className="password-form" onSubmit={handleSubmit}>
         <div>
           <label>New Password:</label>
           <input
@@ -60,7 +57,10 @@ const ChangePassword = () => {
             required
           />
         </div>
+        <div className="password-submit-container">
         <button type="submit">Update Password</button>
+
+        </div>
       </form>
     </div>
   );

@@ -1,4 +1,3 @@
-/**Old one that was inside of the server.js */
 const express = require('express');
 const router = express.Router();
 const authenticateToken = require('../middleware/auth');
@@ -11,38 +10,45 @@ router.post('/', authenticateToken, (req, res) => {
       return res.status(400).json({ message: "Invalid or empty data received" });
     }
 
-    const stmt = db.prepare(
-      `INSERT OR IGNORE INTO auswertungen 
-      ("Beleg", "Firma", " Werkauftrag", "Termin", "Artikel-Nr.", " Artikel-Nr. fertig", "Beschreibung", " Beschreibung 2", 
-      "urspr. Menge", "Menge offen", "Einzelpreis", "G-Preis", "Farbe", "Größe") 
-      VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`
-    );
+    db.serialize(() => {
+      db.run("BEGIN TRANSACTION");
 
-    data.forEach(row => {
+      const stmt = db.prepare(`
+        INSERT OR IGNORE INTO auswertungen 
+        ("Beleg", "Firma", " Werkauftrag", "Termin", "Artikel-Nr.", " Artikel-Nr. fertig", 
+         "Beschreibung", " Beschreibung 2", "urspr. Menge", "Menge offen", 
+         "Einzelpreis", "G-Preis", "Farbe", "Größe") 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `);
+
       try {
-        stmt.run(
-          row["Beleg"],
-          row["Firma"],
-          row[" Werkauftrag"],
-          row["Termin"],
-          row["Artikel-Nr."],
-          row[" Artikel-Nr. fertig"],
-          row["Beschreibung"],
-          row[" Beschreibung 2"],
-          row["urspr. Menge"],
-          row["Menge offen"],
-          row["Einzelpreis"],
-          row["G-Preis"],
-          row["Farbe"],
-          row["Größe"]
-        );
+        for (const row of data) {
+          stmt.run(
+            row["Beleg"],
+            row["Firma"],
+            row[" Werkauftrag"],
+            row["Termin"],
+            row["Artikel-Nr."],
+            row[" Artikel-Nr. fertig"],
+            row["Beschreibung"],
+            row[" Beschreibung 2"],
+            row["urspr. Menge"],
+            row["Menge offen"],
+            row["Einzelpreis"],
+            row["G-Preis"],
+            row["Farbe"],
+            row["Größe"]
+          );
+        }
+        stmt.finalize();
+        db.run("COMMIT");
+        res.json({ message: 'Auswertungen data uploaded successfully.' });
       } catch (error) {
-        console.error("Error inserting row:", row, error);
+        db.run("ROLLBACK");
+        console.error("Error inserting data:", error);
+        res.status(500).json({ message: "Database insertion error" });
       }
     });
-
-    stmt.finalize();
-    res.json({ message: 'Auswertungen data uploaded successfully.' });
   } catch (error) {
     console.error("Server error:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -51,47 +57,51 @@ router.post('/', authenticateToken, (req, res) => {
 
 router.get('/', authenticateToken, (req, res) => {
   let { beleg, firma, werkauftrag, artikelnr, termin, artikelnrfertig, page = 1, limit = 100 } = req.query;
-  page = parseInt(page);
-  limit = parseInt(limit);
+  page = parseInt(page, 10);
+  limit = parseInt(limit, 10);
   const offset = (page - 1) * limit;
 
-  let whereClause = 'WHERE 1=1 ';
+  let whereClauses = [];
   let params = [];
 
   if (beleg) {
-    whereClause += 'AND "Beleg" LIKE ? ';
+    whereClauses.push('"Beleg" LIKE ?');
     params.push(`%${beleg}%`);
   }
   if (firma) {
-    whereClause += 'AND "Firma" LIKE ? ';
+    whereClauses.push('"Firma" LIKE ?');
     params.push(`%${firma}%`);
   }
   if (werkauftrag) {
-    whereClause += 'AND " Werkauftrag" LIKE ? ';
+    whereClauses.push('" Werkauftrag" LIKE ?');
     params.push(`%${werkauftrag}%`);
   }
   if (artikelnr) {
-    whereClause += 'AND "Artikel-Nr." LIKE ? ';
+    whereClauses.push('"Artikel-Nr." LIKE ?');
     params.push(`%${artikelnr}%`);
   }
   if (artikelnrfertig) {
-    whereClause += 'AND " Artikel-Nr. fertig" LIKE ? ';
+    whereClauses.push('" Artikel-Nr. fertig" LIKE ?');
     params.push(`%${artikelnrfertig}%`);
   }
   if (termin) {
     const [year, month, day] = termin.split('-');
     const formattedTermin = `${day}.${month}.${year}`;
-    whereClause += 'AND "Termin" = ? ';
+    whereClauses.push('"Termin" = ?');
     params.push(formattedTermin);
   }
+
+  const whereClause = whereClauses.length ? `WHERE ${whereClauses.join(' AND ')}` : '';
 
   const sql = `SELECT * FROM auswertungen ${whereClause} LIMIT ? OFFSET ?`;
   const countSql = `SELECT COUNT(*) as total FROM auswertungen ${whereClause}`;
 
   db.all(sql, [...params, limit, offset], (err, rows) => {
     if (err) return res.status(500).json({ message: "Database error" });
+
     db.get(countSql, params, (countErr, countRow) => {
       if (countErr) return res.status(500).json({ message: "Database error" });
+
       res.json({
         rows,
         total: countRow.total,

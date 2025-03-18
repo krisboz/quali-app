@@ -18,13 +18,19 @@ const s3Client = new S3Client({
   },
 });
 
+/**
+ * Get all quality reports
+ */
 router.get('/', authenticateToken, (req, res) => {
   db.all('SELECT * FROM quality_reports ORDER BY liefertermin DESC', [], (err, rows) => {
-    if (err) return res.status(500).json({ message: "Database error" });
+    if (err) return res.status(500).json({ message: "Database error", error: err });
     res.json(rows);
   });
 });
 
+/**
+ * Search quality reports by auftragsnummer
+ */
 router.get('/search', authenticateToken, (req, res) => {
   const { auftragsnummer } = req.query;
   if (!auftragsnummer) return res.status(400).json({ message: 'auftragsnummer is required' });
@@ -33,16 +39,36 @@ router.get('/search', authenticateToken, (req, res) => {
     'SELECT * FROM quality_reports WHERE auftragsnummer LIKE ?',
     [`%${auftragsnummer}%`],
     (err, rows) => {
-      if (err) return res.status(500).json({ message: 'Database error' });
+      if (err) return res.status(500).json({ message: 'Database error', error: err });
       res.json(rows);
     }
   );
 });
+
+// Search by mitarbeiter (username)
+router.get('/search-by-username', authenticateToken, (req, res) => {
+  const { mitarbeiter } = req.query;
+
+  if (!mitarbeiter) {
+    return res.status(400).json({ message: "Username (mitarbeiter) is required." });
+  }
+
+  const sql = `SELECT COUNT(*) AS count FROM inspection WHERE mitarbeiter LIKE ?`;
+  const values = [`%${mitarbeiter}%`];
+
+  db.get(sql, values, (err, row) => {
+    if (err) return res.status(500).json({ message: "Database error", error: err });
+    res.json({ count: row.count });
+  });
+});
+
+
+/**
+ * Upload and insert a new quality report
+ */
 router.post('/', authenticateToken, upload.array("fotos"), async (req, res) => {
   const { liefertermin, lieferant, auftragsnummer, artikelnr, produkt, mangel, mangelgrad, mangelgrund, mitarbeiter, lieferantInformiertAm, loesung } = req.body;
   const imageUrls = [];
-
-  // Get today's date from the user's system in YYYY-MM-DD format
   const dateOfInspection = new Date().toISOString().split('T')[0];
 
   try {
@@ -57,63 +83,81 @@ router.post('/', authenticateToken, upload.array("fotos"), async (req, res) => {
       };
 
       await s3Client.send(new PutObjectCommand(uploadParams));
-      const imageUrl = `${process.env.R2_PUBLIC_BUCKET_URL}/${filename}`;
-      imageUrls.push(imageUrl);
+      imageUrls.push(`${process.env.R2_PUBLIC_BUCKET_URL}/${filename}`);
     }
   } catch (error) {
     console.error('Error uploading to R2:', error);
     return res.status(500).send({ message: 'Error uploading images.' });
   }
 
-  // Insert data, including the manually set dateOfInspection
-  db.run(
-    `INSERT INTO quality_reports (liefertermin, lieferant, auftragsnummer, artikelnr, produkt, mangel, mangelgrad, mangelgrund, mitarbeiter, lieferantInformiertAm, loesung, fotos, dateOfInspection) 
-     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`,
-    [
-      liefertermin, lieferant, auftragsnummer, artikelnr, produkt, mangel, mangelgrad, mangelgrund, mitarbeiter, lieferantInformiertAm, loesung,
-      JSON.stringify(imageUrls), dateOfInspection
-    ],
-    function (err) {
-      if (err) return res.status(500).json({ message: "Database error" });
-      res.json({ message: "Quality report saved successfully", reportId: this.lastID });
-    }
-  );
+  db.serialize(() => {
+    db.run("BEGIN TRANSACTION");
+
+    const sql = `
+      INSERT INTO quality_reports 
+      (liefertermin, lieferant, auftragsnummer, artikelnr, produkt, mangel, mangelgrad, mangelgrund, mitarbeiter, lieferantInformiertAm, loesung, fotos, dateOfInspection) 
+      VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+
+    db.run(
+      sql,
+      [
+        liefertermin, lieferant, auftragsnummer, artikelnr, produkt, mangel, mangelgrad, mangelgrund, mitarbeiter, lieferantInformiertAm, loesung,
+        JSON.stringify(imageUrls), dateOfInspection
+      ],
+      function (err) {
+        if (err) {
+          db.run("ROLLBACK");
+          return res.status(500).json({ message: "Database error", error: err });
+        }
+        db.run("COMMIT");
+        res.json({ message: "Quality report saved successfully", reportId: this.lastID });
+      }
+    );
+  });
 });
 
-
+/**
+ * Delete a quality report
+ */
 router.delete('/:id', authenticateToken, (req, res) => {
   const { id } = req.params;
+
   db.run('DELETE FROM quality_reports WHERE id = ?', [id], function(err) {
-    if (err) return res.status(500).json({ message: "Database error" });
+    if (err) return res.status(500).json({ message: "Database error", error: err });
+    if (this.changes === 0) return res.status(404).json({ message: "Report not found" });
     res.json({ message: "Report deleted successfully" });
   });
 });
 
+/**
+ * Update an existing quality report
+ */
 router.put('/:id', authenticateToken, (req, res) => {
   const { id } = req.params;
-  const { liefertermin, lieferant, auftragsnummer, artikelnr, produkt, mangel, mangelgrad, mangelgrund, mitarbeiter, lieferantInformiertAm, loesung, fotos } = req.body;
+  const updates = req.body;
 
-  db.run(
-    `UPDATE quality_reports SET 
-      liefertermin = ?,
-      lieferant = ?,
-      auftragsnummer = ?,
-      artikelnr = ?,
-      produkt = ?,
-      mangel = ?,
-      mangelgrad = ?,
-      mangelgrund = ?,
-      mitarbeiter = ?,
-      lieferantInformiertAm = ?,
-      loesung = ?,
-      fotos = ?
-    WHERE id = ?`,
-    [liefertermin, lieferant, auftragsnummer, artikelnr, produkt, mangel, mangelgrad, mangelgrund, mitarbeiter, lieferantInformiertAm, loesung, fotos, id],
-    function(err) {
-      if (err) return res.status(500).json({ message: "Database error" });
+  if (!id || Object.keys(updates).length === 0) {
+    return res.status(400).json({ message: "ID and at least one field are required for update." });
+  }
+
+  db.serialize(() => {
+    db.run("BEGIN TRANSACTION");
+
+    const fields = Object.keys(updates).map(key => `${key} = ?`).join(", ");
+    const values = Object.values(updates);
+    values.push(id);
+
+    const sql = `UPDATE quality_reports SET ${fields} WHERE id = ?`;
+
+    db.run(sql, values, function(err) {
+      if (err) {
+        db.run("ROLLBACK");
+        return res.status(500).json({ message: "Database error", error: err });
+      }
+      db.run("COMMIT");
       res.json({ message: "Report updated successfully" });
-    }
-  );
+    });
+  });
 });
 
 module.exports = router;

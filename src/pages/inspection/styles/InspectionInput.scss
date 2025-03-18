@@ -124,7 +124,7 @@
   
   /* Submit Button */
   .quality-input-form button[type="submit"] {
-    background-color: #3498db;
+    background-color: var(--primary-color);
     color: white;
     border: none;
     padding: 12px;
