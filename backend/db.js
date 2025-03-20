@@ -71,6 +71,17 @@ const initializeDB = () => {
       loesung TEXT,
       fotos TEXT
     );
+    CREATE TABLE IF NOT EXISTS gold_tests (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  lieferant TEXT NOT NULL CHECK(lieferant IN ('Adoma', 'Breuning', 'Sisti', 'Rösch', 'Schofer', 'Giloy')),
+  farbe TEXT NOT NULL CHECK(farbe IN ('RG', 'YG', 'WG')),
+  test_month DATE NOT NULL,
+  bestellnr TEXT NOT NULL UNIQUE,
+  bemerkung TEXT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(lieferant, farbe, test_month)
+);
   `, (err) => {
     if (err) {
       console.error('Error initializing database:', err.message);

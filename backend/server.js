@@ -16,6 +16,7 @@ const auswertungRouter = require("./routes/auswertung");
 //The next two were inside of server.js and moved to outside files
 const qualityReportsRouter = require('./routes/qualityReports');
 const auswertungenRouter = require('./routes/auswertungen');
+const goldTestsRouter = require("./routes/goldTests")
 
 const {db, initializeDB} = require('./db');
 
@@ -33,6 +34,7 @@ app.use(express.json()); // Parses JSON body
 app.use('/quality-reports', qualityReportsRouter);
 app.use('/auswertungen', auswertungenRouter);
 app.use("/api/auswertungen", auswertungRouter);
+app.use("/gold-tests", goldTestsRouter);
 
 // Simple GET route to check if the server is working
 app.get('/', (req, res) => {
