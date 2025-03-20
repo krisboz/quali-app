@@ -2,6 +2,7 @@ import { useState } from "react";
 import { searchAuswertungen } from "../api/api";
 import Loading from "./Loading";
 import "../styles/components/AuswertungDisplay.scss";
+import { toast } from "react-toastify";
 
 const AuswertungDisplay = () => {
     const [searchParams, setSearchParams] = useState({
@@ -30,6 +31,7 @@ const AuswertungDisplay = () => {
         setLoading(true);
         try {
             const data = await searchAuswertungen({ ...searchParams, page: pagination.page, limit: pagination.limit });
+            console.log("Auswertung data", data.rows)
             setResults(data.rows);
             setPagination({ ...pagination, total: data.total });
         } catch (error) {

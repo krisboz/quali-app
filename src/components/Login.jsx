@@ -1,17 +1,18 @@
-import { useState } from 'react';
-import axios from 'axios';
+import { useState, useContext } from 'react';
 import "../styles/components/LoginForm.scss"
 import { useNavigate } from 'react-router-dom';
 import { login } from '../api/api';
 import Loading from "./Loading";
 import { toast } from 'react-toastify';
+import AuthContext from "../context/AuthContext"
 
 
-const LoginForm = ({setIsAuthenticated}) => {
+const LoginForm = () => {
   const [credentials, setCredentials] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate();
+  const {setIsAuthenticated} = useContext(AuthContext)
 
   const handleChange = ({ target: { name, value } }) => {
     setCredentials((prev) => ({ ...prev, [name]: value }));
@@ -33,6 +34,7 @@ const LoginForm = ({setIsAuthenticated}) => {
       navigate("/app/dashboard");
     } catch (errorMessage) {
       setError(errorMessage);
+      toast.error(errorMessage);
       setLoading(false)
     }
   };
@@ -44,7 +46,6 @@ const LoginForm = ({setIsAuthenticated}) => {
     <form onSubmit={handleSubmit} className='login-form'>
     <div className='login-title'><h2>Login</h2></div>
     <div className='login-title'>
-    {error && <p className="login-error">! {error} !</p>}
 
     </div>
 

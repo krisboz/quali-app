@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }) => {
         toast.error("Invalid token");
       }
     }
-  }, []);
+  }, [setUser, setIsAuthenticated]);
 
   return (
     <AuthContext.Provider value={{ user, isAuthenticated, setUser, setIsAuthenticated }}>

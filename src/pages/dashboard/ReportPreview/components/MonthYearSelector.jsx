@@ -8,9 +8,14 @@ const MonthYearSelector = ({ selectedMonth, setSelectedMonth, selectedYear, setS
         <div className="month-year-selector">
             <label>
                 Select Month:
-                <select value={selectedMonth} onChange={(e) => setSelectedMonth(Number(e.target.value))}>
+                <select 
+                    value={selectedMonth} 
+                    onChange={(e) => setSelectedMonth(Number(e.target.value))}
+                >
                     {months.map((month, index) => (
-                        <option key={index} value={index}>{month}</option>
+                        <option key={index} value={index + 1}>
+                            {month}
+                        </option>
                     ))}
                 </select>
             </label>

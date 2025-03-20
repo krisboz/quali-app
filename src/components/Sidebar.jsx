@@ -1,17 +1,17 @@
 // src/components/Sidebar.jsx
-import React from 'react';
+import {useContext} from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import { FaUserCircle } from "react-icons/fa";
 import { CiLogout } from "react-icons/ci";
 import { MdLogout } from "react-icons/md";
 import "../styles/components/Sidebar.scss";
-import ThemeSwitcher from './ThemeSwitcher';
 
 import { LuLayoutDashboard as DashboardIcon} from "react-icons/lu";
 import { FaMagnifyingGlass as InspectionIcon} from "react-icons/fa6";
 import { TbReportSearch as QualityReportsIcon} from "react-icons/tb";
 import { LiaTruckLoadingSolid as OrdersIcon} from "react-icons/lia";
+import AuthContext from '../context/AuthContext';
 
 
 
@@ -19,8 +19,9 @@ import { LiaTruckLoadingSolid as OrdersIcon} from "react-icons/lia";
 
 
 
-const Sidebar = ({ setIsAuthenticated }) => {
+const Sidebar = (  ) => {
   const navigate = useNavigate();
+  const {setIsAuthenticated} = useContext(AuthContext)
 
   const token = localStorage.getItem("token");
   let username;
