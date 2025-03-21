@@ -18,6 +18,7 @@ export const goldTestsService = {
    * @returns {Promise<Object>} Created test entry with ID
    */
   createTest: async (testData) => {
+    console.log({testData})
     try {
       const token = localStorage.getItem("token");
       const response = await axios.post(API_BASE_URL, testData, {
@@ -25,7 +26,7 @@ export const goldTestsService = {
       });
       return response.data;
     } catch (error) {
-      throw this.handleApiError(error, 'create test');
+      throw new Error(error.message)
     }
   },
 
@@ -74,7 +75,7 @@ export const goldTestsService = {
       });
       return response.data;
     } catch (error) {
-      throw this.handleApiError(error, 'get missing tests');
+      console.log("Error getting missing", error.message)
     }
   },
 
@@ -124,6 +125,6 @@ export const goldTestsService = {
       error.message ||
       `Unknown error occurred while trying to ${action}`;
     
-    return new Error(errorMessage);
+    console.log(errorMessage)
   }
 };

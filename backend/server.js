@@ -4,11 +4,6 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const authenticateToken = require("./middleware/auth"); // Import middleware
-const multer = require("multer");
-const path = require("path");
-const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3'); // Import from AWS SDK
-
-const sqlite3 = require('sqlite3').verbose(); // Import SQLite3
 require('dotenv').config();
 
 //Router import
@@ -16,7 +11,7 @@ const auswertungRouter = require("./routes/auswertung");
 //The next two were inside of server.js and moved to outside files
 const qualityReportsRouter = require('./routes/qualityReports');
 const auswertungenRouter = require('./routes/auswertungen');
-const goldTestsRouter = require("./routes/goldTests")
+const goldTestsRouter = require("./routes/goldTests");
 
 const {db, initializeDB} = require('./db');
 

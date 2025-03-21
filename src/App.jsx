@@ -39,7 +39,7 @@ function AppRoutes() {
         <Route path="auswertungen" element={<Auswertungen />} />
         <Route path="inspection" element={<Inspection />} />
         <Route path="profile" element={<UserProfile />} />
-        <Route path="gold-tests" element={<GoldTestManager />} />
+        <Route path="gold-tests" element={<GoldTestManager/>} />
         <Route path="" element={<Navigate to="dashboard" replace />} />
       </Route>
       <Route

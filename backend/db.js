@@ -74,16 +74,21 @@ const initializeDB = () => {
     );
 
     CREATE TABLE IF NOT EXISTS gold_tests (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  lieferant TEXT NOT NULL CHECK(lieferant IN ('Adoma', 'Breuning', 'Sisti', 'Rösch', 'Schofer')),
-  farbe TEXT NOT NULL CHECK(farbe IN ('RG', 'YG', 'WG')),
-  test_month DATE NOT NULL,
-  bestellnr TEXT NOT NULL UNIQUE,
-  bemerkung TEXT,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE(lieferant, farbe, test_month)
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      lieferant TEXT NOT NULL CHECK(lieferant IN ('Adoma', 'Breuning', 'Sisti', 'Rösch', 'Schofer')),
+      farbe TEXT NOT NULL CHECK(farbe IN ('RG', 'YG', 'WG')),
+      test_month NUMBER NOT NULL,
+      test_year NUMBER NOT NULL,
+      bestellnr TEXT NOT NULL UNIQUE,
+      bemerkung TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(lieferant, farbe, test_month)
+
+
 );
+          ALTER TABLE gold_tests ADD COLUMN test_year NUMBER;
+
   `, (err) => {
     if (err) {
       console.error('Error initializing database:', err.message);

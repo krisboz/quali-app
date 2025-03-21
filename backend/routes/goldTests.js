@@ -1,4 +1,3 @@
-// routes/goldTests.js
 const express = require('express');
 const router = express.Router();
 const authenticateToken = require('../middleware/auth');
@@ -6,17 +5,17 @@ const { db } = require('../db');
 
 // POST - Create new gold test entry
 router.post('/', authenticateToken, (req, res) => {
-  const { lieferant, farbe, test_month, bestellnr, bemerkung } = req.body;
+  const { lieferant, farbe, test_month, test_year, bestellnr, bemerkung } = req.body;
 
-  if (!lieferant || !farbe || !test_month || !bestellnr) {
+  if (!lieferant || !farbe || !test_month || !test_year || !bestellnr) {
     return res.status(400).json({ message: "Missing required fields" });
   }
 
   const sql = `INSERT INTO gold_tests 
-    (lieferant, farbe, test_month, bestellnr, bemerkung) 
-    VALUES (?, ?, ?, ?, ?)`;
+    (lieferant, farbe, test_month, test_year, bestellnr, bemerkung) 
+    VALUES (?, ?, ?, ?, ?, ?)`;
 
-  db.run(sql, [lieferant, farbe, test_month, bestellnr, bemerkung], 
+  db.run(sql, [lieferant, farbe, test_month, test_year, bestellnr, bemerkung], 
     function(err) {
       if (err) {
         if (err.message.includes('UNIQUE constraint failed')) {
@@ -49,9 +48,13 @@ router.get('/', authenticateToken, (req, res) => {
     whereClauses.push("farbe = ?");
     params.push(farbe);
   }
-  if (year && month) {
+  if (year) {
+    whereClauses.push("test_year = ?");
+    params.push(year);
+  }
+  if (month) {
     whereClauses.push("test_month = ?");
-    params.push(`${year}-${month.padStart(2, '0')}-01`);
+    params.push(month);
   }
 
   const where = whereClauses.length ? `WHERE ${whereClauses.join(' AND ')}` : '';
@@ -84,17 +87,16 @@ router.get('/missing', authenticateToken, (req, res) => {
     return res.status(400).json({ message: "Year and month parameters required" });
   }
 
-  const testMonth = `${year}-${month.padStart(2, '0')}-01`;
   const suppliers = ['Adoma', 'Breuning', 'Sisti', 'Rösch', 'Schofer'];
   const colors = ['RG', 'YG', 'WG'];
 
   const sql = `
     SELECT lieferant, farbe 
     FROM gold_tests 
-    WHERE test_month = ?
+    WHERE test_year = ? AND test_month = ?
   `;
 
-  db.all(sql, [testMonth], (err, existingTests) => {
+  db.all(sql, [year, month], (err, existingTests) => {
     if (err) return res.status(500).json({ message: err.message });
 
     const missing = [];
@@ -107,7 +109,7 @@ router.get('/missing', authenticateToken, (req, res) => {
     });
 
     res.json({
-      month: testMonth,
+      month: `${year}-${month}`,
       missingTests: missing,
       totalMissing: missing.length
     });
