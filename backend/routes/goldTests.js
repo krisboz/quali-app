@@ -85,7 +85,7 @@ router.get('/missing', authenticateToken, (req, res) => {
   }
 
   const testMonth = `${year}-${month.padStart(2, '0')}-01`;
-  const suppliers = ['Adoma', 'Breuning', 'Sisti', 'Rösch', 'Schofer', 'Giloy'];
+  const suppliers = ['Adoma', 'Breuning', 'Sisti', 'Rösch', 'Schofer'];
   const colors = ['RG', 'YG', 'WG'];
 
   const sql = `

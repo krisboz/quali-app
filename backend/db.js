@@ -14,6 +14,7 @@ const initializeDB = () => {
     PRAGMA journal_mode = WAL;
     PRAGMA synchronous = NORMAL;
 
+
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       username TEXT UNIQUE NOT NULL,
@@ -71,9 +72,10 @@ const initializeDB = () => {
       loesung TEXT,
       fotos TEXT
     );
+
     CREATE TABLE IF NOT EXISTS gold_tests (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  lieferant TEXT NOT NULL CHECK(lieferant IN ('Adoma', 'Breuning', 'Sisti', 'Rösch', 'Schofer', 'Giloy')),
+  lieferant TEXT NOT NULL CHECK(lieferant IN ('Adoma', 'Breuning', 'Sisti', 'Rösch', 'Schofer')),
   farbe TEXT NOT NULL CHECK(farbe IN ('RG', 'YG', 'WG')),
   test_month DATE NOT NULL,
   bestellnr TEXT NOT NULL UNIQUE,
@@ -110,6 +112,8 @@ const initializeDB = () => {
       }
     });
   });
+
+
 };
 
 // Export database connection and initializer function

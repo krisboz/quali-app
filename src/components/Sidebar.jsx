@@ -11,6 +11,8 @@ import { LuLayoutDashboard as DashboardIcon} from "react-icons/lu";
 import { FaMagnifyingGlass as InspectionIcon} from "react-icons/fa6";
 import { TbReportSearch as QualityReportsIcon} from "react-icons/tb";
 import { LiaTruckLoadingSolid as OrdersIcon} from "react-icons/lia";
+import { AiOutlineGold as GoldIcon } from "react-icons/ai";
+
 import AuthContext from '../context/AuthContext';
 
 
@@ -64,6 +66,16 @@ const Sidebar = (  ) => {
             >
               <InspectionIcon/>
               Inspection
+            </NavLink>
+          </li>
+
+          <li style={{ marginBottom: '10px' }}>
+          <NavLink
+              to="/app/gold-tests"
+              style={({ isActive }) => ({ fontWeight: isActive ? 'bold' : 'normal' })}
+            >
+              <GoldIcon/>
+              Gold Tests
             </NavLink>
           </li>
           

@@ -9,6 +9,7 @@ import UserProfile from './components/UserProfile';
 import Auswertungen from './components/Auswertungen';
 import  AuthContext, {AuthProvider}   from './context/AuthContext'; // Import the context
 import Inspection from './pages/inspection/Inspection';
+import GoldTestManager from './pages/goldTests/GoldTestManager';
 
 function AppRoutes() {
   const { isAuthenticated } = useContext(AuthContext);
@@ -38,6 +39,7 @@ function AppRoutes() {
         <Route path="auswertungen" element={<Auswertungen />} />
         <Route path="inspection" element={<Inspection />} />
         <Route path="profile" element={<UserProfile />} />
+        <Route path="gold-tests" element={<GoldTestManager />} />
         <Route path="" element={<Navigate to="dashboard" replace />} />
       </Route>
       <Route
