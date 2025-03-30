@@ -1,15 +1,16 @@
-const sqlite3 = require('sqlite3').verbose();
-const bcrypt = require('bcryptjs');
+const sqlite3 = require("sqlite3").verbose();
+const bcrypt = require("bcryptjs");
 
-const db = new sqlite3.Database('./database.sqlite', (err) => {
+const db = new sqlite3.Database("./database.sqlite", (err) => {
   if (err) {
-    console.error('Error opening database:', err.message);
+    console.error("Error opening database:", err.message);
   }
 });
 
 // Function to initialize the database
 const initializeDB = () => {
-  db.exec(`
+  db.exec(
+    `
     PRAGMA foreign_keys = ON;
     PRAGMA journal_mode = WAL;
     PRAGMA synchronous = NORMAL;
@@ -87,24 +88,24 @@ const initializeDB = () => {
 
 
 );
-          ALTER TABLE gold_tests ADD COLUMN test_year NUMBER;
 
-  `, (err) => {
-    if (err) {
-      console.error('Error initializing database:', err.message);
-      return;
-    }
-
-    // Seed default users only if no users exist
-    db.get(`SELECT COUNT(*) AS count FROM users`, (err, row) => {
+  `,
+    (err) => {
       if (err) {
-        console.error('Database error:', err);
+        console.error("Error initializing database:", err.message);
         return;
       }
-      if (row.count === 0) {
-        console.log("Seeding database with default users...");
-        const hashedPassword = bcrypt.hashSync('password123', 10);
-        db.exec(`
+
+      // Seed default users only if no users exist
+      db.get(`SELECT COUNT(*) AS count FROM users`, (err, row) => {
+        if (err) {
+          console.error("Database error:", err);
+          return;
+        }
+        if (row.count === 0) {
+          console.log("Seeding database with default users...");
+          const hashedPassword = bcrypt.hashSync("password123", 10);
+          db.exec(`
           INSERT INTO users (username, password) VALUES 
           ('kristijan.b', '${hashedPassword}'),
           ('vanessa.m', '${hashedPassword}'),
@@ -114,11 +115,10 @@ const initializeDB = () => {
           ('sandra.h', '${hashedPassword}'),
           ('roman.j', '${hashedPassword}');
         `);
-      }
-    });
-  });
-
-
+        }
+      });
+    }
+  );
 };
 
 // Export database connection and initializer function

@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const API_BASE_URL = "https://reimagined-journey-5r599v49g9r2577-5000.app.github.dev/gold-tests";
-
+//const API_BASE_URL = "https://reimagined-journey-5r599v49g9r2577-5000.app.github.dev/gold-tests";
+const API_BASE_URL = "http://localhost:5000/gold-tests";
 /**
  * Gold Tests API Service
  * Provides methods for interacting with all gold test endpoints
@@ -12,21 +12,22 @@ export const goldTestsService = {
    * @param {Object} testData
    * @param {string} testData.lieferant - Supplier name
    * @param {string} testData.farbe - Color code (RG/YG/WG)
-   * @param {string} testData.test_month - Test month in 'YYYY-MM-DD' format
+   * @param {string} testData.test_month - Test month in 'MM' format
+   * @param {string} testData.test_year - Test year in 'YYYY' format
    * @param {string} testData.bestellnr - Order number
    * @param {string} [testData.bemerkung] - Optional remark
    * @returns {Promise<Object>} Created test entry with ID
    */
   createTest: async (testData) => {
-    console.log({testData})
+    console.log({ testData });
     try {
       const token = localStorage.getItem("token");
       const response = await axios.post(API_BASE_URL, testData, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       return response.data;
     } catch (error) {
-      throw new Error(error.message)
+      throw new Error(error.message);
     }
   },
 
@@ -47,16 +48,41 @@ export const goldTestsService = {
       const params = {
         ...filters,
         page,
-        limit
+        limit,
       };
 
       const response = await axios.get(API_BASE_URL, {
         params,
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       return response.data;
     } catch (error) {
-      throw this.handleApiError(error, 'fetch tests');
+      throw this.handleApiError(error, "fetch tests");
+    }
+  },
+
+  /**
+   * Get missing tests for a specific month
+   * @param {number} test_month - Month to check (1-12)
+   * @param {number} test_year - Year to check
+   * @returns {Promise<Object>} Missing tests information
+   */
+  getTestsByMonth: async (test_month, test_year, page = 1, limit = 100) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await axios.get(API_BASE_URL, {
+        params: {
+          month: test_month,
+          year: test_year,
+          page,
+          limit,
+        },
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || error.message);
     }
   },
 
@@ -71,11 +97,11 @@ export const goldTestsService = {
       const token = localStorage.getItem("token");
       const response = await axios.get(`${API_BASE_URL}/missing`, {
         params: { year, month },
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       return response.data;
     } catch (error) {
-      console.log("Error getting missing", error.message)
+      console.log("Error getting missing", error.message);
     }
   },
 
@@ -88,12 +114,16 @@ export const goldTestsService = {
   updateTestRemark: async (id, bemerkung) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.put(`${API_BASE_URL}/${id}`, { bemerkung }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await axios.put(
+        `${API_BASE_URL}/${id}`,
+        { bemerkung },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       return response.data;
     } catch (error) {
-      throw this.handleApiError(error, 'update test');
+      throw this.handleApiError(error, "update test");
     }
   },
 
@@ -106,11 +136,11 @@ export const goldTestsService = {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.delete(`${API_BASE_URL}/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       return response.data;
     } catch (error) {
-      throw this.handleApiError(error, 'delete test');
+      throw this.handleApiError(error, "delete test");
     }
   },
 
@@ -120,11 +150,12 @@ export const goldTestsService = {
    */
   handleApiError: (error, action) => {
     console.error(`Error trying to ${action}:`, error);
-    
-    const errorMessage = error.response?.data?.message ||
+
+    const errorMessage =
+      error.response?.data?.message ||
       error.message ||
       `Unknown error occurred while trying to ${action}`;
-    
-    console.log(errorMessage)
-  }
+
+    console.log(errorMessage);
+  },
 };

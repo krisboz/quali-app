@@ -1,0 +1,37 @@
+.add-test-plus-button {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1rem;
+    font-size: 2rem;
+    padding: 1rem;
+
+    button {
+        border: none;
+        background: none;
+        color: var(--primary-color);
+        font-size: 2rem;
+        line-height: 0;
+        padding: 0;
+        transition: .2s linear;
+
+        &:hover {
+            transform: scale(1.2);
+        }
+    }
+
+}
+
+.background-button-container {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+
+    button {
+        border: none;
+        background: none;
+        color: black;
+        padding: none;
+    }
+}
