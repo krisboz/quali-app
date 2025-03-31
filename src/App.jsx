@@ -1,15 +1,16 @@
-import React, { useContext } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import LoginForm from './components/Login';
-import AppLayout from './components/AppLayout';
-import Dashboard from './pages/dashboard/Dashboard';
-import QualityInput from './components/QualityInput';
-import PrivateRoute from './components/PrivateRoute';
-import UserProfile from './components/UserProfile';
-import Auswertungen from './components/Auswertungen';
-import  AuthContext, {AuthProvider}   from './context/AuthContext'; // Import the context
-import Inspection from './pages/inspection/Inspection';
-import GoldTestManager from './pages/goldTests/GoldTestManager';
+import React, { useContext } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import LoginForm from "./components/Login";
+import AppLayout from "./components/AppLayout";
+import Dashboard from "./pages/dashboard/Dashboard";
+import QualityInput from "./components/QualityInput";
+import PrivateRoute from "./components/PrivateRoute";
+import UserProfile from "./components/UserProfile";
+import Auswertungen from "./components/Auswertungen";
+import AuthContext, { AuthProvider } from "./context/AuthContext"; // Import the context
+import Inspection from "./pages/inspection/Inspection";
+import GoldTestManager from "./pages/goldTests/GoldTestManager";
+import DiamondScreening from "./pages/diamondScreening/DiamondScreening";
 
 function AppRoutes() {
   const { isAuthenticated } = useContext(AuthContext);
@@ -39,12 +40,19 @@ function AppRoutes() {
         <Route path="auswertungen" element={<Auswertungen />} />
         <Route path="inspection" element={<Inspection />} />
         <Route path="profile" element={<UserProfile />} />
-        <Route path="gold-tests" element={<GoldTestManager/>} />
+        <Route path="gold-tests" element={<GoldTestManager />} />
+        <Route path="diamond-screening" element={<DiamondScreening />} />
+
         <Route path="" element={<Navigate to="dashboard" replace />} />
       </Route>
       <Route
         path="*"
-        element={<Navigate to={isAuthenticated ? "/app/dashboard" : "/login"} replace />}
+        element={
+          <Navigate
+            to={isAuthenticated ? "/app/dashboard" : "/login"}
+            replace
+          />
+        }
       />
     </Routes>
   );

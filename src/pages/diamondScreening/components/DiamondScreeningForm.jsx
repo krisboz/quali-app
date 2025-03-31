@@ -1,88 +1,150 @@
-import { useState } from "react";
-import "./DiamondScreeningForm.scss";
+import React, { useState } from "react";
+import "../styles/DiamondScreeningForm.scss";
 
-const DiamondScreeningForm = ({ orderData }) => {
-  const [bestellnr, setBestellnr] = useState("");
-  const [artikelnr, setArtikelnr] = useState("");
-  const [liefertermin, setLiefertermin] = useState("");
-  const [issueType, setIssueType] = useState("");
-  const [notes, setNotes] = useState("");
-  const [image, setImage] = useState(null);
+const supplierOptions = [
+  "Adoma",
+  "Breuning",
+  "Rösch",
+  "Sisti",
+  "Schofer",
+  "Scheingraber",
+];
 
-  const issueOptions = [
-    "Phosphorescence detected",
-    "Synthetic Diamond",
-    "HPHT Treatment",
-    "Other",
-  ];
+export default function DiamondScreeningForm() {
+  const [formData, setFormData] = useState({
+    liefertermin: "",
+    lieferant: "",
+    artikelnr: "",
+    quantity: 1,
+    bemerkung: "",
+  });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log({
-      bestellnr,
-      artikelnr,
-      liefertermin,
-      issueType,
-      notes,
-      image,
+  //TODO useEffect that fetches the data
+
+  const resetFormData = () => {
+    setFormData({
+      liefertermin: "",
+      lieferant: "",
+      artikelnr: "",
+      quantity: 1,
+      bemerkung: "",
     });
   };
 
+  const [clicked, setClicked] = useState(false);
+
+  const toggleClicked = () => {
+    setClicked((prev) => !prev);
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const entry = {
+      ...formData,
+      quantity: parseInt(formData.quantity, 10),
+    };
+    console.log(entry);
+    //TODO make a backend call to add to the sql table
+    resetFormData();
+    setClicked(false);
+  };
+
+  if (!clicked) {
+    return (
+      <div className="diamond-screening-container">
+        <h2>Diamond Screening</h2>
+        <button onClick={toggleClicked}> + </button>
+      </div>
+    );
+  }
+
   return (
-    <div className="screening-form">
-      <h2>Report Diamond Defect</h2>
-      <form onSubmit={handleSubmit}>
-        <label>Order Number (Bestellnr)</label>
-        <input
-          type="text"
-          value={bestellnr}
-          onChange={(e) => setBestellnr(e.target.value)}
-          required
-        />
+    <form onSubmit={handleSubmit} className="diamond-screening-form-container">
+      <div className="diamond-screening-title-container">
+        <h3>Diamond Screening Input</h3>
+        <button onClick={toggleClicked}>X</button>
+      </div>
+      <div className="artikel-quantity-container">
+        <label>
+          Liefertermin:
+          <input
+            type="date"
+            name="liefertermin"
+            value={formData.liefertermin}
+            onChange={handleChange}
+            required
+            className="input"
+          />
+        </label>
 
-        <label>Article Number (Artikelnr)</label>
-        <input
-          type="text"
-          value={artikelnr}
-          onChange={(e) => setArtikelnr(e.target.value)}
-          required
-        />
-
-        <label>Delivery Date (Liefertermin)</label>
-        <input
-          type="date"
-          value={liefertermin}
-          onChange={(e) => setLiefertermin(e.target.value)}
-          required
-        />
-
-        <label>Issue Type</label>
-        <select
-          value={issueType}
-          onChange={(e) => setIssueType(e.target.value)}
-          required
-        >
-          <option value="">Select Issue</option>
-          {issueOptions.map((option) => (
-            <option key={option} value={option}>
-              {option}
+        <label>
+          Lieferant:
+          <select
+            name="lieferant"
+            value={formData.lieferant}
+            onChange={handleChange}
+            required
+            className="input lieferant-input"
+          >
+            <option value="" disabled>
+              -- Choose a supplier --
             </option>
-          ))}
-        </select>
+            {supplierOptions.map((supplier) => (
+              <option key={supplier} value={supplier}>
+                {supplier}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
 
-        <label>Additional Notes</label>
-        <textarea
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-        ></textarea>
+      <div className="artikel-quantity-container">
+        <label>
+          Artikelnummer:
+          <input
+            type="text"
+            name="artikelnr"
+            value={formData.artikelnr}
+            onChange={handleChange}
+            required
+            className="input artikel-input"
+          />
+        </label>
 
-        <label>Upload Image</label>
-        <input type="file" onChange={(e) => setImage(e.target.files[0])} />
+        <label>
+          Quantity:
+          <input
+            type="number"
+            name="quantity"
+            value={formData.quantity}
+            onChange={handleChange}
+            required
+            className="input quantity-input"
+            min="1"
+          />
+        </label>
+      </div>
 
-        <button type="submit">Submit Report</button>
-      </form>
-    </div>
+      <div className="bemerkung-container">
+        <label>
+          Bemerkung:
+          <input
+            type="text"
+            name="bemerkung"
+            value={formData.bemerkung}
+            onChange={handleChange}
+            className="input"
+          />
+        </label>
+      </div>
+
+      <button type="submit" className="btn btn-primary">
+        Submit
+      </button>
+    </form>
   );
-};
-
-export default DiamondScreeningForm;
+}

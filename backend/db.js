@@ -15,7 +15,6 @@ const initializeDB = () => {
     PRAGMA journal_mode = WAL;
     PRAGMA synchronous = NORMAL;
 
-
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       username TEXT UNIQUE NOT NULL,
@@ -43,19 +42,19 @@ const initializeDB = () => {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       "Beleg" TEXT,
       "Firma" TEXT,
-      " Werkauftrag" TEXT,
+      "Werkauftrag" TEXT,
       "Termin" TEXT,
       "Artikel-Nr." TEXT,
-      " Artikel-Nr. fertig" TEXT,
+      "Artikel-Nr. fertig" TEXT,
       "Beschreibung" TEXT,
-      " Beschreibung 2" TEXT,
+      "Beschreibung 2" TEXT,
       "urspr. Menge" INTEGER,
       "Menge offen" INTEGER,
       "Einzelpreis" REAL,
       "G-Preis" REAL,
       "Farbe" TEXT,
       "Größe" TEXT,
-      UNIQUE("Beleg", " Artikel-Nr. fertig") 
+      UNIQUE("Beleg", "Artikel-Nr. fertig") 
     );
 
     CREATE TABLE IF NOT EXISTS inspection (
@@ -85,10 +84,17 @@ const initializeDB = () => {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       UNIQUE(lieferant, farbe, test_month)
+    );
 
-
-);
-
+    CREATE TABLE IF NOT EXISTS diamond_screenings (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      liefertermin TEXT NOT NULL,
+      lieferant TEXT NOT NULL CHECK(lieferant IN ('Adoma', 'Breuning', 'Sisti', 'Rösch', 'Schofer', 'Scheingraber')),
+      bestellnr TEXT NOT NULL UNIQUE,
+      artikelnr TEXT NOT NULL,
+      quantity INTEGER NOT NULL,
+      bemerkung TEXT
+    );
   `,
     (err) => {
       if (err) {
