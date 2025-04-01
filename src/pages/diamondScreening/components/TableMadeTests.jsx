@@ -24,6 +24,7 @@ const TableMadeTests = () => {
       try {
         const response = await getDiamondScreenings();
         setData(response.data);
+        console.log("screening data", response.data)
       } catch (err) {
         setError(err);
       } finally {
