@@ -15,6 +15,15 @@ import DefectiveDetailedItems from "./sections/DefectiveDetailedItems";
 import DiamondScreening from "./sections/DiamondScreening";
 import GoldTestsTable from "../../goldTests/components/GoldTestsTable";
 
+import { SiAlwaysdata as AllTimeIcon } from "react-icons/si";
+import { TbCalendarMonth as MonthlyIcon } from "react-icons/tb";
+import { CgPlayListRemove as MangelgrundIcon } from "react-icons/cg";
+import { GiBigDiamondRing as DefectiveItemsIcon } from "react-icons/gi";
+import { AiOutlineGold as GoldIcon } from "react-icons/ai";
+import { FaRegGem as DiamondIcon } from "react-icons/fa";
+
+
+
 const ReportPreview = () => {
     const [auswertungen, setAuswertungen] = useState([]);
     const [inspections, setInspections] = useState([]);
@@ -44,12 +53,12 @@ const ReportPreview = () => {
         <div>
             <div className="stat-to-show-selector">
                 <h4>Choose stats to show: </h4>
-                <button className={visibleSection==="allTime"?"active":null} onClick={() => setVisibleSection("allTime")}>All Time Statistics</button>
-                <button className={visibleSection==="monthly"?"active":null} onClick={() => setVisibleSection("monthly")}>Monthly Reports</button>
-                <button className={visibleSection==="mangelgrund"?"active":null} onClick={() => setVisibleSection("mangelgrund")}>Defect Statistics</button>
-                <button className={visibleSection==="defectiveItems"?"active":null} onClick={() => setVisibleSection("defectiveItems")}>Defective Items</button>
-                <button className={visibleSection==="diamondScreening"?"active":null} onClick={() => setVisibleSection("diamondScreening")}>Diamond Screening</button>
-                <button className={visibleSection==="goldTests"?"active":null} onClick={() => setVisibleSection("goldTests")}>Gold Tests</button>
+                <button className={visibleSection==="allTime"?"active":null} onClick={() => setVisibleSection("allTime")}> <AllTimeIcon/> All Time Statistics</button>
+                <button className={visibleSection==="monthly"?"active":null} onClick={() => setVisibleSection("monthly")}> <MonthlyIcon/> Monthly Reports</button>
+                <button className={visibleSection==="mangelgrund"?"active":null} onClick={() => setVisibleSection("mangelgrund")}> <MangelgrundIcon /> Defect Statistics</button>
+                <button className={visibleSection==="defectiveItems"?"active":null} onClick={() => setVisibleSection("defectiveItems")}><DefectiveItemsIcon/> Defective Items</button>
+                <button className={visibleSection==="diamondScreening"?"active":null} onClick={() => setVisibleSection("diamondScreening")}><DiamondIcon/> Diamond Screening</button>
+                <button className={visibleSection==="goldTests"?"active":null} onClick={() => setVisibleSection("goldTests")}><GoldIcon/> Gold Tests</button>
 
 
             </div>

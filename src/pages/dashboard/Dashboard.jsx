@@ -37,10 +37,10 @@ const Dashboard = () => {
         const currentMonth = currentDate.getMonth(); 
         const currentYear = currentDate.getFullYear();
 
-        const dateString = currentDayOfMonth + ". " + (currentMonth + 1) + ". " + currentYear + ".";
+
+        const dateString = String(currentDayOfMonth).padStart(2, "0") + ". " + (String(currentMonth + 1).padStart(2, "0")) + ". " + currentYear + ".";
         return dateString
             }
-
             const calcDayInWeek = () => {
                 const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
                 const today = new Date().getDay();
@@ -62,8 +62,8 @@ const Dashboard = () => {
             <div className="report-preview-header">
                 <h2>Report Previews</h2>
                 <p>Use the button underneath to generate report previews and decide which data you want to include in your report!</p>
-                <p>Keep in mind that depending on the data selected it can take up to a couple of minutes to load</p>
-                <button onClick={toggleShowPreviews}>{!showPreviews ? "Generate Report Previews": "Hide Report Previews"}</button>
+                <p>Keep in mind that depending on the quantity of data it can take up to a couple of minutes to load</p>
+                <button onClick={toggleShowPreviews}>{!showPreviews ? "Show Report Previews": "Hide Report Previews"}</button>
             </div>
 
             <div className="report-preview-container">
