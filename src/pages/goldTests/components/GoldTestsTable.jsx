@@ -37,13 +37,18 @@ const RenderTableCell = ({ test }) => {
   }
 
   return (
-    <p style={{ color: `${test.bemerkung ? "red" : "green"}` }}>
+    <div className="populated-gold-test-cell">
+      <p className="gold-test-date">      {test.created_at.split(" ")[0].split("-").reverse().join(".")}
+      </p>
+ <p className="gold-made-test-cell" style={{ color: `${test.bemerkung ? "red" : "green"}` }}>
       {test.bestellnr.toUpperCase()}
     </p>
+    </div>
+   
   );
 };
 
-const GoldTestsTable = () => {
+const GoldTestsTable = ({isDemoOnly = false}) => {
   const suppliers = ["Adoma", "Breuning", "Sisti", "Rösch", "Schofer"];
   const colors = ["RG", "YG", "WG"];
   const [cellClicked, setCellClicked] = useState(false);
@@ -67,6 +72,9 @@ const GoldTestsTable = () => {
   }, [month, year]);
 
   const handleCellClick = (lieferant, farbe, test) => {
+    if(isDemoOnly) {
+      return;
+    }
     //If test is false, theyve clicked an empty cell
     //  opens up the form to input new bestellnr and bemerkung
     //otherwise its one that has already been filled

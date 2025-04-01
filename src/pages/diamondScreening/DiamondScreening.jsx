@@ -1,6 +1,6 @@
 import { useState } from "react";
 import DiamondScreeningForm from "./components/DiamondScreeningForm";
-import TableMadeTests from "./components/tableMadeTests";
+import TableMadeTests from "./components/TableMadeTests";
 const DiamondScreening = () => {
   return (
     <div>

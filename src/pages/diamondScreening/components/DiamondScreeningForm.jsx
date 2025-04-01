@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import "../styles/DiamondScreeningForm.scss";
+import { createDiamondScreening } from "../../../api/diamondScreenings";
+import { toast } from "react-toastify";
 
 const supplierOptions = [
   "Adoma",
@@ -16,6 +18,7 @@ export default function DiamondScreeningForm() {
     lieferant: "",
     artikelnr: "",
     quantity: 1,
+    bestellnr:"",
     bemerkung: "",
   });
 
@@ -41,16 +44,26 @@ export default function DiamondScreeningForm() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const entry = {
-      ...formData,
-      quantity: parseInt(formData.quantity, 10),
-    };
-    console.log(entry);
-    //TODO make a backend call to add to the sql table
-    resetFormData();
-    setClicked(false);
+  
+
+    try {
+      const entry = {
+        ...formData,
+        quantity: parseInt(formData.quantity, 10),
+      };
+      console.log(entry);
+      const result = await createDiamondScreening(entry)
+      //TODO make a backend call to add to the sql table
+      console.log("result", result);
+      toast.success(`${formData.lieferant}'s diamond screening for ${formData.artikelnr} successfully submitted`)
+      resetFormData();
+      setClicked(false);
+
+    }catch(error) {
+      console.log(error)
+    }
   };
 
   if (!clicked) {
@@ -130,6 +143,16 @@ export default function DiamondScreeningForm() {
       </div>
 
       <div className="bemerkung-container">
+      <label>
+          Bestellnr:
+          <input
+            type="text"
+            name="bestellnr"
+            value={formData.bestellnr}
+            onChange={handleChange}
+            className="input"
+          />
+        </label>
         <label>
           Bemerkung:
           <input

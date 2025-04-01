@@ -50,7 +50,7 @@ router.get("/", authenticateToken, (req, res) => {
 
   if (liefertermin) {
     whereClauses.push("strftime('%Y-%m', liefertermin) = ?");
-    params.push(liefertermin);
+    params.push(liefertermin); // This should be in 'YYYY-MM' format
   }
   if (lieferant) {
     whereClauses.push("lieferant LIKE ?");

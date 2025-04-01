@@ -124,4 +124,56 @@ router.get('/', authenticateToken, (req, res) => {
   });
 });
 
+router.get('/diamond_items', authenticateToken, (req, res) => {
+  try {
+    const { month, year } = req.query;
+    
+    if (!month || !year) {
+      return res.status(400).json({
+        success: false,
+        message: 'Month and year parameters are required'
+      });
+    }
+
+    // Pad month to 2 digits and create search pattern
+    const paddedMonth = month.padStart(2, '0');
+    const searchPattern = `%.${paddedMonth}.${year}`;
+
+    const sql = `SELECT * FROM auswertungen WHERE "Termin" LIKE ?`;
+    
+    db.all(sql, [searchPattern], (err, rows) => {
+      if (err) {
+        console.error('Database error:', err);
+        return res.status(500).json({
+          success: false,
+          message: 'Database error'
+        });
+      }
+    
+    
+      // Filter items with "-p-" or "Cl" in Artikel-Nr. fertig (case-insensitive)
+      const filteredItems = rows.filter(row => {
+        const artikelNr = row[' Artikel-Nr. fertig']?.toLowerCase() || '';
+        return artikelNr.includes('-p-') || artikelNr.includes('cl');
+      });
+    
+    
+      res.json({
+        success: true,
+        month: paddedMonth,
+        year,
+        count: filteredItems.length,
+        items: filteredItems
+      });
+    });
+
+  } catch (error) {
+    console.error('Error in diamond_items endpoint:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+});
+
 module.exports = router;

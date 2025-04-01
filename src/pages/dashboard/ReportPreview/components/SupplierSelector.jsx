@@ -8,6 +8,7 @@ const SupplierSelector = ({selectedSupplier, setSelectedSupplier}) => {
         <div className="supplier-buttons">
         {suppliers.map((supplier) => (
             <button 
+            className={selectedSupplier===supplier?"active":null}
                 key={supplier} 
                 onClick={() => setSelectedSupplier(selectedSupplier === supplier ? null : supplier)}
             >

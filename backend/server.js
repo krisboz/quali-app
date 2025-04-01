@@ -29,7 +29,7 @@ app.use("/quality-reports", qualityReportsRouter);
 app.use("/auswertungen", auswertungenRouter);
 app.use("/api/auswertungen", auswertungRouter);
 app.use("/gold-tests", goldTestsRouter);
-app.use("api/diamond-screening", diamondScreeningRouter);
+app.use("/api/diamond-screening", diamondScreeningRouter);
 
 // Simple GET route to check if the server is working
 app.get("/", (req, res) => {

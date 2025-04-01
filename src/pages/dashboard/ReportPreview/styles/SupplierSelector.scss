@@ -2,4 +2,12 @@
     display: flex;
     align-items: center;
     gap: 1rem;
+
+
+    .active {
+        background-color: rgb(189, 189, 189);
+        color: black;
+        font-weight: bold;
+        border: 2px solid var(--primary-color);
+    }
 }

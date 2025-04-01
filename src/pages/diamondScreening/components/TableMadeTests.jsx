@@ -1,50 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getDiamondScreenings } from "../../../api/diamondScreenings";
 
 const TableMadeTests = () => {
-  const dummyData = [
-    {
-      liefertermin: "2025-03-10",
-      lieferant: "Adoma",
-      bestellnr: "B-25-1234",
-      artikelnr: "P-MB-p-rg",
-
-      quantity: 1,
-      bemerkung: "Phosphorescence noticed",
-    },
-    {
-      liefertermin: "2025-03-15",
-      lieferant: "Breuning",
-      bestellnr: "B-25-4321",
-      artikelnr: "14-R-CV77-13-PrL-p",
-      quantity: 2,
-      bemerkung:
-        "Possible synthetic diamonds, sent to a lab to do further testing",
-    },
-    {
-      liefertermin: "2025-03-20",
-      lieferant: "Rösch",
-      bestellnr: "B-25-2134",
-      artikelnr: "B-AD-alt-Cl-rg",
-      quantity: 1,
-      bemerkung: "Gives a questionable test result, sent for further testing",
-    },
-    {
-      liefertermin: "2025-03-25",
-      lieferant: "Sisti",
-      bestellnr: "B-25-4132",
-      artikelnr: "BA-Gyp-Cl-16-rg",
-      quantity: 1,
-      bemerkung: "Phosphorescence detected",
-    },
-    {
-      liefertermin: "2025-03-30",
-      lieferant: "Schofer",
-      bestellnr: "B-25-1111",
-      artikelnr: "B-BOU-Camel-Cl-rg",
-      quantity: 7,
-      bemerkung: "Unsure device results, sent to further testing to a lab.",
-    },
-  ];
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // State for filtering and pagination
   const [filters, setFilters] = useState({
@@ -59,8 +19,23 @@ const TableMadeTests = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getDiamondScreenings();
+        setData(response.data);
+      } catch (err) {
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [filters]);
+
   // Filter data based on filter inputs
-  const filteredData = dummyData.filter((item) => {
+  const filteredData = data.filter((item) => {
     return Object.keys(filters).every((key) => {
       if (!filters[key]) return true;
       const itemValue = String(item[key]).toLowerCase();
@@ -82,6 +57,9 @@ const TableMadeTests = () => {
     }));
     setCurrentPage(1); // Reset to first page when filters change
   };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div style={{ padding: "20px", maxWidth: "1200px", margin: "0 auto" }}>

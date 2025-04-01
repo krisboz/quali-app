@@ -1,3 +1,24 @@
+.stat-to-show-selector {
+    padding: 1rem;
+    display:flex;
+    align-items: center;
+    gap: 1rem;
+
+    .active{
+        background-color: rgb(189, 185, 185);
+        color: black;
+        font-weight: bold;
+        border: 2px solid var(--primary-color);
+
+    }
+}
+
+.controls-container {
+    display: flex;
+    align-items: center;
+    gap:2rem;
+}
+
 .graphs {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
