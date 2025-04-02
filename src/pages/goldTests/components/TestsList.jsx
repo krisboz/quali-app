@@ -1,4 +1,6 @@
 // TestsList.jsx
+import { MdDeleteOutline as DeleteIcon} from "react-icons/md";
+
 const TestsList = ({ tests, loading, onDelete, onUpdateRemark }) => {
   if (loading) return <div>Loading tests...</div>;
 
@@ -32,7 +34,7 @@ const TestsList = ({ tests, loading, onDelete, onUpdateRemark }) => {
                   .split(" ")[1]
                   .split(":")
                   .slice(0, -1)
-                  .join(":")}
+                  .join(":")  }
               </td>
               <td>{test.bestellnr}</td>
               <td>
@@ -44,7 +46,7 @@ const TestsList = ({ tests, loading, onDelete, onUpdateRemark }) => {
                 />
               </td>
               <td>
-                <button onClick={() => onDelete(test.id)}>Delete</button>
+                <button onClick={() => onDelete(test.id)}><DeleteIcon/></button>
               </td>
             </tr>
           ))}

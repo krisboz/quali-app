@@ -114,7 +114,7 @@ const ReportPreview = () => {
 
             {visibleSection === "goldTests" && (
                             <>
-                                <GoldTestsTable/>
+                                <GoldTestsTable isDemoOnly={true}/>
                             </>
                         )}
         </div>

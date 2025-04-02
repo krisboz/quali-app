@@ -38,7 +38,7 @@ const RenderTableCell = ({ test }) => {
 
   return (
     <div className="populated-gold-test-cell">
-      <p className="gold-test-date">      {test.created_at.split(" ")[0].split("-").reverse().join(".")}
+      <p className="gold-test-date">      {test.created_at ? test.created_at.split(" ")[0].split("-").reverse().join("."): "Now"}
       </p>
  <p className="gold-made-test-cell" style={{ color: `${test.bemerkung ? "red" : "green"}` }}>
       {test.bestellnr.toUpperCase()}
