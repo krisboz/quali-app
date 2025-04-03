@@ -12,13 +12,13 @@ const supplierOptions = [
   "Scheingraber",
 ];
 
-export default function DiamondScreeningForm() {
+export default function DiamondScreeningForm({ setFormToShow }) {
   const [formData, setFormData] = useState({
     liefertermin: "",
     lieferant: "",
     artikelnr: "",
     quantity: 1,
-    bestellnr:"",
+    bestellnr: "",
     bemerkung: "",
   });
 
@@ -36,17 +36,12 @@ export default function DiamondScreeningForm() {
 
   const [clicked, setClicked] = useState(false);
 
-  const toggleClicked = () => {
-    setClicked((prev) => !prev);
-  };
-
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
 
     try {
       const entry = {
@@ -54,32 +49,24 @@ export default function DiamondScreeningForm() {
         quantity: parseInt(formData.quantity, 10),
       };
       console.log(entry);
-      const result = await createDiamondScreening(entry)
+      const result = await createDiamondScreening(entry);
       //TODO make a backend call to add to the sql table
       console.log("result", result);
-      toast.success(`${formData.lieferant}'s diamond screening for ${formData.artikelnr} successfully submitted`)
+      toast.success(
+        `${formData.lieferant}'s diamond screening for ${formData.artikelnr} successfully submitted`
+      );
       resetFormData();
       setClicked(false);
-
-    }catch(error) {
-      console.log(error)
+    } catch (error) {
+      console.log(error);
     }
   };
-
-  if (!clicked) {
-    return (
-      <div className="diamond-screening-container">
-        <h2>Diamond Screening</h2>
-        <button onClick={toggleClicked}> + </button>
-      </div>
-    );
-  }
 
   return (
     <form onSubmit={handleSubmit} className="diamond-screening-form-container">
       <div className="diamond-screening-title-container">
         <h3>Diamond Screening Input</h3>
-        <button onClick={toggleClicked}>X</button>
+        <button onClick={() => setFormToShow(null)}>X</button>
       </div>
       <div className="artikel-quantity-container">
         <label>
@@ -143,7 +130,7 @@ export default function DiamondScreeningForm() {
       </div>
 
       <div className="bemerkung-container">
-      <label>
+        <label>
           Bestellnr:
           <input
             type="text"
