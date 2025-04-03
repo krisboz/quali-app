@@ -237,7 +237,7 @@ router.get('/diamond_items', authenticateToken, (req, res) => {
       // Filter items with "-p-" or "Cl" in Artikel-Nr. fertig (case-insensitive)
       const filteredItems = rows.filter(row => {
         const artikelNr = row[' Artikel-Nr. fertig']?.toLowerCase() || '';
-        return artikelNr.includes('-p-') || artikelNr.includes('cl') || artikelNr.includes('-prg') || artikelNr.includes('-pyg') || artikelNr.includes('-pwg');
+        return artikelNr.includes('-p-') || artikelNr.includes('-cl-') || artikelNr.includes('-prg') || artikelNr.includes('-pyg') || artikelNr.includes('-pwg');
       });
     
     
