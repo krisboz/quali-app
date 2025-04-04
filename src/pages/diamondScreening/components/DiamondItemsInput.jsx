@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import "../styles/DiamondItemsInput.scss";
+import {createDiamondScreeningsBatch} from "../../../api/diamondScreenings";
+import {toast} from "react-toastify";
 
 const DiamondItemsInput = ({ items }) => {
+  console.log({items})
   const [screenedItems, setScreenedItems] = useState([]);
   const [quantities, setQuantities] = useState(
     items.reduce((acc, item) => {
@@ -73,9 +76,27 @@ const DiamondItemsInput = ({ items }) => {
     return suppliers.find((sup) => firma.toLowerCase().includes(sup.toLowerCase())) || "Unknown";
   }
 
-  const submitScreenings = () => {
-    // Handle the submission logic here
-    console.log({ screenedItems });
+  const submitScreenings = async () => {
+    try {
+      const enrichedScreenedItems = screenedItems.map((item) => ({
+        ...item,
+        ursprMenge: items.find(i => i.id === item.id)?.["urspr. Menge"] || 0,
+      }));
+
+      const res = await createDiamondScreeningsBatch(enrichedScreenedItems);
+      
+      toast.success(
+        `Success: ${res.insertedCount} inserted, ${res.updatedCount} updated`
+      );
+      
+      // Refresh parent data and clear selection
+      setScreenedItems([]);
+      setQuantities({});
+      setBemerkungen({});
+
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   return (

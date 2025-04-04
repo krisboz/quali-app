@@ -12,13 +12,13 @@ const DiamondScreening = () => {
   useEffect(() => {
     //TODO custom month/year
     const fetchData = async () => {
-      const formattedMonth = String(3).padStart(2, "0"); // Ensure MM format
+      const formattedMonth = String(4).padStart(2, "0"); // Ensure MM format
       const selectedYear = 2025;
       try {
         const data = await getDiamondItems(formattedMonth, selectedYear);
 
         setItemsToTest(data.items);
-        console.log("Made Tests:", data);
+        console.log("Items to test:", data);
       } catch (error) {
         console.error("Error fetching diamond screenings:", error);
       }

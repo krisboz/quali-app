@@ -86,15 +86,18 @@ const initializeDB = () => {
       UNIQUE(lieferant, farbe, test_month)
     );
 
-    CREATE TABLE IF NOT EXISTS diamond_screenings (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      liefertermin TEXT NOT NULL,
-      lieferant TEXT NOT NULL CHECK(lieferant IN ('Adoma', 'Breuning', 'Sisti', 'Rösch', 'Schofer', 'Scheingraber')),
-      bestellnr TEXT NOT NULL UNIQUE,
-      artikelnr TEXT NOT NULL,
-      quantity INTEGER NOT NULL,
-      bemerkung TEXT
-    );
+
+   CREATE TABLE IF NOT EXISTS diamond_screenings (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  liefertermin TEXT NOT NULL,
+  lieferant TEXT NOT NULL,
+  bestellnr TEXT NOT NULL,
+  artikelnr TEXT NOT NULL,
+  quantity INTEGER NOT NULL CHECK(quantity > 0),
+  bemerkung TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(bestellnr, artikelnr, liefertermin)
+);
   `,
     (err) => {
       if (err) {
