@@ -1,12 +1,16 @@
 import { useState, useEffect } from "react";
-import { getDiamondScreenings } from "../../../api/diamondScreenings";
+import {
+  getDiamondScreenings,
+  deleteDiamondScreening,
+} from "../../../api/diamondScreenings";
+import { MdDeleteOutline } from "react-icons/md";
+
 
 const TableMadeTests = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // State for filtering and pagination
   const [filters, setFilters] = useState({
     liefertermin: "",
     lieferant: "",
@@ -24,7 +28,7 @@ const TableMadeTests = () => {
       try {
         const response = await getDiamondScreenings();
         setData(response.data);
-        console.log("screening data", response.data)
+        console.log("screening data", response.data);
       } catch (err) {
         setError(err);
       } finally {
@@ -35,17 +39,26 @@ const TableMadeTests = () => {
     fetchData();
   }, [filters]);
 
-  // Filter data based on filter inputs
-  const filteredData = data.filter((item) => {
-    return Object.keys(filters).every((key) => {
+  const handleDelete = async (id) => {
+    console.log(id)
+    try {
+      await deleteDiamondScreening(id);
+      setData((prevData) => prevData.filter((item) => item.id !== id));
+    } catch (err) {
+      console.error("Delete failed:", err);
+      alert("Failed to delete the item.");
+    }
+  };
+
+  const filteredData = data.filter((item) =>
+    Object.keys(filters).every((key) => {
       if (!filters[key]) return true;
       const itemValue = String(item[key]).toLowerCase();
       const filterValue = filters[key].toLowerCase();
       return itemValue.includes(filterValue);
-    });
-  });
+    })
+  );
 
-  // Paginate data
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
@@ -56,11 +69,11 @@ const TableMadeTests = () => {
       ...prev,
       [column]: value,
     }));
-    setCurrentPage(1); // Reset to first page when filters change
+    setCurrentPage(1);
   };
 
   if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (error) return <div>Error: {error.message || error}</div>;
 
   return (
     <div style={{ padding: "20px", maxWidth: "1200px", margin: "0 auto" }}>
@@ -99,17 +112,33 @@ const TableMadeTests = () => {
                   />
                 </th>
               ))}
+              <th style={{ padding: "8px", border: "1px solid #ddd" }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {currentItems.map((item, index) => (
-              <tr key={index} style={{ borderBottom: "1px solid #ddd" }}>
+              <tr key={item.id || index} style={{ borderBottom: "1px solid #ddd" }}>
                 <td style={{ padding: "8px" }}>{item.liefertermin}</td>
                 <td style={{ padding: "8px" }}>{item.lieferant}</td>
                 <td style={{ padding: "8px" }}>{item.bestellnr}</td>
                 <td style={{ padding: "8px" }}>{item.artikelnr}</td>
                 <td style={{ padding: "8px" }}>{item.quantity}</td>
                 <td style={{ padding: "8px" }}>{item.bemerkung}</td>
+                <td style={{ padding: "8px" }}>
+                  <button
+                    onClick={() => handleDelete(item.id)}
+                    style={{
+                      padding: "4px 8px",
+                      backgroundColor: "#e74c3c",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "4px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <MdDeleteOutline/>
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>

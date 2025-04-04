@@ -75,7 +75,7 @@ export const deleteDiamondScreening = async (id) => {
   try {
     const token = localStorage.getItem("token");
     const response = await axios.delete(
-      `${API_BASE_URL}/api/diamond-screenings/${id}`,
+      `${API_BASE_URL}/api/diamond-screening/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
