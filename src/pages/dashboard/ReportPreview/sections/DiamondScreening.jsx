@@ -12,12 +12,15 @@ const DiamondScreening = ({ selectedMonth, selectedYear }) => {
 
   useEffect(() => {
     const filterProblematicTests = (tests) => {
-      return tests.filter(test => test.bemerkung && test.bemerkung.trim() !== '');
+      return tests.filter(
+        (test) => test.bemerkung && test.bemerkung.trim() !== ""
+      );
     };
 
     const fetchData = async () => {
       try {
         const liefertermin = `${selectedYear}-${formattedMonth}`;
+        console.log({ liefertermin });
 
         const data = await getDiamondItems(formattedMonth, selectedYear);
         const madeTests = await getDiamondScreenings({ liefertermin });
@@ -26,7 +29,7 @@ const DiamondScreening = ({ selectedMonth, selectedYear }) => {
         setMadeTests(madeTests.data);
         const problematic = filterProblematicTests(madeTests.data);
         setProblematicTests(problematic);
-        console.log("Problematic Tests:", problematic);
+        console.log("made tests:", madeTests);
       } catch (error) {
         console.error("Error fetching diamond screenings:", error);
       }
@@ -38,7 +41,10 @@ const DiamondScreening = ({ selectedMonth, selectedYear }) => {
   if (madeTests.length === 0) {
     return (
       <div>
-        <p>No diamond screenings were performed for the {diamondItems.length} delivered items in {formattedMonth}/{selectedYear}.</p>
+        <p>
+          No diamond screenings were performed for the {diamondItems.length}{" "}
+          delivered items in {formattedMonth}/{selectedYear}.
+        </p>
       </div>
     );
   }
@@ -46,12 +52,19 @@ const DiamondScreening = ({ selectedMonth, selectedYear }) => {
   return (
     <div className="diamond-screening-container">
       <h2 className="title">Diamond Screening Report</h2>
-      <p className="summary">For {formattedMonth}/{selectedYear}, a total of {diamondItems.length} diamond items were delivered.</p>
-      <p className="summary">Out of the {diamondItems.length} delivered items, {madeTests.length} underwent screening tests.</p>
       <p className="summary">
-        {madeTests.length - problematicTests.length} items passed the tests without any issues.
+        For {formattedMonth}/{selectedYear}, a total of {diamondItems.length}{" "}
+        diamond items were delivered.
       </p>
-      
+      <p className="summary">
+        Out of the {diamondItems.length} delivered items, {madeTests.length}{" "}
+        underwent screening tests.
+      </p>
+      <p className="summary">
+        {madeTests.length - problematicTests.length} items passed the tests
+        without any issues.
+      </p>
+
       <h3 className="problematic-heading">Problematic Screenings:</h3>
       <div className="problematic-tests">
         {problematicTests.map((test, index) => (

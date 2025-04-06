@@ -5,13 +5,13 @@ import {
 } from "../../../api/diamondScreenings";
 import { MdDeleteOutline } from "react-icons/md";
 
-
 const TableMadeTests = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const [filters, setFilters] = useState({
+    created_at: "",
     liefertermin: "",
     lieferant: "",
     bestellnr: "",
@@ -40,7 +40,7 @@ const TableMadeTests = () => {
   }, [filters]);
 
   const handleDelete = async (id) => {
-    console.log(id)
+    console.log(id);
     try {
       await deleteDiamondScreening(id);
       setData((prevData) => prevData.filter((item) => item.id !== id));
@@ -112,12 +112,19 @@ const TableMadeTests = () => {
                   />
                 </th>
               ))}
-              <th style={{ padding: "8px", border: "1px solid #ddd" }}>Actions</th>
+              <th style={{ padding: "8px", border: "1px solid #ddd" }}>
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
             {currentItems.map((item, index) => (
-              <tr key={item.id || index} style={{ borderBottom: "1px solid #ddd" }}>
+              <tr
+                key={item.id || index}
+                style={{ borderBottom: "1px solid #ddd" }}
+              >
+                <td style={{ padding: "8px" }}>{item.created_at}</td>
+
                 <td style={{ padding: "8px" }}>{item.liefertermin}</td>
                 <td style={{ padding: "8px" }}>{item.lieferant}</td>
                 <td style={{ padding: "8px" }}>{item.bestellnr}</td>
@@ -136,7 +143,7 @@ const TableMadeTests = () => {
                       cursor: "pointer",
                     }}
                   >
-                    <MdDeleteOutline/>
+                    <MdDeleteOutline />
                   </button>
                 </td>
               </tr>
