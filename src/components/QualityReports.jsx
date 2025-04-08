@@ -23,6 +23,7 @@ const QualityReports = () => {
   const loadReports = async () => {
     try {
       const data = await fetchQualityReports();
+      console.log({data})
       setReports(data);
     } catch (err) {
       setError(err.message);

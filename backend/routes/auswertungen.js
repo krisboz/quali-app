@@ -70,6 +70,14 @@ router.post('/', authenticateToken, (req, res) => {
           return res.status(400).json({ message: "All data is duplicate." });
         }
 
+        //Handle 
+        function normalizeTermin(termin) {
+          if (/^\d+$/.test(termin)) {
+            return convertExcelSerialToDate(Number(termin));
+          }
+          return termin;
+        }
+
         // Proceed to insert newData
         db.serialize(() => {
           db.run("BEGIN TRANSACTION");
@@ -89,7 +97,7 @@ router.post('/', authenticateToken, (req, res) => {
                 row["Beleg"],
                 row["Firma"],
                 row[" Werkauftrag"],
-                row["Termin"],
+                normalizeTermin(row["Termin"]),
                 row["Artikel-Nr."],
                 row[" Artikel-Nr. fertig"],
                 row["Beschreibung"],
@@ -168,7 +176,7 @@ router.get('/', authenticateToken, (req, res) => {
     params.push(`%${firma}%`);
   }
   if (werkauftrag) {
-    whereClauses.push('" Werkauftrag" LIKE ?');
+    whereClauses.push('"Werkauftrag" LIKE ?');
     params.push(`%${werkauftrag}%`);
   }
   if (artikelnr) {
@@ -176,7 +184,7 @@ router.get('/', authenticateToken, (req, res) => {
     params.push(`%${artikelnr}%`);
   }
   if (artikelnrfertig) {
-    whereClauses.push('" Artikel-Nr. fertig" LIKE ?');
+    whereClauses.push('"Artikel-Nr. fertig" LIKE ?');
     params.push(`%${artikelnrfertig}%`);
   }
   if (termin) {
@@ -188,7 +196,20 @@ router.get('/', authenticateToken, (req, res) => {
 
   const whereClause = whereClauses.length ? `WHERE ${whereClauses.join(' AND ')}` : '';
 
-  const sql = `SELECT * FROM auswertungen ${whereClause} LIMIT ? OFFSET ?`;
+  // Add ORDER BY Termin DESC with proper date conversion
+  const sql = `
+    SELECT * 
+    FROM auswertungen 
+    ${whereClause} 
+    ORDER BY 
+      STRFTIME('%Y-%m-%d', 
+        SUBSTR("Termin", 7, 4) || '-' || 
+        SUBSTR("Termin", 4, 2) || '-' || 
+        SUBSTR("Termin", 1, 2)
+      ) DESC 
+    LIMIT ? OFFSET ?;
+  `;
+  
   const countSql = `SELECT COUNT(*) as total FROM auswertungen ${whereClause}`;
 
   db.all(sql, [...params, limit, offset], (err, rows) => {
@@ -206,6 +227,8 @@ router.get('/', authenticateToken, (req, res) => {
     });
   });
 });
+
+
 
 router.get('/diamond_items', authenticateToken, (req, res) => {
   try {
@@ -237,7 +260,7 @@ router.get('/diamond_items', authenticateToken, (req, res) => {
       // Filter items with "-p-" or "Cl" in Artikel-Nr. fertig (case-insensitive)
       const filteredItems = rows.filter(row => {
         const artikelNr = row[' Artikel-Nr. fertig']?.toLowerCase() || '';
-        return artikelNr.includes('-p-') || artikelNr.includes('-cl-') || artikelNr.includes('-prg') || artikelNr.includes('-pyg') || artikelNr.includes('-pwg');
+        return artikelNr.includes('-p-') || artikelNr.includes('-cl-') || artikelNr.includes('-prg') || artikelNr.includes('-pyg') || artikelNr.includes('-pwg') || artikelNr.includes('-pl-');
       });
     
     

@@ -7,6 +7,46 @@ const db = new sqlite3.Database("./database.sqlite", (err) => {
   }
 });
 
+// Convert Excel serial date to DD.MM.YYYY probasbly not necessary anymore since from now on
+//all rows are normalized befoer uploading
+function convertExcelSerialToDate(serial) {
+  const epoch = new Date(Date.UTC(1899, 11, 30)); // Excel's zero date
+  const converted = new Date(epoch.getTime() + serial * 86400 * 1000);
+  return `${converted.getDate().toString().padStart(2, '0')}.${(converted.getMonth() + 1).toString().padStart(2, '0')}.${converted.getFullYear()}`;
+}
+// One-time fixer for "Termin" in auswertungen
+function fixExistingTerminDates() {
+  db.all(`SELECT id, "Termin" FROM auswertungen`, (err, rows) => {
+    if (err) {
+      console.error("Failed to read Termin fields:", err);
+      return;
+    }
+
+    const updates = rows
+      .filter(row => /^\d+$/.test(row["Termin"])) // only numeric strings
+      .map(row => ({
+        id: row.id,
+        fixedDate: convertExcelSerialToDate(Number(row["Termin"]))
+      }));
+
+    if (updates.length === 0) {
+      console.log("✅ No Excel-style 'Termin' dates to fix.");
+      return;
+    }
+
+    db.serialize(() => {
+      const stmt = db.prepare(`UPDATE auswertungen SET "Termin" = ? WHERE id = ?`);
+      updates.forEach(({ fixedDate, id }) => {
+        stmt.run(fixedDate, id);
+      });
+      stmt.finalize(() => {
+        console.log(`✅ Fixed ${updates.length} old Excel-style 'Termin' dates.`);
+      });
+    });
+  });
+}
+
+
 // Function to initialize the database
 const initializeDB = () => {
   db.exec(

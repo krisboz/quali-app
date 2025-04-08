@@ -1,0 +1,43 @@
+.title-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.month-year-input {
+    display: flex;
+    align-items: center;
+    font-size: 1.2rem;
+    gap: .5rem;
+
+
+
+    .month-input {
+        width: 40px;
+    }
+
+    .year-input {
+        width: 60px;
+    }
+}
+
+.diamond-screening-controls-container {
+    button {
+        display:flex;
+        align-items: center;
+        justify-content: center;
+        transition: .2s ease-in-out;
+
+        svg {
+            transition: .2s ease-in-out;
+
+        }
+
+        &:hover {
+            border-radius: 12px;
+            svg {
+                transform: scale(1.2);
+            }
+        }
+    }
+}

@@ -20,11 +20,11 @@ const InspectionInput = ({ chosenOrder, clickedItem, setClickedItem, setInspecti
     mitarbeiter: "",
     lieferantInformiertAm: "",
     fotos: [],
-    loesung: ""
+    loesung: "",
+    quantity: 1 // Add quantity field here
   });
   const [loading, setLoading] = useState(false);
   const modalRef = useRef(null);
-
 
   const resetFormData = () => {
     setFormData({
@@ -39,7 +39,8 @@ const InspectionInput = ({ chosenOrder, clickedItem, setClickedItem, setInspecti
       mitarbeiter: "",
       lieferantInformiertAm: "",
       fotos: [],
-      loesung: ""
+      loesung: "",
+      quantity: 1 // Reset quantity field
     });
   };
 
@@ -84,6 +85,7 @@ const InspectionInput = ({ chosenOrder, clickedItem, setClickedItem, setInspecti
     formDataToSend.append("mitarbeiter", formData.mitarbeiter);
     formDataToSend.append("lieferantInformiertAm", formData.lieferantInformiertAm);
     formDataToSend.append("loesung", formData.loesung);
+    formDataToSend.append("quantity", formData.quantity); // Add quantity to the FormData
 
     // Append each photo to the FormData
     for (let i = 0; i < formData.fotos.length; i++) {
@@ -95,7 +97,8 @@ const InspectionInput = ({ chosenOrder, clickedItem, setClickedItem, setInspecti
     // Send data to the backend using the new API function
     try {
       const result = await submitQualityReport(formDataToSend);
-      toast.success(`Report for ${formData.artikelnr} submitted successfully`)
+      console.log("LOOK AT ME RESULT", {result})
+      toast.success(`Report for ${formData.artikelnr} submitted successfully`);
       setInspectionsOptimistically(formData);
       resetFormData();
       setLoading(false); // Stop the loading spinner
@@ -127,7 +130,7 @@ const InspectionInput = ({ chosenOrder, clickedItem, setClickedItem, setInspecti
     <>
       {/* Loading spinner */}
       {loading && <Loading />}
-      
+
       {/* Form in background */}
       <div className="quality-input-overlay">
         <div className="quality-input" ref={modalRef}>
@@ -139,32 +142,42 @@ const InspectionInput = ({ chosenOrder, clickedItem, setClickedItem, setInspecti
           </div>
 
           <form onSubmit={handleSubmit} className="quality-input-form">
-       
+            <div className="inspection-input-unchangeable-data">
+              <label>
+                Lieferant:
+                <p>{formData.lieferant}</p>
+              </label>
 
-<div className="inspection-input-unchangeable-data">
-<label>
-              Lieferant:
-              <p>{formData.lieferant}</p>
-            </label>
+              <label>
+                Auftragsnummer:
+                <p>{formData.auftragsnummer}</p>
+              </label>
 
-            <label>
-              Auftragsnummer:
-              <p>{formData.auftragsnummer}</p>
-            </label>
+              <label>
+                Artikelnr:
+                <p>{formData.artikelnr}</p>
+              </label>
+            </div>
 
-            <label>
-              Artikelnr:
-              <p>{formData.artikelnr}</p>
-            </label>
-
-</div>
-      
+            <div className="two-column-inspection-input-container">
             <label>
               Datum Liefertermin:
               <input
                 type="date"
                 name="liefertermin"
                 value={formData.liefertermin}
+                onChange={handleChange}
+                required
+              />
+            </label>
+
+            {/* New Quantity field */}
+            <label>
+              Quantity:
+              <input
+                type="number"
+                name="quantity"
+                value={formData.quantity}
                 onChange={handleChange}
                 required
               />
@@ -189,7 +202,7 @@ const InspectionInput = ({ chosenOrder, clickedItem, setClickedItem, setInspecti
                 onChange={handleChange}
                 required
               >
-                    {formData.mangelgrad === "" && <option value="">Choose Mangelgrad</option>}
+                {formData.mangelgrad === "" && <option value="">Choose Mangelgrad</option>}
 
                 <option value="1">1</option>
                 <option value="2">2</option>
@@ -228,6 +241,9 @@ const InspectionInput = ({ chosenOrder, clickedItem, setClickedItem, setInspecti
               />
             </label>
 
+            </div>
+
+      
             <div className="foto-input-container">
               <label>
                 Fotos:

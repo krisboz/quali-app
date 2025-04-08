@@ -4,7 +4,6 @@ import {createDiamondScreeningsBatch} from "../../../api/diamondScreenings";
 import {toast} from "react-toastify";
 
 const DiamondItemsInput = ({ items }) => {
-  console.log({items})
   const [screenedItems, setScreenedItems] = useState([]);
   const [quantities, setQuantities] = useState(
     items.reduce((acc, item) => {

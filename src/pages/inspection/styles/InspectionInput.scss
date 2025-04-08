@@ -50,6 +50,11 @@
   .close-input-button:hover {
     color: #e74c3c;
   }
+
+  .two-column-inspection-input-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
   
   /* Form Input Styles */
   .quality-input-form label {
