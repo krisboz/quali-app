@@ -1,0 +1,100 @@
+.report-wrapper {
+    font-family: sans-serif;
+    padding: 2rem;
+}
+
+.report-content {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 10px;
+    max-width: 800px;
+    margin: 0 auto;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.report-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.report-logo {
+    height: 20px;
+    margin-right: 0;
+}
+
+.report-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding-right: 3rem;
+
+    h2 {
+        margin: 0;
+    }
+
+    p {
+        margin: 0;
+        color: #555;
+    }
+}
+
+.report-section {
+    margin: 2rem 0;
+}
+
+.report-download-button {
+    text-align: center;
+    margin-top: 2rem;
+
+    button {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        background-color: #1976d2;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+
+        &:hover {
+            background-color: #1565c0;
+        }
+    }
+}
+
+
+
+//NEWWWWW
+.report-content {
+    background: white; // Ensure background is white for PDF
+    box-sizing: border-box;
+    margin: 0 auto;
+    padding: 20px;
+
+    // Hide download button in PDF
+    .report-download-button {
+        display: none;
+    }
+
+    // Adjust chart sizes for PDF
+    .recharts-wrapper {
+        svg {
+            width: 100% !important;
+            height: auto !important;
+        }
+    }
+}
+
+// Temporary styles applied during PDF export
+.pdf-export {
+    width: 794px !important; // A4 width in pixels
+    margin: 0 auto;
+    padding: 20px;
+    box-shadow: none;
+
+    .report-download-button {
+        display: none;
+    }
+}

@@ -1,30 +1,36 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const authenticateToken = require('../middleware/auth');
-const { db } = require('../db');
+const authenticateToken = require("../middleware/auth");
+const { db } = require("../db");
 
-router.post('/', authenticateToken, (req, res) => {
+router.post("/", authenticateToken, (req, res) => {
   try {
     let data = req.body;
 
     if (!Array.isArray(data) || data.length === 0) {
-      return res.status(400).json({ message: "Invalid or empty data received" });
+      return res
+        .status(400)
+        .json({ message: "Invalid or empty data received" });
     }
 
     // Step 1: Remove rows where "Artikel-Nr." is "01-TCGoldschmiede"
-    data = data.filter(row => row["Artikel-Nr."] !== "01-TCGoldschmiede");
+    data = data.filter((row) => row["Artikel-Nr."] !== "01-TCGoldschmiede");
 
     // Step 2: Remove rows where "Artikel-Nr." is undefined or doesn't start with "01"
-    data = data.filter(row => row["Artikel-Nr."] && row["Artikel-Nr."].startsWith("01"));
+    data = data.filter(
+      (row) => row["Artikel-Nr."] && row["Artikel-Nr."].startsWith("01")
+    );
 
     if (data.length === 0) {
-      return res.status(400).json({ message: "No valid data left after initial filtering." });
+      return res
+        .status(400)
+        .json({ message: "No valid data left after initial filtering." });
     }
 
     // Step 3: Remove intra-batch duplicates
     const seenInBatch = new Set();
     let batchDuplicates = 0;
-    data = data.filter(row => {
+    data = data.filter((row) => {
       const key = `${row["Beleg"]}|${row["Firma"]}|${row[" Artikel-Nr. fertig"]}`;
       if (seenInBatch.has(key)) {
         batchDuplicates++;
@@ -35,12 +41,14 @@ router.post('/', authenticateToken, (req, res) => {
     });
 
     if (data.length === 0) {
-      return res.status(400).json({ message: "No valid data after removing intra-batch duplicates." });
+      return res.status(400).json({
+        message: "No valid data after removing intra-batch duplicates.",
+      });
     }
 
     // Step 4: Check existing duplicates in the database
-    const keys = Array.from(seenInBatch).map(k => {
-      const [beleg, firma, artikel] = k.split('|');
+    const keys = Array.from(seenInBatch).map((k) => {
+      const [beleg, firma, artikel] = k.split("|");
       return { beleg, firma, artikel };
     });
 
@@ -57,20 +65,22 @@ router.post('/', authenticateToken, (req, res) => {
     const checkChunks = () => {
       if (processedChunks >= keyChunks.length) {
         // All chunks processed, proceed to filter data
-        const newData = data.filter(row => {
+        const newData = data.filter((row) => {
           const key = `${row["Beleg"]}|${row["Firma"]}|${row[" Artikel-Nr. fertig"]}`;
           return !existingKeys.has(key);
         });
 
         const dbDuplicates = data.length - newData.length;
         const totalDuplicates = batchDuplicates + dbDuplicates;
-        console.log(`Found ${totalDuplicates} duplicate rows (${batchDuplicates} in batch, ${dbDuplicates} in database).`);
+        console.log(
+          `Found ${totalDuplicates} duplicate rows (${batchDuplicates} in batch, ${dbDuplicates} in database).`
+        );
 
         if (newData.length === 0) {
           return res.status(400).json({ message: "All data is duplicate." });
         }
 
-        //Handle 
+        //Handle
         function normalizeTermin(termin) {
           if (/^\d+$/.test(termin)) {
             return convertExcelSerialToDate(Number(termin));
@@ -91,7 +101,7 @@ router.post('/', authenticateToken, (req, res) => {
           );
 
           try {
-            console.log({newData})
+            console.log({ newData });
             for (const row of newData) {
               stmt.run(
                 row["Beleg"],
@@ -112,9 +122,9 @@ router.post('/', authenticateToken, (req, res) => {
             }
             stmt.finalize();
             db.run("COMMIT");
-            res.json({ 
-              message: 'Filtered Auswertungen data uploaded successfully.',
-              duplicates: totalDuplicates
+            res.json({
+              message: "Filtered Auswertungen data uploaded successfully.",
+              duplicates: totalDuplicates,
             });
           } catch (error) {
             db.run("ROLLBACK");
@@ -126,21 +136,23 @@ router.post('/', authenticateToken, (req, res) => {
       }
 
       const chunk = keyChunks[processedChunks];
-      const placeholders = chunk.map(() => '(?, ?, ?)').join(', ');
+      const placeholders = chunk.map(() => "(?, ?, ?)").join(", ");
       const query = `
         SELECT Beleg, Firma, " Artikel-Nr. fertig" 
         FROM auswertungen 
         WHERE (Beleg, Firma, " Artikel-Nr. fertig") IN (${placeholders})
       `;
-      const params = chunk.flatMap(k => [k.beleg, k.firma, k.artikel]);
+      const params = chunk.flatMap((k) => [k.beleg, k.firma, k.artikel]);
 
       db.all(query, params, (err, rows) => {
         if (err) {
           console.error("Error checking duplicates:", err);
-          return res.status(500).json({ message: "Error checking for duplicates" });
+          return res
+            .status(500)
+            .json({ message: "Error checking for duplicates" });
         }
 
-        rows.forEach(row => {
+        rows.forEach((row) => {
           const key = `${row.Beleg}|${row.Firma}|${row[" Artikel-Nr. fertig"]}`;
           existingKeys.add(key);
         });
@@ -151,15 +163,26 @@ router.post('/', authenticateToken, (req, res) => {
     };
 
     checkChunks();
-
   } catch (error) {
     console.error("Server error:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
 
-router.get('/', authenticateToken, (req, res) => {
-  let { beleg, firma, werkauftrag, artikelnr, termin, artikelnrfertig, page = 1, limit = 100 } = req.query;
+router.get("/", authenticateToken, (req, res) => {
+  let {
+    beleg,
+    firma,
+    werkauftrag,
+    artikelnr,
+    termin,
+    terminFrom,
+    terminTo,
+    artikelnrfertig,
+    page = 1,
+    limit = 100,
+  } = req.query;
+
   page = parseInt(page, 10);
   limit = parseInt(limit, 10);
   const offset = (page - 1) * limit;
@@ -187,16 +210,29 @@ router.get('/', authenticateToken, (req, res) => {
     whereClauses.push('"Artikel-Nr. fertig" LIKE ?');
     params.push(`%${artikelnrfertig}%`);
   }
+
+  // Filter by exact date if provided
   if (termin) {
-    const [year, month, day] = termin.split('-');
-    const formattedTermin = `${day}.${month}.${year}`;
+    const [year, month, day] = termin.split("-");
+    const formatted = `${day}.${month}.${year}`;
     whereClauses.push('"Termin" = ?');
-    params.push(formattedTermin);
+    params.push(formatted);
   }
 
-  const whereClause = whereClauses.length ? `WHERE ${whereClauses.join(' AND ')}` : '';
+  // Handle date range filtering
+  if (terminFrom && terminTo) {
+    whereClauses.push(`
+      DATE(
+        SUBSTR("Termin", 7, 4) || '-' || SUBSTR("Termin", 4, 2) || '-' || SUBSTR("Termin", 1, 2)
+      ) BETWEEN DATE(?) AND DATE(?)
+    `);
+    params.push(terminFrom, terminTo); // now already in YYYY-MM-DD
+  }
 
-  // Add ORDER BY Termin DESC with proper date conversion
+  const whereClause = whereClauses.length
+    ? `WHERE ${whereClauses.join(" AND ")}`
+    : "";
+
   const sql = `
     SELECT * 
     FROM auswertungen 
@@ -209,7 +245,7 @@ router.get('/', authenticateToken, (req, res) => {
       ) DESC 
     LIMIT ? OFFSET ?;
   `;
-  
+
   const countSql = `SELECT COUNT(*) as total FROM auswertungen ${whereClause}`;
 
   db.all(sql, [...params, limit, offset], (err, rows) => {
@@ -228,56 +264,58 @@ router.get('/', authenticateToken, (req, res) => {
   });
 });
 
-
-
-router.get('/diamond_items', authenticateToken, (req, res) => {
+router.get("/diamond_items", authenticateToken, (req, res) => {
   try {
     const { month, year } = req.query;
-    
+
     if (!month || !year) {
       return res.status(400).json({
         success: false,
-        message: 'Month and year parameters are required'
+        message: "Month and year parameters are required",
       });
     }
 
     // Pad month to 2 digits and create search pattern
-    const paddedMonth = month.padStart(2, '0');
+    const paddedMonth = month.padStart(2, "0");
     const searchPattern = `%.${paddedMonth}.${year}`;
 
     const sql = `SELECT * FROM auswertungen WHERE "Termin" LIKE ?`;
-    
+
     db.all(sql, [searchPattern], (err, rows) => {
       if (err) {
-        console.error('Database error:', err);
+        console.error("Database error:", err);
         return res.status(500).json({
           success: false,
-          message: 'Database error'
+          message: "Database error",
         });
       }
-    
-    
+
       // Filter items with "-p-" or "Cl" in Artikel-Nr. fertig (case-insensitive)
-      const filteredItems = rows.filter(row => {
-        const artikelNr = row[' Artikel-Nr. fertig']?.toLowerCase() || '';
-        return artikelNr.includes('-p-') || artikelNr.includes('-cl-') || artikelNr.includes('-prg') || artikelNr.includes('-pyg') || artikelNr.includes('-pwg') || artikelNr.includes('-pl-');
+      const filteredItems = rows.filter((row) => {
+        const artikelNr = row[" Artikel-Nr. fertig"]?.toLowerCase() || "";
+        return (
+          artikelNr.includes("-p-") ||
+          artikelNr.includes("-cl-") ||
+          artikelNr.includes("-prg") ||
+          artikelNr.includes("-pyg") ||
+          artikelNr.includes("-pwg") ||
+          artikelNr.includes("-pl-")
+        );
       });
-    
-    
+
       res.json({
         success: true,
         month: paddedMonth,
         year,
         count: filteredItems.length,
-        items: filteredItems
+        items: filteredItems,
       });
     });
-
   } catch (error) {
-    console.error('Error in diamond_items endpoint:', error);
+    console.error("Error in diamond_items endpoint:", error);
     res.status(500).json({
       success: false,
-      message: 'Internal server error'
+      message: "Internal server error",
     });
   }
 });

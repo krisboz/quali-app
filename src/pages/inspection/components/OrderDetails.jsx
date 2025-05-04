@@ -4,20 +4,24 @@ import { IoClose } from "react-icons/io5";
 import InspectionInput from "./InspectionInput";
 import { searchQualityReportsByAuftragsnummer } from "../../../api/api";
 import { toast } from "react-toastify";
+import EtiketGenerator from "./../../../components/EtiketGenerator/EtiketGenerator";
 
 const OrderDetails = ({ chosenOrder, setChosenOrder }) => {
   const [clickedItem, setClickedItem] = useState(null);
   const [inspections, setInspections] = useState(null);
+  const [printItems, setPrintItems] = useState(false);
 
   useEffect(() => {
     if (chosenOrder && chosenOrder.orderNumber) {
       const loadInspections = async (orderNumber) => {
         try {
-          const inspections = await searchQualityReportsByAuftragsnummer(chosenOrder.orderNumber);
+          const inspections = await searchQualityReportsByAuftragsnummer(
+            chosenOrder.orderNumber
+          );
           setInspections(inspections);
         } catch (err) {
           console.log("Error", err);
-          toast.error(err.message)
+          toast.error(err.message);
         }
       };
       loadInspections(chosenOrder.orderNumber);
@@ -26,12 +30,12 @@ const OrderDetails = ({ chosenOrder, setChosenOrder }) => {
 
   const handleRowClick = (e, index) => {
     const clickedItem = chosenOrder.items[index];
-    
+
     // Check if item is already inspected
-    const isInspected = inspections?.some(inspection => 
-      inspection.artikelnr === clickedItem["Artikel-Nr. fertig"]
+    const isInspected = inspections?.some(
+      (inspection) => inspection.artikelnr === clickedItem["Artikel-Nr. fertig"]
     );
-    
+
     if (!isInspected) {
       setClickedItem(clickedItem);
     }
@@ -39,25 +43,25 @@ const OrderDetails = ({ chosenOrder, setChosenOrder }) => {
 
   // Check if specific item is inspected
   const isItemInspected = (item) => {
-    return inspections?.some(inspection => 
-      inspection.artikelnr === item["Artikel-Nr. fertig"]
+    return inspections?.some(
+      (inspection) => inspection.artikelnr === item["Artikel-Nr. fertig"]
     );
   };
 
   const renderTableRows = () => {
     return chosenOrder.items.map((item, index) => {
       const isInspected = isItemInspected(item);
-      
+
       return (
         <tr
           key={item.id || index}
           onClick={(e) => handleRowClick(e, index)}
           className={isInspected ? "inspected-row" : ""}
-          style={{ 
+          style={{
             cursor: isInspected ? "not-allowed" : "pointer",
-            backgroundColor: isInspected ? "#f5f5f5" : "transparent"
+            backgroundColor: isInspected ? "#f5f5f5" : "transparent",
           }}
-          title={isInspected?"Already inspected":null}
+          title={isInspected ? "Already inspected" : null}
         >
           <td>{item["Artikel-Nr. fertig"] || ""}</td>
           <td>{item["Einzelpreis"] || ""}</td>
@@ -74,11 +78,27 @@ const OrderDetails = ({ chosenOrder, setChosenOrder }) => {
   };
 
   const setInspectionsOptimistically = (newEntry) => {
-    setInspections(prev=>[...prev, newEntry])
-  }
+    setInspections((prev) => [...prev, newEntry]);
+  };
+
+  const generateInputForEtiketGenerator = () => {
+    const items = chosenOrder.items;
+
+    console.log("ITEMS", items);
+    const arrayToInput = items.map((item) => ({
+      code: item["Artikel-Nr. fertig"],
+      size: item["Größe"],
+      quantity: item["Menge offen"] < 10 ? item["Menge offen"] : 10,
+    }));
+
+    return arrayToInput;
+  };
 
   return (
     <div className="detailed-order-preview">
+      {printItems && (
+        <EtiketGenerator dataToPrint={generateInputForEtiketGenerator()} />
+      )}
       <div className="close-button-container">
         <button onClick={(e) => setChosenOrder(null)}>
           <IoClose />
@@ -89,6 +109,7 @@ const OrderDetails = ({ chosenOrder, setChosenOrder }) => {
         <div className="detailed-order-title">
           <h1>{chosenOrder.orderNumber}</h1>
           <h2>{chosenOrder.firma}</h2>
+          <button onClick={() => setPrintItems(true)}>PRINT</button>
         </div>
 
         <div className="detailed-items-container">
@@ -118,9 +139,9 @@ const OrderDetails = ({ chosenOrder, setChosenOrder }) => {
 
       {clickedItem && (
         <div className="inspection-input-container">
-          <InspectionInput 
-            chosenOrder={chosenOrder} 
-            clickedItem={clickedItem} 
+          <InspectionInput
+            chosenOrder={chosenOrder}
+            clickedItem={clickedItem}
             setClickedItem={setClickedItem}
             setInspectionsOptimistically={setInspectionsOptimistically}
           />

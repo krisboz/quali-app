@@ -1,8 +1,8 @@
 import axios from "axios";
 
-const API_BASE_URL ="https://reimagined-journey-5r599v49g9r2577-5000.app.github.dev";
+//const API_BASE_URL ="https://reimagined-journey-5r599v49g9r2577-5000.app.github.dev";
 
-//const API_BASE_URL = "http://localhost:5000"; // Change this to your actual backend URL
+const API_BASE_URL = "http://localhost:5000"; // Change this to your actual backend URL
 
 // Login function
 export const login = async (credentials) => {
@@ -49,13 +49,20 @@ export const submitQualityReport = async (formData) => {
   }
 };
 
-// Function to fetch quality reports
-export const fetchQualityReports = async () => {
+// Function to fetch quality reports, optionally filtered by date range
+export const fetchQualityReports = async (terminFrom, terminTo) => {
   try {
     const token = localStorage.getItem("token");
+
+    const params = {};
+    if (terminFrom) params.terminFrom = terminFrom;
+    if (terminTo) params.terminTo = terminTo;
+
     const response = await axios.get(`${API_BASE_URL}/quality-reports`, {
-      headers: { Authorization: `Bearer ${token}` }, // Send JWT in headers
+      headers: { Authorization: `Bearer ${token}` },
+      params,
     });
+
     return response.data;
   } catch (error) {
     throw error.response?.data?.message || "Failed to fetch quality reports";

@@ -22,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+/backend/database.sqlite
+/backend/database.sqlite-shm
+/backend/database.sqlite-wal
+
+# Optional: Ignore other potential log/temp files
+/backend/*.log
+/backend/node_modules/
