@@ -62,7 +62,6 @@ export const fetchQualityReports = async (terminFrom, terminTo) => {
       headers: { Authorization: `Bearer ${token}` },
       params,
     });
-
     return response.data;
   } catch (error) {
     throw error.response?.data?.message || "Failed to fetch quality reports";

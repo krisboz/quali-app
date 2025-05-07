@@ -181,11 +181,17 @@ router.get("/", authenticateToken, (req, res) => {
     artikelnrfertig,
     page = 1,
     limit = 100,
+    pagesOff, // new param
   } = req.query;
 
-  page = parseInt(page, 10);
-  limit = parseInt(limit, 10);
-  const offset = (page - 1) * limit;
+  const usePaging = !(pagesOff === "true" || pagesOff === "1");
+
+  if (usePaging) {
+    page = parseInt(page, 10);
+    limit = parseInt(limit, 10);
+  }
+
+  const offset = usePaging ? (page - 1) * limit : 0;
 
   let whereClauses = [];
   let params = [];
@@ -211,7 +217,6 @@ router.get("/", authenticateToken, (req, res) => {
     params.push(`%${artikelnrfertig}%`);
   }
 
-  // Filter by exact date if provided
   if (termin) {
     const [year, month, day] = termin.split("-");
     const formatted = `${day}.${month}.${year}`;
@@ -219,37 +224,46 @@ router.get("/", authenticateToken, (req, res) => {
     params.push(formatted);
   }
 
-  // Handle date range filtering
   if (terminFrom && terminTo) {
     whereClauses.push(`
       DATE(
         SUBSTR("Termin", 7, 4) || '-' || SUBSTR("Termin", 4, 2) || '-' || SUBSTR("Termin", 1, 2)
       ) BETWEEN DATE(?) AND DATE(?)
     `);
-    params.push(terminFrom, terminTo); // now already in YYYY-MM-DD
+    params.push(terminFrom, terminTo);
   }
 
   const whereClause = whereClauses.length
     ? `WHERE ${whereClauses.join(" AND ")}`
     : "";
 
-  const sql = `
-    SELECT * 
-    FROM auswertungen 
-    ${whereClause} 
+  const orderBy = `
     ORDER BY 
       STRFTIME('%Y-%m-%d', 
         SUBSTR("Termin", 7, 4) || '-' || 
         SUBSTR("Termin", 4, 2) || '-' || 
         SUBSTR("Termin", 1, 2)
-      ) DESC 
-    LIMIT ? OFFSET ?;
+      ) DESC
+  `;
+
+  const sql = `
+    SELECT * 
+    FROM auswertungen 
+    ${whereClause} 
+    ${orderBy}
+    ${usePaging ? "LIMIT ? OFFSET ?" : ""};
   `;
 
   const countSql = `SELECT COUNT(*) as total FROM auswertungen ${whereClause}`;
 
-  db.all(sql, [...params, limit, offset], (err, rows) => {
+  const sqlParams = usePaging ? [...params, limit, offset] : params;
+
+  db.all(sql, sqlParams, (err, rows) => {
     if (err) return res.status(500).json({ message: "Database error" });
+
+    if (!usePaging) {
+      return res.json({ rows, total: rows.length });
+    }
 
     db.get(countSql, params, (countErr, countRow) => {
       if (countErr) return res.status(500).json({ message: "Database error" });

@@ -15,6 +15,7 @@
    it should display it nicely in the pdf
  */
 import React, { useRef, useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import {
   PieChart,
   Pie,
@@ -64,6 +65,87 @@ const barData = [
 
 const COLORS = ["#4caf50", "#f44336"];
 
+// Assuming `auswertungen` and `qualityReports` are already fetched data arrays
+const returnFailRateStats = (inspections, auswertungen) => {
+  // Utility function to filter data based on a date range
+  const filterDataByDateRange = (data, startDate, endDate) => {
+    return data.filter((item) => {
+      const itemDate = new Date(item.liefertermin || item.Termin); // Adjust this based on your date field
+      return isWithinInterval(itemDate, { start: startDate, end: endDate });
+    });
+  };
+
+  // Get today's date
+  const today = new Date();
+
+  // Last Week: Get the start and end of the last week
+  const lastWeekStart = startOfWeek(subDays(today, 7), { weekStartsOn: 1 }); // 1 means Monday
+  const lastWeekEnd = endOfWeek(subDays(today, 7), { weekStartsOn: 1 });
+
+  // Last Month: Get the start and end of the last month
+  const lastMonthStart = startOfMonth(subMonths(today, 1));
+  const lastMonthEnd = endOfMonth(subMonths(today, 1));
+
+  // Last Year: Get the start and end of the last fiscal year (April 1st of the last year to March 31st of this year)
+  const lastYearStart = new Date(today.getFullYear() - 1, 3, 1); // April 1st of last year
+  const lastYearEnd = new Date(today.getFullYear(), 2, 31); // March 31st of this year
+
+  // Filter inspections, auswertungen, and quality reports based on the time ranges
+  const lastWeekInspections = filterDataByDateRange(
+    inspections,
+    lastWeekStart,
+    lastWeekEnd
+  );
+  const lastWeekAuswertungen = filterDataByDateRange(
+    auswertungen,
+    lastWeekStart,
+    lastWeekEnd
+  );
+
+  const lastMonthInspections = filterDataByDateRange(
+    inspections,
+    lastMonthStart,
+    lastMonthEnd
+  );
+  const lastMonthAuswertungen = filterDataByDateRange(
+    auswertungen,
+    lastMonthStart,
+    lastMonthEnd
+  );
+
+  const lastYearInspections = filterDataByDateRange(
+    inspections,
+    lastYearStart,
+    lastYearEnd
+  );
+  const lastYearAuswertungen = filterDataByDateRange(
+    auswertungen,
+    lastYearStart,
+    lastYearEnd
+  );
+
+  // Logging the filtered data for debugging or for UI rendering
+  const stats = {
+    lastWeek: {
+      inspections: lastWeekInspections,
+      auswertungen: lastWeekAuswertungen,
+    },
+    lastMonth: {
+      inspections: lastMonthInspections,
+      auswertungen: lastMonthAuswertungen,
+    },
+    lastYear: {
+      inspections: lastYearInspections,
+      auswertungen: lastYearAuswertungen,
+    },
+  };
+
+  console.log("Data for Last Week, Month, and Year:", stats);
+  console.table(stats);
+
+  // Here you can calculate fail rates or other stats using the filtered data
+};
+
 const ReportGenerator = () => {
   const reportRef = useRef(null);
 
@@ -92,11 +174,16 @@ const ReportGenerator = () => {
       try {
         const [inspectionsRes, auswertungenRes] = await Promise.all([
           fetchQualityReports("2024-04-01", "2025-05-04"),
-          searchAuswertungen({ terminFrom: "2024-04-01", terminTo }),
+          searchAuswertungen({
+            terminFrom: "2024-04-01",
+            terminTo: "2025-05-04",
+            pagesOff: true,
+          }),
         ]);
+        const tempAuswertungen = auswertungenRes.rows;
         setInspections(inspectionsRes);
         setAuswertungen(auswertungenRes.rows);
-        console.log(inspectionsRes, auswertungenRes.rows);
+        returnFailRateStats(inspectionsRes, tempAuswertungen);
       } catch (err) {
         console.error("Error fetching data:", err);
         toast.error(err.message);
@@ -188,108 +275,8 @@ const ReportGenerator = () => {
     pdf.save("quality-report.pdf");
   };
 
-  // Assuming `auswertungen` and `qualityReports` are already fetched data arrays
-  const returnFailRateStats = (inspections, auswertungen, qualityReports) => {
-    // Utility function to filter data based on a date range
-    const filterDataByDateRange = (data, startDate, endDate) => {
-      return data.filter((item) => {
-        const itemDate = new Date(item.termin || item.liefertermin); // Adjust this based on your date field
-        return isWithinInterval(itemDate, { start: startDate, end: endDate });
-      });
-    };
-
-    // Get today's date
-    const today = new Date();
-
-    // Last Week: Get the start and end of the last week
-    const lastWeekStart = startOfWeek(subDays(today, 7), { weekStartsOn: 1 }); // 1 means Monday
-    const lastWeekEnd = endOfWeek(subDays(today, 7), { weekStartsOn: 1 });
-
-    // Last Month: Get the start and end of the last month
-    const lastMonthStart = startOfMonth(subMonths(today, 1));
-    const lastMonthEnd = endOfMonth(subMonths(today, 1));
-
-    // Last Year: Get the start and end of the last fiscal year (April 1st of the last year to March 31st of this year)
-    const lastYearStart = new Date(today.getFullYear() - 1, 3, 1); // April 1st of last year
-    const lastYearEnd = new Date(today.getFullYear(), 2, 31); // March 31st of this year
-
-    // Filter inspections, auswertungen, and quality reports based on the time ranges
-    const lastWeekInspections = filterDataByDateRange(
-      inspections,
-      lastWeekStart,
-      lastWeekEnd
-    );
-    const lastWeekAuswertungen = filterDataByDateRange(
-      auswertungen,
-      lastWeekStart,
-      lastWeekEnd
-    );
-    const lastWeekReports = filterDataByDateRange(
-      qualityReports,
-      lastWeekStart,
-      lastWeekEnd
-    );
-
-    const lastMonthInspections = filterDataByDateRange(
-      inspections,
-      lastMonthStart,
-      lastMonthEnd
-    );
-    const lastMonthAuswertungen = filterDataByDateRange(
-      auswertungen,
-      lastMonthStart,
-      lastMonthEnd
-    );
-    const lastMonthReports = filterDataByDateRange(
-      qualityReports,
-      lastMonthStart,
-      lastMonthEnd
-    );
-
-    const lastYearInspections = filterDataByDateRange(
-      inspections,
-      lastYearStart,
-      lastYearEnd
-    );
-    const lastYearAuswertungen = filterDataByDateRange(
-      auswertungen,
-      lastYearStart,
-      lastYearEnd
-    );
-    const lastYearReports = filterDataByDateRange(
-      qualityReports,
-      lastYearStart,
-      lastYearEnd
-    );
-
-    // Logging the filtered data for debugging or for UI rendering
-    const stats = {
-      lastWeek: {
-        inspections: lastWeekInspections,
-        auswertungen: lastWeekAuswertungen,
-        qualityReports: lastWeekReports,
-      },
-      lastMonth: {
-        inspections: lastMonthInspections,
-        auswertungen: lastMonthAuswertungen,
-        qualityReports: lastMonthReports,
-      },
-      lastYear: {
-        inspections: lastYearInspections,
-        auswertungen: lastYearAuswertungen,
-        qualityReports: lastYearReports,
-      },
-    };
-
-    console.log("Data for Last Week, Month, and Year:");
-    console.table(stats);
-
-    // Here you can calculate fail rates or other stats using the filtered data
-  };
-
   // Example usage of the function:
   // Assuming inspections, auswertungen, and qualityReports are already fetched data arrays
-  returnFailRateStats(inspections, auswertungen, inspections);
 
   /**
    * first notes
