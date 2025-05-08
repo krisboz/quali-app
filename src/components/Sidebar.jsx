@@ -11,6 +11,8 @@ import "../styles/components/Sidebar.scss";
 import { LuLayoutDashboard as DashboardIcon } from "react-icons/lu";
 import { FaMagnifyingGlass as InspectionIcon } from "react-icons/fa6";
 import { TbReportSearch as QualityReportsIcon } from "react-icons/tb";
+import { TbTags as ItemsIcon } from "react-icons/tb";
+
 import { LiaTruckLoadingSolid as OrdersIcon } from "react-icons/lia";
 import { AiOutlineGold as GoldIcon } from "react-icons/ai";
 
@@ -101,6 +103,19 @@ const Sidebar = () => {
               Quality Reports
             </NavLink>
           </li>
+
+          <li style={{ marginBottom: "10px" }}>
+            <NavLink
+              to="/app/items"
+              style={({ isActive }) => ({
+                fontWeight: isActive ? "bold" : "normal",
+              })}
+            >
+              <ItemsIcon />
+              Items
+            </NavLink>
+          </li>
+
           <li style={{ marginBottom: "10px" }}>
             <NavLink
               to="/app/auswertungen"

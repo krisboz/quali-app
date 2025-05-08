@@ -7,6 +7,23 @@
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 
+    .close-btn-container {
+        display: flex;
+        justify-content: end;
+        padding: .5rem;
+        button {
+            padding: .2rem;
+            height: 30px;
+            width: 30px;
+            background:none;
+            color:black;
+
+            &:hover {
+                color: red;
+            }
+        }
+    }
+
     form {
         display: flex;
         flex-wrap: wrap;

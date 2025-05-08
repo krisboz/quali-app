@@ -1,0 +1,21 @@
+h1 {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 2rem;
+}
+
+.close-button {
+    color: black;
+    background: none;
+    padding: 0.3rem;
+    margin: 0 1rem;
+    transition: .1s ease-in-out;
+    border: none;
+
+    &:hover {
+        transform: scale(1.2);
+        color: red;
+        border: none;
+    }
+}

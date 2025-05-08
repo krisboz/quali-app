@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import "../styles/OrderDetails.scss";
-import { IoClose } from "react-icons/io5";
+import { IoClose, IoPrint } from "react-icons/io5";
 import InspectionInput from "./InspectionInput";
 import { searchQualityReportsByAuftragsnummer } from "../../../api/api";
 import { toast } from "react-toastify";
 import EtiketGenerator from "./../../../components/EtiketGenerator/EtiketGenerator";
+
 
 const OrderDetails = ({ chosenOrder, setChosenOrder }) => {
   const [clickedItem, setClickedItem] = useState(null);
@@ -27,6 +28,11 @@ const OrderDetails = ({ chosenOrder, setChosenOrder }) => {
       loadInspections(chosenOrder.orderNumber);
     }
   }, [chosenOrder]);
+
+  const togglePrintItems = () => {
+    setPrintItems(prev=>!prev)
+  }
+
 
   const handleRowClick = (e, index) => {
     const clickedItem = chosenOrder.items[index];
@@ -82,6 +88,7 @@ const OrderDetails = ({ chosenOrder, setChosenOrder }) => {
   };
 
   const generateInputForEtiketGenerator = () => {
+  
     const items = chosenOrder.items;
 
     console.log("ITEMS", items);
@@ -97,7 +104,7 @@ const OrderDetails = ({ chosenOrder, setChosenOrder }) => {
   return (
     <div className="detailed-order-preview">
       {printItems && (
-        <EtiketGenerator dataToPrint={generateInputForEtiketGenerator()} />
+        <EtiketGenerator toggleFunction={togglePrintItems} dataToPrint={generateInputForEtiketGenerator()} />
       )}
       <div className="close-button-container">
         <button onClick={(e) => setChosenOrder(null)}>
@@ -109,7 +116,7 @@ const OrderDetails = ({ chosenOrder, setChosenOrder }) => {
         <div className="detailed-order-title">
           <h1>{chosenOrder.orderNumber}</h1>
           <h2>{chosenOrder.firma}</h2>
-          <button onClick={() => setPrintItems(true)}>PRINT</button>
+          <button onClick={() => togglePrintItems()}><IoPrint/></button>
         </div>
 
         <div className="detailed-items-container">

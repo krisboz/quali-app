@@ -6,6 +6,7 @@ import ReportGenerator from "../../components/ReportGenerator/ReportGenerator";
 const Dashboard = () => {
   const [user, setUser] = useState(null);
   const [showPreviews, setShowPreviews] = useState(false);
+  const [generateReport, setGenerateReport] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -22,6 +23,10 @@ const Dashboard = () => {
   const toggleShowPreviews = () => {
     setShowPreviews((prev) => !prev);
   };
+
+  const toggleGenerateReports = () => {
+    setGenerateReport(prev=>!prev)
+  }
 
   const calcTimeOfDay = () => {
     const curHr = new Date().getHours();
@@ -90,11 +95,14 @@ const Dashboard = () => {
         <button onClick={toggleShowPreviews}>
           {!showPreviews ? "Show Report Previews" : "Hide Report Previews"}
         </button>
+        <button onClick={toggleGenerateReports}>
+          {!generateReport ? "Generate Report" : "Hide Report Generation"}
+        </button>
       </div>
-      <ReportGenerator />
 
       <div className="report-preview-container">
         {showPreviews && <ReportPreview />}
+        {generateReport && <ReportGenerator/>}
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import jsPDF from "jspdf";
 import "./EtiketGenerator.scss";
 
-const EtiketGenerator = ({ dataToPrint }) => {
+const EtiketGenerator = ({ toggleFunction, dataToPrint }) => {
   const [inputValue, setInputValue] = useState("");
   const [valuesToPrint, setValuesToPrint] = useState([]);
   const [ringSize, setRingSize] = useState("54");
@@ -101,6 +101,7 @@ const EtiketGenerator = ({ dataToPrint }) => {
 
   return (
     <div className="etiket-generator">
+      <div className="close-btn-container"><button onClick={toggleFunction}>X</button></div>
       <form onSubmit={handleAddValue}>
         <input
           value={inputValue}

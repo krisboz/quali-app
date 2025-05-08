@@ -4,7 +4,6 @@ import { MdDeleteOutline as DeleteIcon} from "react-icons/md";
 const TestsList = ({ tests, loading, onDelete, onUpdateRemark }) => {
   if (loading) return <div>Loading tests...</div>;
 
-  console.log({ tests });
 
   return (
     <div>

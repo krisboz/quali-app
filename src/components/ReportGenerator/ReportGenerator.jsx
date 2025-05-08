@@ -75,6 +75,38 @@ const returnFailRateStats = (inspections, auswertungen) => {
     });
   };
 
+  const groupDataBySupplier = (inspections, auswertungen) => {
+    const suppliers = ["Adoma", "Breuning", "Rösch", "Schofer", "Sisti"];
+  
+    const result = suppliers.map((supplier) => {
+      const filteredInspections = inspections.filter(
+        (i) => i.lieferant?.toLowerCase() === supplier.toLowerCase()
+      );
+  
+      const filteredAuswertungen = auswertungen.filter(
+        (a) => a.Firma?.toLowerCase().includes(supplier.toLowerCase())
+      );
+  
+      return {
+        supplier,
+        inspections: filteredInspections,
+        auswertungen: filteredAuswertungen,
+        inspectionCount: filteredInspections.length,
+        auswertungCount: filteredAuswertungen.length,
+        // optionally calculate fail rate or other metrics here
+      };
+    });
+  
+    console.table(result.map(({ supplier, inspectionCount, auswertungCount }) => ({
+      supplier,
+      inspectionCount,
+      auswertungCount
+    })));
+  
+    return result;
+  };
+  
+
   // Get today's date
   const today = new Date();
 
@@ -101,6 +133,7 @@ const returnFailRateStats = (inspections, auswertungen) => {
     lastWeekStart,
     lastWeekEnd
   );
+  const lastWeekBySupplier = groupDataBySupplier(lastWeekInspections, lastWeekAuswertungen)
 
   const lastMonthInspections = filterDataByDateRange(
     inspections,
@@ -129,19 +162,24 @@ const returnFailRateStats = (inspections, auswertungen) => {
     lastWeek: {
       inspections: lastWeekInspections,
       auswertungen: lastWeekAuswertungen,
+      suppliers: groupDataBySupplier(lastWeekInspections, lastWeekAuswertungen),
     },
     lastMonth: {
       inspections: lastMonthInspections,
       auswertungen: lastMonthAuswertungen,
+      suppliers: groupDataBySupplier(lastMonthInspections, lastMonthAuswertungen),
     },
     lastYear: {
       inspections: lastYearInspections,
       auswertungen: lastYearAuswertungen,
+      suppliers: groupDataBySupplier(lastYearInspections, lastYearAuswertungen),
     },
   };
+  
+  groupDataBySupplier(inspections, auswertungen)
 
   console.log("Data for Last Week, Month, and Year:", stats);
-  console.table(stats);
+  return stats
 
   // Here you can calculate fail rates or other stats using the filtered data
 };
@@ -163,6 +201,7 @@ const ReportGenerator = () => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedSupplier, setSelectedSupplier] = useState("Adoma");
   const [visibleSection, setVisibleSection] = useState("allTime");
+  const [stats, setStats] = useState([]);
 
   useEffect(() => {
     const fetchAndSetData = async () => {
@@ -183,7 +222,7 @@ const ReportGenerator = () => {
         const tempAuswertungen = auswertungenRes.rows;
         setInspections(inspectionsRes);
         setAuswertungen(auswertungenRes.rows);
-        returnFailRateStats(inspectionsRes, tempAuswertungen);
+        setStats(returnFailRateStats(inspectionsRes, tempAuswertungen))
       } catch (err) {
         console.error("Error fetching data:", err);
         toast.error(err.message);

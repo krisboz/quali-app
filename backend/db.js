@@ -126,6 +126,31 @@ const initializeDB = () => {
       UNIQUE(lieferant, farbe, test_month)
     );
 
+    CREATE TABLE IF NOT EXISTS items (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  Artikelgruppe TEXT,
+  Artikelnummer TEXT UNIQUE,
+  Bestand INTEGER,
+  Bezeichnung TEXT,
+  Inaktiv BOOLEAN,
+  LetzterEK REAL,
+  Lieferantenname TEXT,
+  Lieferfrist INTEGER,
+  MakeOrBuy TEXT,
+  Matchcode TEXT,
+  Mengeneinheit TEXT,
+  "UVP - Euro " REAL,
+  "VK 1 - Euro" REAL,
+  "verfügbar in" INTEGER,
+  _ARTIKELGRUPPENEU TEXT,
+  _BESTSELLER BOOLEAN,
+  _MARKETINGFOCUS BOOLEAN,
+  _PARETOCLUSTER TEXT,
+  _REGULARREPLENISHMENT BOOLEAN,
+  _SILHOUETTE TEXT
+);
+
+
 
    CREATE TABLE IF NOT EXISTS diamond_screenings (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
