@@ -1,0 +1,44 @@
+.grouped-items-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 16px; /* Adjust spacing between items */
+    border-top: 1px solid rgb(153, 153, 153);
+    padding: 16px;
+}
+
+.grouped-items-block {
+    border: 1px solid rgb(174, 174, 174);
+    width: 250px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 12px;
+    padding: 0 0 .5rem 0;
+    box-shadow: 1px 1px 1px 1px rgba(203, 203, 203, 0.295);
+    transition: .2s ease-in-out;
+
+    &:hover {
+        box-shadow: 2px 2px 2px 2px rgba(144, 144, 144, 0.295);
+    }
+
+    &:active {
+         box-shadow: 1px 1px 1px 1px rgba(203, 203, 203, 0.295);
+      
+    }
+
+    p, h3 {
+        cursor: pointer;
+    }
+  
+    p:first-of-type {
+      color: rgb(255, 255, 255); // or any style you want
+      border-bottom: 1px solid rgb(139, 139, 139);
+      cursor: pointer;
+      width:100%;
+      padding: .2rem .5rem;
+      background-color: var(--primary-color);
+      border-radius: 12px 12px 0 0;
+    }
+
+ 
+  }
