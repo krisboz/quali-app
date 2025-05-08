@@ -2,11 +2,23 @@ import { useState, useEffect } from "react"
 import ItemExcelInput from "./components/ItemExcelInput"
 import { TbTags as ItemsIcon } from "react-icons/tb";
 import "./Items.scss";
+import { fetchItems } from "../../api/items";
 
 
 const Items = () => {
     const [items, setItems] = useState([])
     const [uploadMode, setUploadMode] = useState(false)
+
+  useEffect(()=> {
+
+    const fetchApiItems = async() => {
+        const data = await fetchItems()
+        console.log(data)
+    }
+
+    fetchApiItems()
+
+    }, [])
 
     const toggleUploadMode = () => {
         setUploadMode(prev=>!prev)
