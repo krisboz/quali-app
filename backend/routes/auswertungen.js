@@ -8,30 +8,35 @@ router.post("/", authenticateToken, (req, res) => {
     let data = req.body;
 
     if (!Array.isArray(data) || data.length === 0) {
-      return res
-        .status(400)
-        .json({ message: "Invalid or empty data received" });
+      return res.status(400).json({ message: "Invalid or empty data received" });
     }
 
-    // Step 1: Remove rows where "Artikel-Nr." is "01-TCGoldschmiede"
-    data = data.filter((row) => row["Artikel-Nr."] !== "01-TCGoldschmiede");
-
-    // Step 2: Remove rows where "Artikel-Nr." is undefined or doesn't start with "01"
-    data = data.filter(
-      (row) => row["Artikel-Nr."] && row["Artikel-Nr."].startsWith("01")
-    );
+    // Initial filtering
+    data = data
+      .filter(row => row["Artikel-Nr."] !== "01-TCGoldschmiede")
+      .filter(row => row["Artikel-Nr."]?.startsWith("01"));
 
     if (data.length === 0) {
-      return res
-        .status(400)
-        .json({ message: "No valid data left after initial filtering." });
+      return res.status(400).json({ message: "No valid data after initial filtering." });
     }
 
-    // Step 3: Remove intra-batch duplicates
+    // Normalization functions
+    const normalizeTermin = (termin) => {
+      return /^\d+$/.test(termin) ? convertExcelSerialToDate(Number(termin)) : termin;
+    };
+
+    const normalizeNumber = (value) => {
+      if (typeof value === 'string') {
+        return parseFloat(value.replace(/\./g, '').replace(/,/g, '.'));
+      }
+      return value;
+    };
+
+    // Remove intra-batch duplicates using UNIQUE constraint columns
     const seenInBatch = new Set();
     let batchDuplicates = 0;
-    data = data.filter((row) => {
-      const key = `${row["Beleg"]}|${row["Firma"]}|${row[" Artikel-Nr. fertig"]}`;
+    data = data.filter(row => {
+      const key = `${row["Beleg"]}|${row[" Artikel-Nr. fertig"]}`; // Removed Firma from key
       if (seenInBatch.has(key)) {
         batchDuplicates++;
         return false;
@@ -41,19 +46,16 @@ router.post("/", authenticateToken, (req, res) => {
     });
 
     if (data.length === 0) {
-      return res.status(400).json({
-        message: "No valid data after removing intra-batch duplicates.",
-      });
+      return res.status(400).json({ message: "No data after deduplication" });
     }
 
-    // Step 4: Check existing duplicates in the database
-    const keys = Array.from(seenInBatch).map((k) => {
-      const [beleg, firma, artikel] = k.split("|");
-      return { beleg, firma, artikel };
+    // Check existing duplicates in database
+    const keys = Array.from(seenInBatch).map(k => {
+      const [beleg, artikel] = k.split("|"); // Removed Firma
+      return { beleg, artikel };
     });
 
-    // Split keys into chunks to avoid SQL parameter limit
-    const chunkSize = 300; // Adjust based on SQLITE_LIMIT_VARIABLE_NUMBER (default 999)
+    const chunkSize = 300;
     const keyChunks = [];
     for (let i = 0; i < keys.length; i += chunkSize) {
       keyChunks.push(keys.slice(i, i + chunkSize));
@@ -64,46 +66,43 @@ router.post("/", authenticateToken, (req, res) => {
 
     const checkChunks = () => {
       if (processedChunks >= keyChunks.length) {
-        // All chunks processed, proceed to filter data
-        const newData = data.filter((row) => {
-          const key = `${row["Beleg"]}|${row["Firma"]}|${row[" Artikel-Nr. fertig"]}`;
-          return !existingKeys.has(key);
-        });
+        const toInsert = [];
+        const toUpdate = [];
 
-        const dbDuplicates = data.length - newData.length;
-        const totalDuplicates = batchDuplicates + dbDuplicates;
-        console.log(
-          `Found ${totalDuplicates} duplicate rows (${batchDuplicates} in batch, ${dbDuplicates} in database).`
-        );
-
-        if (newData.length === 0) {
-          return res.status(400).json({ message: "All data is duplicate." });
+        for (const row of data) {
+          const key = `${row["Beleg"]}|${row[" Artikel-Nr. fertig"]}`;
+          existingKeys.has(key) ? toUpdate.push(row) : toInsert.push(row);
         }
 
-        //Handle
-        function normalizeTermin(termin) {
-          if (/^\d+$/.test(termin)) {
-            return convertExcelSerialToDate(Number(termin));
-          }
-          return termin;
-        }
-
-        // Proceed to insert newData
         db.serialize(() => {
           db.run("BEGIN TRANSACTION");
 
-          const stmt = db.prepare(
-            `INSERT INTO auswertungen 
-            ("Beleg", "Firma", " Werkauftrag", "Termin", "Artikel-Nr.", " Artikel-Nr. fertig", 
-             "Beschreibung", " Beschreibung 2", "urspr. Menge", "Menge offen", 
-             "Einzelpreis", "G-Preis", "Farbe", "Größe") 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-          );
-
           try {
-            console.log({ newData });
-            for (const row of newData) {
-              stmt.run(
+            // INSERT statement with ON CONFLICT handling
+            const insertStmt = db.prepare(`
+              INSERT INTO auswertungen 
+              ("Beleg", "Firma", " Werkauftrag", "Termin", "Artikel-Nr.", " Artikel-Nr. fertig", 
+              "Beschreibung", " Beschreibung 2", "urspr. Menge", "Menge offen", 
+              "Einzelpreis", "G-Preis", "Farbe", "Größe") 
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+              ON CONFLICT("Beleg", " Artikel-Nr. fertig") DO UPDATE SET
+                "Firma" = excluded."Firma",
+                " Werkauftrag" = excluded." Werkauftrag",
+                "Termin" = excluded."Termin",
+                "Artikel-Nr." = excluded."Artikel-Nr.",
+                "Beschreibung" = excluded."Beschreibung",
+                " Beschreibung 2" = excluded." Beschreibung 2",
+                "urspr. Menge" = excluded."urspr. Menge",
+                "Menge offen" = excluded."Menge offen",
+                "Einzelpreis" = excluded."Einzelpreis",
+                "G-Preis" = excluded."G-Preis",
+                "Farbe" = excluded."Farbe",
+                "Größe" = excluded."Größe"
+            `);
+
+            // Process all rows with UPSERT logic
+            for (const row of data) {
+              insertStmt.run(
                 row["Beleg"],
                 row["Firma"],
                 row[" Werkauftrag"],
@@ -112,49 +111,51 @@ router.post("/", authenticateToken, (req, res) => {
                 row[" Artikel-Nr. fertig"],
                 row["Beschreibung"],
                 row[" Beschreibung 2"],
-                row["urspr. Menge"],
-                row["Menge offen"],
-                row["Einzelpreis"],
-                row["G-Preis"],
+                normalizeNumber(row["urspr. Menge"]),
+                normalizeNumber(row["Menge offen"]),
+                normalizeNumber(row["Einzelpreis"]),
+                normalizeNumber(row["G-Preis"]),
                 row["Farbe"],
                 row["Größe"]
               );
             }
-            stmt.finalize();
-            db.run("COMMIT");
-            res.json({
-              message: "Filtered Auswertungen data uploaded successfully.",
-              duplicates: totalDuplicates,
+
+            insertStmt.finalize();
+            db.run("COMMIT", (err) => {
+              if (err) throw err;
+              res.json({
+                message: "Data processed successfully",
+                inserted: toInsert.length,
+                updated: toUpdate.length,
+                duplicates: batchDuplicates
+              });
             });
           } catch (error) {
             db.run("ROLLBACK");
-            console.error("Error inserting data:", error);
-            res.status(500).json({ message: "Database insertion error" });
+            console.error("Database error:", error);
+            res.status(500).json({ message: "Database operation failed" });
           }
         });
         return;
       }
 
       const chunk = keyChunks[processedChunks];
-      const placeholders = chunk.map(() => "(?, ?, ?)").join(", ");
+      const placeholders = chunk.map(() => "(?, ?)").join(", ");
       const query = `
-        SELECT Beleg, Firma, " Artikel-Nr. fertig" 
+        SELECT Beleg, " Artikel-Nr. fertig" 
         FROM auswertungen 
-        WHERE (Beleg, Firma, " Artikel-Nr. fertig") IN (${placeholders})
+        WHERE (Beleg, " Artikel-Nr. fertig") IN (${placeholders})
       `;
-      const params = chunk.flatMap((k) => [k.beleg, k.firma, k.artikel]);
+      const params = chunk.flatMap(k => [k.beleg, k.artikel]);
 
       db.all(query, params, (err, rows) => {
         if (err) {
-          console.error("Error checking duplicates:", err);
-          return res
-            .status(500)
-            .json({ message: "Error checking for duplicates" });
+          console.error("Duplicate check error:", err);
+          return res.status(500).json({ message: "Duplicate check failed" });
         }
 
-        rows.forEach((row) => {
-          const key = `${row.Beleg}|${row.Firma}|${row[" Artikel-Nr. fertig"]}`;
-          existingKeys.add(key);
+        rows.forEach(row => {
+          existingKeys.add(`${row.Beleg}|${row[" Artikel-Nr. fertig"]}`);
         });
 
         processedChunks++;
