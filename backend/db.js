@@ -12,7 +12,11 @@ const db = new sqlite3.Database("./database.sqlite", (err) => {
 function convertExcelSerialToDate(serial) {
   const epoch = new Date(Date.UTC(1899, 11, 30)); // Excel's zero date
   const converted = new Date(epoch.getTime() + serial * 86400 * 1000);
-  return `${converted.getDate().toString().padStart(2, '0')}.${(converted.getMonth() + 1).toString().padStart(2, '0')}.${converted.getFullYear()}`;
+  return `${converted.getDate().toString().padStart(2, "0")}.${(
+    converted.getMonth() + 1
+  )
+    .toString()
+    .padStart(2, "0")}.${converted.getFullYear()}`;
 }
 // One-time fixer for "Termin" in auswertungen
 function fixExistingTerminDates() {
@@ -23,10 +27,10 @@ function fixExistingTerminDates() {
     }
 
     const updates = rows
-      .filter(row => /^\d+$/.test(row["Termin"])) // only numeric strings
-      .map(row => ({
+      .filter((row) => /^\d+$/.test(row["Termin"])) // only numeric strings
+      .map((row) => ({
         id: row.id,
-        fixedDate: convertExcelSerialToDate(Number(row["Termin"]))
+        fixedDate: convertExcelSerialToDate(Number(row["Termin"])),
       }));
 
     if (updates.length === 0) {
@@ -35,17 +39,20 @@ function fixExistingTerminDates() {
     }
 
     db.serialize(() => {
-      const stmt = db.prepare(`UPDATE auswertungen SET "Termin" = ? WHERE id = ?`);
+      const stmt = db.prepare(
+        `UPDATE auswertungen SET "Termin" = ? WHERE id = ?`
+      );
       updates.forEach(({ fixedDate, id }) => {
         stmt.run(fixedDate, id);
       });
       stmt.finalize(() => {
-        console.log(`✅ Fixed ${updates.length} old Excel-style 'Termin' dates.`);
+        console.log(
+          `✅ Fixed ${updates.length} old Excel-style 'Termin' dates.`
+        );
       });
     });
   });
 }
-
 
 // Function to initialize the database
 const initializeDB = () => {
@@ -77,6 +84,7 @@ const initializeDB = () => {
       fotos TEXT,
       dateOfInspection TEXT
     );
+
 
     CREATE TABLE IF NOT EXISTS auswertungen (
       id INTEGER PRIMARY KEY AUTOINCREMENT,

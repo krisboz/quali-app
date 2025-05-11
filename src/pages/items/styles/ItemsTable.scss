@@ -1,0 +1,96 @@
+// JewelryTable.scss
+.jewelry-table-container {
+    padding: 1rem;
+
+    .controls {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+
+        input {
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            flex-grow: 1;
+        }
+
+        .toggle-view {
+            padding: 0.5rem 1rem;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+
+            &:hover {
+                background: #0056b3;
+            }
+        }
+    }
+
+    .back-button {
+        margin-bottom: 1rem;
+        padding: 0.5rem 1rem;
+        background: #6c757d;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background 0.2s;
+
+        &:hover {
+            background: #5a6268;
+        }
+    }
+
+    .group-container,
+    .subgroup-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 1rem;
+
+        .group-box,
+        .subgroup-box {
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+
+            &:hover {
+                background: #e2e6ea;
+                transform: translateY(-2px);
+            }
+        }
+    }
+
+    .jewelry-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+
+        th,
+        td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        tr {
+            cursor: pointer;
+            transition: background 0.2s;
+
+            &:hover {
+                background: #f8f9fa;
+            }
+        }
+    }
+}

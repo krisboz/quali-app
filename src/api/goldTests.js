@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const API_BASE_URL ="https://reimagined-journey-5r599v49g9r2577-5000.app.github.dev/gold-tests";
-//const API_BASE_URL = "http://localhost:5000/gold-tests";
+//const API_BASE_URL ="https://reimagined-journey-5r599v49g9r2577-5000.app.github.dev/gold-tests";
+const API_BASE_URL = "http://localhost:5000/gold-tests";
 /**
  * Gold Tests API Service
  * Provides methods for interacting with all gold test endpoints

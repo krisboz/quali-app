@@ -1,36 +1,50 @@
-import { useState, useEffect } from "react"
-import ItemExcelInput from "./components/ItemExcelInput"
+import { useState, useEffect } from "react";
+import ItemExcelInput from "./components/ItemExcelInput";
 import { TbTags as ItemsIcon } from "react-icons/tb";
 import "./Items.scss";
 import { fetchItems } from "../../api/items";
-
+import ItemsTable from "./components/ItemsTable";
 
 const Items = () => {
-    const [items, setItems] = useState([])
-    const [uploadMode, setUploadMode] = useState(false)
+  const [items, setItems] = useState([]);
+  const [uploadMode, setUploadMode] = useState(false);
 
-  useEffect(()=> {
+  useEffect(() => {
+    const fetchApiItems = async () => {
+      const data = await fetchItems();
+      setItems(data);
+    };
 
-    const fetchApiItems = async() => {
-        const data = await fetchItems()
-        console.log(data)
-    }
+    fetchApiItems();
+  }, []);
 
-    fetchApiItems()
+  const toggleUploadMode = () => {
+    setUploadMode((prev) => !prev);
+  };
 
-    }, [])
+  return (
+    <main>
+      <h1>
+        <ItemsIcon /> Items
+      </h1>
 
-    const toggleUploadMode = () => {
-        setUploadMode(prev=>!prev)
-    }
+      <div className="item-excel-input-container">
+        {uploadMode ? (
+          <ItemExcelInput
+            setItems={setItems}
+            toggleFunction={toggleUploadMode}
+          />
+        ) : (
+          <button className="excel-input-button" onClick={toggleUploadMode}>
+            Add Excel
+          </button>
+        )}
+      </div>
+      <div className="items-table-container">
+        <ItemsTable items={items} />
+      </div>
+    </main>
+  );
+};
 
-    return(<main>
-        <h1><ItemsIcon/> Items</h1>
-
-        <div className="item-excel-input-container">
-       {uploadMode? <ItemExcelInput setItems={setItems} toggleFunction={toggleUploadMode}/>:<button className="excel-input-button" onClick={toggleUploadMode}>Add Excel</button>}
-        </div>
-    </main>)
-}
-
-export default Items
+export default Items;

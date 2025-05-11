@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const API_BASE_URL = "https://reimagined-journey-5r599v49g9r2577-5000.app.github.dev"; // Update to match your deployment
-//const API_BASE_URL = "http://localhost:5000"; // Change this to your actual backend URL
+//const API_BASE_URL = "https://reimagined-journey-5r599v49g9r2577-5000.app.github.dev"; // Update to match your deployment
+const API_BASE_URL = "http://localhost:5000"; // Change this to your actual backend URL
 
 /**
  * Bulk upload or update multiple items.
@@ -40,13 +40,9 @@ export const uploadItems = async (itemsArray) => {
 export const upsertItem = async (itemData) => {
   try {
     const token = localStorage.getItem("token");
-    const response = await axios.post(
-      `${API_BASE_URL}/api/items`,
-      itemData,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    const response = await axios.post(`${API_BASE_URL}/api/items`, itemData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
     return response.data;
   } catch (error) {
     throw error.response?.data?.message || "Failed to upsert item";

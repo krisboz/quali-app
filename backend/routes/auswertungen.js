@@ -5,38 +5,54 @@ const { db } = require("../db");
 
 router.post("/", authenticateToken, (req, res) => {
   try {
-    let data = req.body;
+    // Step 1: Sanitize incoming data keys (removes leading/trailing spaces in column names)
+    const sanitizeKeys = (data) =>
+      data.map((row) => {
+        const cleanRow = {};
+        for (let key in row) {
+          cleanRow[key.trim()] = row[key];
+        }
+        return cleanRow;
+      });
+
+    let data = sanitizeKeys(req.body);
 
     if (!Array.isArray(data) || data.length === 0) {
-      return res.status(400).json({ message: "Invalid or empty data received" });
+      return res
+        .status(400)
+        .json({ message: "Invalid or empty data received" });
     }
 
-    // Initial filtering
+    // Step 2: Filter data
     data = data
-      .filter(row => row["Artikel-Nr."] !== "01-TCGoldschmiede")
-      .filter(row => row["Artikel-Nr."]?.startsWith("01"));
+      .filter((row) => row["Artikel-Nr."] !== "01-TCGoldschmiede")
+      .filter((row) => row["Artikel-Nr."]?.startsWith("01"));
 
     if (data.length === 0) {
-      return res.status(400).json({ message: "No valid data after initial filtering." });
+      return res
+        .status(400)
+        .json({ message: "No valid data after initial filtering." });
     }
 
-    // Normalization functions
+    // Helpers
     const normalizeTermin = (termin) => {
-      return /^\d+$/.test(termin) ? convertExcelSerialToDate(Number(termin)) : termin;
+      return /^\d+$/.test(termin)
+        ? convertExcelSerialToDate(Number(termin))
+        : termin;
     };
 
     const normalizeNumber = (value) => {
-      if (typeof value === 'string') {
-        return parseFloat(value.replace(/\./g, '').replace(/,/g, '.'));
+      if (typeof value === "string") {
+        return parseFloat(value.replace(/\./g, "").replace(/,/g, "."));
       }
       return value;
     };
 
-    // Remove intra-batch duplicates using UNIQUE constraint columns
+    // Remove intra-batch duplicates using Beleg + Artikel-Nr. fertig as unique key
     const seenInBatch = new Set();
     let batchDuplicates = 0;
-    data = data.filter(row => {
-      const key = `${row["Beleg"]}|${row[" Artikel-Nr. fertig"]}`; // Removed Firma from key
+    data = data.filter((row) => {
+      const key = `${row["Beleg"]}|${row["Artikel-Nr. fertig"]}`;
       if (seenInBatch.has(key)) {
         batchDuplicates++;
         return false;
@@ -49,9 +65,9 @@ router.post("/", authenticateToken, (req, res) => {
       return res.status(400).json({ message: "No data after deduplication" });
     }
 
-    // Check existing duplicates in database
-    const keys = Array.from(seenInBatch).map(k => {
-      const [beleg, artikel] = k.split("|"); // Removed Firma
+    // Check which rows already exist in DB
+    const keys = Array.from(seenInBatch).map((k) => {
+      const [beleg, artikel] = k.split("|");
       return { beleg, artikel };
     });
 
@@ -70,7 +86,7 @@ router.post("/", authenticateToken, (req, res) => {
         const toUpdate = [];
 
         for (const row of data) {
-          const key = `${row["Beleg"]}|${row[" Artikel-Nr. fertig"]}`;
+          const key = `${row["Beleg"]}|${row["Artikel-Nr. fertig"]}`;
           existingKeys.has(key) ? toUpdate.push(row) : toInsert.push(row);
         }
 
@@ -78,20 +94,19 @@ router.post("/", authenticateToken, (req, res) => {
           db.run("BEGIN TRANSACTION");
 
           try {
-            // INSERT statement with ON CONFLICT handling
             const insertStmt = db.prepare(`
               INSERT INTO auswertungen 
-              ("Beleg", "Firma", " Werkauftrag", "Termin", "Artikel-Nr.", " Artikel-Nr. fertig", 
-              "Beschreibung", " Beschreibung 2", "urspr. Menge", "Menge offen", 
+              ("Beleg", "Firma", "Werkauftrag", "Termin", "Artikel-Nr.", "Artikel-Nr. fertig", 
+              "Beschreibung", "Beschreibung 2", "urspr. Menge", "Menge offen", 
               "Einzelpreis", "G-Preis", "Farbe", "Größe") 
               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-              ON CONFLICT("Beleg", " Artikel-Nr. fertig") DO UPDATE SET
+              ON CONFLICT("Beleg", "Artikel-Nr. fertig") DO UPDATE SET
                 "Firma" = excluded."Firma",
-                " Werkauftrag" = excluded." Werkauftrag",
+                "Werkauftrag" = excluded."Werkauftrag",
                 "Termin" = excluded."Termin",
                 "Artikel-Nr." = excluded."Artikel-Nr.",
                 "Beschreibung" = excluded."Beschreibung",
-                " Beschreibung 2" = excluded." Beschreibung 2",
+                "Beschreibung 2" = excluded."Beschreibung 2",
                 "urspr. Menge" = excluded."urspr. Menge",
                 "Menge offen" = excluded."Menge offen",
                 "Einzelpreis" = excluded."Einzelpreis",
@@ -100,17 +115,16 @@ router.post("/", authenticateToken, (req, res) => {
                 "Größe" = excluded."Größe"
             `);
 
-            // Process all rows with UPSERT logic
             for (const row of data) {
               insertStmt.run(
                 row["Beleg"],
                 row["Firma"],
-                row[" Werkauftrag"],
+                row["Werkauftrag"],
                 normalizeTermin(row["Termin"]),
                 row["Artikel-Nr."],
-                row[" Artikel-Nr. fertig"],
+                row["Artikel-Nr. fertig"],
                 row["Beschreibung"],
-                row[" Beschreibung 2"],
+                row["Beschreibung 2"],
                 normalizeNumber(row["urspr. Menge"]),
                 normalizeNumber(row["Menge offen"]),
                 normalizeNumber(row["Einzelpreis"]),
@@ -127,7 +141,7 @@ router.post("/", authenticateToken, (req, res) => {
                 message: "Data processed successfully",
                 inserted: toInsert.length,
                 updated: toUpdate.length,
-                duplicates: batchDuplicates
+                duplicates: batchDuplicates,
               });
             });
           } catch (error) {
@@ -142,11 +156,11 @@ router.post("/", authenticateToken, (req, res) => {
       const chunk = keyChunks[processedChunks];
       const placeholders = chunk.map(() => "(?, ?)").join(", ");
       const query = `
-        SELECT Beleg, " Artikel-Nr. fertig" 
+        SELECT Beleg, "Artikel-Nr. fertig" 
         FROM auswertungen 
-        WHERE (Beleg, " Artikel-Nr. fertig") IN (${placeholders})
+        WHERE (Beleg, "Artikel-Nr. fertig") IN (${placeholders})
       `;
-      const params = chunk.flatMap(k => [k.beleg, k.artikel]);
+      const params = chunk.flatMap((k) => [k.beleg, k.artikel]);
 
       db.all(query, params, (err, rows) => {
         if (err) {
@@ -154,8 +168,8 @@ router.post("/", authenticateToken, (req, res) => {
           return res.status(500).json({ message: "Duplicate check failed" });
         }
 
-        rows.forEach(row => {
-          existingKeys.add(`${row.Beleg}|${row[" Artikel-Nr. fertig"]}`);
+        rows.forEach((row) => {
+          existingKeys.add(`${row.Beleg}|${row["Artikel-Nr. fertig"]}`);
         });
 
         processedChunks++;
