@@ -14,8 +14,10 @@ const auswertungenRouter = require("./routes/auswertungen");
 const goldTestsRouter = require("./routes/goldTests");
 const diamondScreeningRouter = require("./routes/diamondScreening");
 const itemsRouter = require("./routes/items")
+const stichprobenRouter = require("./routes/stichproben")
 
 const { db, initializeDB } = require("./db");
+
 
 initializeDB();
 // Initialize express app
@@ -32,7 +34,7 @@ app.use("/api/auswertungen", auswertungRouter);
 app.use("/gold-tests", goldTestsRouter);
 app.use("/api/diamond-screening", diamondScreeningRouter);
 app.use("/api/items", itemsRouter);
-
+app.use("/api/stichproben", stichprobenRouter);
 
 // Simple GET route to check if the server is working
 app.get("/", (req, res) => {

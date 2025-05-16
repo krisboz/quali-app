@@ -116,6 +116,18 @@ const Sidebar = () => {
             </NavLink>
           </li>
 
+               <li style={{ marginBottom: "10px" }}>
+            <NavLink
+              to="/app/stichproben"
+              style={({ isActive }) => ({
+                fontWeight: isActive ? "bold" : "normal",
+              })}
+            >
+              <ItemsIcon />
+              Stichproben
+            </NavLink>
+          </li>
+
           <li style={{ marginBottom: "10px" }}>
             <NavLink
               to="/app/auswertungen"

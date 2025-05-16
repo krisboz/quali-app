@@ -196,102 +196,121 @@ router.get("/", authenticateToken, (req, res) => {
     artikelnrfertig,
     page = 1,
     limit = 100,
-    pagesOff, // new param
+    pagesOff,
   } = req.query;
 
-  const usePaging = !(pagesOff === "true" || pagesOff === "1");
+  try {
+    const usePaging = !(pagesOff === "true" || pagesOff === "1");
 
-  if (usePaging) {
-    page = parseInt(page, 10);
-    limit = parseInt(limit, 10);
-  }
-
-  const offset = usePaging ? (page - 1) * limit : 0;
-
-  let whereClauses = [];
-  let params = [];
-
-  if (beleg) {
-    whereClauses.push('"Beleg" LIKE ?');
-    params.push(`%${beleg}%`);
-  }
-  if (firma) {
-    whereClauses.push('"Firma" LIKE ?');
-    params.push(`%${firma}%`);
-  }
-  if (werkauftrag) {
-    whereClauses.push('"Werkauftrag" LIKE ?');
-    params.push(`%${werkauftrag}%`);
-  }
-  if (artikelnr) {
-    whereClauses.push('"Artikel-Nr." LIKE ?');
-    params.push(`%${artikelnr}%`);
-  }
-  if (artikelnrfertig) {
-    whereClauses.push('"Artikel-Nr. fertig" LIKE ?');
-    params.push(`%${artikelnrfertig}%`);
-  }
-
-  if (termin) {
-    const [year, month, day] = termin.split("-");
-    const formatted = `${day}.${month}.${year}`;
-    whereClauses.push('"Termin" = ?');
-    params.push(formatted);
-  }
-
-  if (terminFrom && terminTo) {
-    whereClauses.push(`
-      DATE(
-        SUBSTR("Termin", 7, 4) || '-' || SUBSTR("Termin", 4, 2) || '-' || SUBSTR("Termin", 1, 2)
-      ) BETWEEN DATE(?) AND DATE(?)
-    `);
-    params.push(terminFrom, terminTo);
-  }
-
-  const whereClause = whereClauses.length
-    ? `WHERE ${whereClauses.join(" AND ")}`
-    : "";
-
-  const orderBy = `
-    ORDER BY 
-      STRFTIME('%Y-%m-%d', 
-        SUBSTR("Termin", 7, 4) || '-' || 
-        SUBSTR("Termin", 4, 2) || '-' || 
-        SUBSTR("Termin", 1, 2)
-      ) DESC
-  `;
-
-  const sql = `
-    SELECT * 
-    FROM auswertungen 
-    ${whereClause} 
-    ${orderBy}
-    ${usePaging ? "LIMIT ? OFFSET ?" : ""};
-  `;
-
-  const countSql = `SELECT COUNT(*) as total FROM auswertungen ${whereClause}`;
-
-  const sqlParams = usePaging ? [...params, limit, offset] : params;
-
-  db.all(sql, sqlParams, (err, rows) => {
-    if (err) return res.status(500).json({ message: "Database error" });
-
-    if (!usePaging) {
-      return res.json({ rows, total: rows.length });
+    if (usePaging) {
+      page = parseInt(page, 10);
+      limit = parseInt(limit, 10);
+      if (isNaN(page) || isNaN(limit) || page < 1 || limit < 1) {
+        return res.status(400).json({ message: "Invalid pagination parameters." });
+      }
     }
 
-    db.get(countSql, params, (countErr, countRow) => {
-      if (countErr) return res.status(500).json({ message: "Database error" });
+    const offset = usePaging ? (page - 1) * limit : 0;
 
-      res.json({
-        rows,
-        total: countRow.total,
-        page,
-        limit,
+    const whereClauses = [];
+    const params = [];
+
+    if (beleg) {
+      whereClauses.push('"Beleg" LIKE ?');
+      params.push(`%${beleg}%`);
+    }
+    if (firma) {
+      whereClauses.push('"Firma" LIKE ?');
+      params.push(`%${firma}%`);
+    }
+    if (werkauftrag) {
+      whereClauses.push('"Werkauftrag" LIKE ?');
+      params.push(`%${werkauftrag}%`);
+    }
+    if (artikelnr) {
+      whereClauses.push('"Artikel-Nr." LIKE ?');
+      params.push(`%${artikelnr}%`);
+    }
+    if (artikelnrfertig) {
+      whereClauses.push('"Artikel-Nr. fertig" LIKE ?');
+      params.push(`%${artikelnrfertig}%`);
+    }
+
+    if (termin) {
+      const [year, month, day] = termin.split("-");
+      if (!year || !month || !day) {
+        return res.status(400).json({ message: "Invalid 'termin' format. Expected YYYY-MM-DD." });
+      }
+      const formatted = `${day}.${month}.${year}`;
+      whereClauses.push('"Termin" = ?');
+      params.push(formatted);
+    }
+
+    if (terminFrom && terminTo) {
+      whereClauses.push(`
+        DATE(
+          SUBSTR("Termin", 7, 4) || '-' || 
+          SUBSTR("Termin", 4, 2) || '-' || 
+          SUBSTR("Termin", 1, 2)
+        ) BETWEEN DATE(?) AND DATE(?)
+      `);
+      params.push(terminFrom, terminTo);
+    }
+
+    const whereClause = whereClauses.length
+      ? `WHERE ${whereClauses.join(" AND ")}`
+      : "";
+
+    const orderBy = `
+      ORDER BY 
+        STRFTIME('%Y-%m-%d', 
+          SUBSTR("Termin", 7, 4) || '-' || 
+          SUBSTR("Termin", 4, 2) || '-' || 
+          SUBSTR("Termin", 1, 2)
+        ) DESC
+    `;
+
+    const sql = `
+      SELECT * 
+      FROM auswertungen 
+      ${whereClause} 
+      ${orderBy}
+      ${usePaging ? "LIMIT ? OFFSET ?" : ""};
+    `;
+
+    const countSql = `SELECT COUNT(*) as total FROM auswertungen ${whereClause}`;
+    const sqlParams = usePaging ? [...params, limit, offset] : params;
+
+    db.all(sql, sqlParams, (err, rows) => {
+      if (err) {
+        console.error("Error querying rows:", err);
+        return res.status(500).json({ message: "Database query error." });
+      }
+
+      if (!usePaging) {
+        return res.json({ rows, total: rows.length });
+      }
+
+      db.get(countSql, params, (countErr, countRow) => {
+        if (countErr) {
+          console.error("Error counting rows:", countErr);
+          return res.status(500).json({ message: "Database count error." });
+        }
+
+        res.json({
+          rows,
+          total: countRow.total,
+          page,
+          limit,
+        });
       });
     });
-  });
+  } catch (err) {
+    console.error("Unexpected error:", err);
+    res.status(500).json({ message: "Unexpected server error." });
+  }
 });
+
 
 router.get("/diamond_items", authenticateToken, (req, res) => {
   try {

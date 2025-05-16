@@ -138,12 +138,12 @@ const AuswertungDisplay = () => {
                             <tr key={index}>
                                 <td>{row.Beleg}</td>
                                 <td>{row.Firma?.trim()}</td>
-                                <td>{row[" Werkauftrag"]}</td>
+                                <td>{row["Werkauftrag"]}</td>
                                 <td>{row.Termin}</td>
                                 <td>{row["Artikel-Nr."]}</td>
-                                <td>{row[" Artikel-Nr. fertig"]}</td>
+                                <td>{row["Artikel-Nr. fertig"]}</td>
                                 <td>{row.Beschreibung}</td>
-                                <td>{row[" Beschreibung 2"]}</td>
+                                <td>{row["Beschreibung 2"]}</td>
                                 <td>{row.Einzelpreis}</td>
                                 <td>{row.Farbe}</td>
                                 <td>{row["G-Preis"]}</td>

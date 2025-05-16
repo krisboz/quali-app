@@ -5,12 +5,17 @@ import InspectionInput from "./InspectionInput";
 import { searchQualityReportsByAuftragsnummer } from "../../../api/api";
 import { toast } from "react-toastify";
 import EtiketGenerator from "./../../../components/EtiketGenerator/EtiketGenerator";
+import { PiEyedropperSampleFill as SampleIcon } from "react-icons/pi";
+import StichprobeForm from "../../stichprobe/StichprobeForm";
 
 
 const OrderDetails = ({ chosenOrder, setChosenOrder }) => {
   const [clickedItem, setClickedItem] = useState(null);
   const [inspections, setInspections] = useState(null);
   const [printItems, setPrintItems] = useState(false);
+  const [stichprobeActive, setStichprobeActive] = useState(false);
+  const [selectedStichprobeItem, setSelectedStichprobeItem] = useState(null);
+
 
   useEffect(() => {
     if (chosenOrder && chosenOrder.orderNumber) {
@@ -28,36 +33,45 @@ const OrderDetails = ({ chosenOrder, setChosenOrder }) => {
       loadInspections(chosenOrder.orderNumber);
     }
   }, [chosenOrder]);
-
+  
+const toggleStichprobeActive = () => {
+  setStichprobeActive((prev) => {
+    if (prev) setSelectedStichprobeItem(null);
+    return !prev;
+  });
+};
   const togglePrintItems = () => {
-    setPrintItems(prev=>!prev)
-  }
-
+    setPrintItems((prev) => !prev);
+  };
 
   const handleRowClick = (e, index) => {
     const clickedItem = chosenOrder.items[index];
-
-    // Check if item is already inspected
     const isInspected = inspections?.some(
       (inspection) => inspection.artikelnr === clickedItem["Artikel-Nr. fertig"]
     );
-
     if (!isInspected) {
       setClickedItem(clickedItem);
     }
   };
 
-  // Check if specific item is inspected
   const isItemInspected = (item) => {
     return inspections?.some(
       (inspection) => inspection.artikelnr === item["Artikel-Nr. fertig"]
     );
   };
 
+const handleStichProbeClick = (item) => {
+  setSelectedStichprobeItem({ 
+    ...item, 
+    firma: chosenOrder.firma, 
+    orderNumber: chosenOrder.orderNumber 
+  });
+  setStichprobeActive(true); // Open the form
+};
+
   const renderTableRows = () => {
     return chosenOrder.items.map((item, index) => {
       const isInspected = isItemInspected(item);
-
       return (
         <tr
           key={item.id || index}
@@ -78,6 +92,16 @@ const OrderDetails = ({ chosenOrder, setChosenOrder }) => {
           <td>{item["Termin"] || ""}</td>
           <td>{item["Werkauftrag"] || ""}</td>
           <td>{item["urspr. Menge"] || ""}</td>
+          <td>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleStichProbeClick(item)
+              }}
+            >
+              <SampleIcon/>
+            </button>
+          </td>
         </tr>
       );
     });
@@ -88,23 +112,22 @@ const OrderDetails = ({ chosenOrder, setChosenOrder }) => {
   };
 
   const generateInputForEtiketGenerator = () => {
-  
     const items = chosenOrder.items;
-
-    console.log("ITEMS", items);
     const arrayToInput = items.map((item) => ({
       code: item["Artikel-Nr. fertig"],
       size: item["Größe"],
       quantity: item["Menge offen"] < 10 ? item["Menge offen"] : 10,
     }));
-
     return arrayToInput;
   };
 
   return (
     <div className="detailed-order-preview">
       {printItems && (
-        <EtiketGenerator toggleFunction={togglePrintItems} dataToPrint={generateInputForEtiketGenerator()} />
+        <EtiketGenerator
+          toggleFunction={togglePrintItems}
+          dataToPrint={generateInputForEtiketGenerator()}
+        />
       )}
       <div className="close-button-container">
         <button onClick={(e) => setChosenOrder(null)}>
@@ -116,7 +139,9 @@ const OrderDetails = ({ chosenOrder, setChosenOrder }) => {
         <div className="detailed-order-title">
           <h1>{chosenOrder.orderNumber}</h1>
           <h2>{chosenOrder.firma}</h2>
-          <button onClick={() => togglePrintItems()}><IoPrint/></button>
+          <button onClick={togglePrintItems}>
+            <IoPrint />
+          </button>
         </div>
 
         <div className="detailed-items-container">
@@ -136,6 +161,7 @@ const OrderDetails = ({ chosenOrder, setChosenOrder }) => {
                   <th>Termin</th>
                   <th>Werkauftrag</th>
                   <th>urspr. Menge</th>
+                  <th>Aktion</th>
                 </tr>
               </thead>
               <tbody>{renderTableRows()}</tbody>
@@ -154,6 +180,12 @@ const OrderDetails = ({ chosenOrder, setChosenOrder }) => {
           />
         </div>
       )}
+      {stichprobeActive && selectedStichprobeItem && (
+  <div className="stichprobe-form-wrapper">
+    <button onClick={toggleStichprobeActive} className="close-stichprobe-form">Schließen</button>
+    <StichprobeForm clickedItem={selectedStichprobeItem} />
+  </div>
+)}
     </div>
   );
 };

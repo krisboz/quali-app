@@ -7,18 +7,16 @@ const db = new sqlite3.Database("./database.sqlite", (err) => {
   }
 });
 
-// Convert Excel serial date to DD.MM.YYYY probasbly not necessary anymore since from now on
-//all rows are normalized befoer uploading
+// Convert Excel serial date to DD.MM.YYYY
 function convertExcelSerialToDate(serial) {
-  const epoch = new Date(Date.UTC(1899, 11, 30)); // Excel's zero date
+  const epoch = new Date(Date.UTC(1899, 11, 30));
   const converted = new Date(epoch.getTime() + serial * 86400 * 1000);
   return `${converted.getDate().toString().padStart(2, "0")}.${(
     converted.getMonth() + 1
-  )
-    .toString()
-    .padStart(2, "0")}.${converted.getFullYear()}`;
+  ).toString().padStart(2, "0")}.${converted.getFullYear()}`;
 }
-// One-time fixer for "Termin" in auswertungen
+
+// Fix Excel-style 'Termin' values in auswertungen
 function fixExistingTerminDates() {
   db.all(`SELECT id, "Termin" FROM auswertungen`, (err, rows) => {
     if (err) {
@@ -27,7 +25,7 @@ function fixExistingTerminDates() {
     }
 
     const updates = rows
-      .filter((row) => /^\d+$/.test(row["Termin"])) // only numeric strings
+      .filter((row) => /^\d+$/.test(row["Termin"]))
       .map((row) => ({
         id: row.id,
         fixedDate: convertExcelSerialToDate(Number(row["Termin"])),
@@ -39,22 +37,18 @@ function fixExistingTerminDates() {
     }
 
     db.serialize(() => {
-      const stmt = db.prepare(
-        `UPDATE auswertungen SET "Termin" = ? WHERE id = ?`
-      );
+      const stmt = db.prepare(`UPDATE auswertungen SET "Termin" = ? WHERE id = ?`);
       updates.forEach(({ fixedDate, id }) => {
         stmt.run(fixedDate, id);
       });
       stmt.finalize(() => {
-        console.log(
-          `✅ Fixed ${updates.length} old Excel-style 'Termin' dates.`
-        );
+        console.log(`✅ Fixed ${updates.length} old Excel-style 'Termin' dates.`);
       });
     });
   });
 }
 
-// Function to initialize the database
+// Initialize the database and tables
 const initializeDB = () => {
   db.exec(
     `
@@ -84,7 +78,6 @@ const initializeDB = () => {
       fotos TEXT,
       dateOfInspection TEXT
     );
-
 
     CREATE TABLE IF NOT EXISTS auswertungen (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -135,42 +128,64 @@ const initializeDB = () => {
     );
 
     CREATE TABLE IF NOT EXISTS items (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  Artikelgruppe TEXT,
-  Artikelnummer TEXT UNIQUE,
-  Bestand INTEGER,
-  Bezeichnung TEXT,
-  Inaktiv BOOLEAN,
-  LetzterEK REAL,
-  Lieferantenname TEXT,
-  Lieferfrist INTEGER,
-  MakeOrBuy TEXT,
-  Matchcode TEXT,
-  Mengeneinheit TEXT,
-  "UVP - Euro " REAL,
-  "VK 1 - Euro" REAL,
-  "verfügbar in" INTEGER,
-  _ARTIKELGRUPPENEU TEXT,
-  _BESTSELLER BOOLEAN,
-  _MARKETINGFOCUS BOOLEAN,
-  _PARETOCLUSTER TEXT,
-  _REGULARREPLENISHMENT BOOLEAN,
-  _SILHOUETTE TEXT
-);
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      Artikelgruppe TEXT,
+      Artikelnummer TEXT UNIQUE,
+      Bestand INTEGER,
+      Bezeichnung TEXT,
+      Inaktiv BOOLEAN,
+      LetzterEK REAL,
+      Lieferantenname TEXT,
+      Lieferfrist INTEGER,
+      MakeOrBuy TEXT,
+      Matchcode TEXT,
+      Mengeneinheit TEXT,
+      "UVP - Euro " REAL,
+      "VK 1 - Euro" REAL,
+      "verfügbar in" INTEGER,
+      _ARTIKELGRUPPENEU TEXT,
+      _BESTSELLER BOOLEAN,
+      _MARKETINGFOCUS BOOLEAN,
+      _PARETOCLUSTER TEXT,
+      _REGULARREPLENISHMENT BOOLEAN,
+      _SILHOUETTE TEXT
+    );
+
+    CREATE TABLE IF NOT EXISTS diamond_screenings (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      liefertermin TEXT NOT NULL,
+      lieferant TEXT NOT NULL,
+      bestellnr TEXT NOT NULL,
+      artikelnr TEXT NOT NULL,
+      quantity INTEGER NOT NULL CHECK(quantity > 0),
+      bemerkung TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(bestellnr, artikelnr, liefertermin)
+    );
 
 
-
-   CREATE TABLE IF NOT EXISTS diamond_screenings (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  liefertermin TEXT NOT NULL,
-  lieferant TEXT NOT NULL,
-  bestellnr TEXT NOT NULL,
-  artikelnr TEXT NOT NULL,
-  quantity INTEGER NOT NULL CHECK(quantity > 0),
-  bemerkung TEXT,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE(bestellnr, artikelnr, liefertermin)
-);
+    -- NEW TABLE for Stichprobenform results
+    CREATE TABLE IF NOT EXISTS stichproben (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      artikelnr TEXT NOT NULL,
+      firma TEXT NOT NULL,
+      orderNumber TEXT NOT NULL,
+      status TEXT NOT NULL CHECK(status IN ('approved', 'rejected', 'needs_review')),
+      mitarbeiter TEXT,
+      allgemein_checks TEXT,
+      allgemein_remarks TEXT,
+      oberflaeche_checks TEXT,
+      oberflaeche_remarks TEXT,
+      masse_checks TEXT,
+      masse_remarks TEXT,
+      mechanik_checks TEXT,
+      mechanik_remarks TEXT,
+      steine_checks TEXT,
+      steine_remarks TEXT,
+      weiter_checks TEXT,
+      weiter_remarks TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
   `,
     (err) => {
       if (err) {
@@ -178,7 +193,7 @@ const initializeDB = () => {
         return;
       }
 
-      // Seed default users only if no users exist
+      // Seed users
       db.get(`SELECT COUNT(*) AS count FROM users`, (err, row) => {
         if (err) {
           console.error("Database error:", err);
@@ -188,20 +203,19 @@ const initializeDB = () => {
           console.log("Seeding database with default users...");
           const hashedPassword = bcrypt.hashSync("password123", 10);
           db.exec(`
-          INSERT INTO users (username, password) VALUES 
-          ('kristijan.b', '${hashedPassword}'),
-          ('vanessa.m', '${hashedPassword}'),
-          ('michelle.s', '${hashedPassword}'),
-          ('luisa.p', '${hashedPassword}'),
-          ('sebastian.h', '${hashedPassword}'),
-          ('sandra.h', '${hashedPassword}'),
-          ('roman.j', '${hashedPassword}');
-        `);
+            INSERT INTO users (username, password) VALUES 
+            ('kristijan.b', '${hashedPassword}'),
+            ('vanessa.m', '${hashedPassword}'),
+            ('michelle.s', '${hashedPassword}'),
+            ('luisa.p', '${hashedPassword}'),
+            ('sebastian.h', '${hashedPassword}'),
+            ('sandra.h', '${hashedPassword}'),
+            ('roman.j', '${hashedPassword}');
+          `);
         }
       });
     }
   );
 };
 
-// Export database connection and initializer function
 module.exports = { db, initializeDB };

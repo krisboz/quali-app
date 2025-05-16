@@ -20,8 +20,8 @@ const groupResultsByOrderNumber = (results) => {
         }
 
         grouped[orderNumber].items.push({
-            "Artikel-Nr. fertig": entry[" Artikel-Nr. fertig"],
-            "Werkauftrag": entry[" Werkauftrag"],
+            "Artikel-Nr. fertig": entry["Artikel-Nr. fertig"],
+            "Werkauftrag": entry["Werkauftrag"],
             Einzelpreis: entry.Einzelpreis,
             Farbe: entry.Farbe,
             "G-Preis": entry["G-Preis"],
@@ -51,8 +51,8 @@ const Inspection = () => {
 
         try {
             const result = await searchAuswertungen({beleg})
-            console.log({result})
             const groupedResults = groupResultsByOrderNumber(result.rows);
+            console.log({groupedResults})
             setSearchResults(groupedResults)
             setLoading(false)
             toast.info(`${groupedResults.length>1?`${groupedResults.length} orders`: `${groupedResults.length} order`}  found.`)

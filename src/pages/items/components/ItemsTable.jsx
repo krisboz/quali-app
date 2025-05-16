@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import "../styles/ItemsTable.scss";
 
-const JewelryTable = ({ items }) => {
+const ItemsTable = ({ items }) => {
   const [filterText, setFilterText] = useState("");
   const [viewMode, setViewMode] = useState("default");
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [selectedSubgroup, setSelectedSubgroup] = useState(null);
+  const [selectedItem, setSelectedItem] = useState(null);
 
   const filteredItems = items.filter((item) =>
     item.Artikelnummer.toLowerCase().includes(filterText.toLowerCase())
@@ -31,7 +32,11 @@ const JewelryTable = ({ items }) => {
   };
 
   const handleRowClick = (item) => {
-    alert(`Item Details:\n${JSON.stringify(item, null, 2)}`);
+    setSelectedItem(item);
+  };
+
+  const closeModal = () => {
+    setSelectedItem(null);
   };
 
   const renderTable = (items) => (
@@ -67,10 +72,7 @@ const JewelryTable = ({ items }) => {
         ) || [];
       return (
         <>
-          <button
-            className="back-button"
-            onClick={() => setSelectedSubgroup(null)}
-          >
+          <button className="back-button" onClick={() => setSelectedSubgroup(null)}>
             ← Back to {selectedGroup}
           </button>
           {renderTable(subgroupItems)}
@@ -82,10 +84,7 @@ const JewelryTable = ({ items }) => {
       const subgroups = groupBySubgroup(groups[selectedGroup]);
       return (
         <>
-          <button
-            className="back-button"
-            onClick={() => setSelectedGroup(null)}
-          >
+          <button className="back-button" onClick={() => setSelectedGroup(null)}>
             ← Back to groups
           </button>
           <div className="subgroup-container">
@@ -133,17 +132,53 @@ const JewelryTable = ({ items }) => {
             setViewMode((prev) => (prev === "default" ? "grouped" : "default"))
           }
         >
-          {viewMode === "default"
-            ? "Switch to Grouped View"
-            : "Switch to Default View"}
+          {viewMode === "default" ? "Switch to Grouped View" : "Switch to Default View"}
         </button>
       </div>
 
-      {viewMode === "default"
-        ? renderTable(filteredItems)
-        : renderGroupedView()}
+      {viewMode === "default" ? renderTable(filteredItems) : renderGroupedView()}
+          
+          {/**
+           * 
+  "Artikelgruppe": "100.15.05",
+  "Artikelnummer": "A-Dr-p-rg",
+  "Bestand": 19,
+  "Bezeichnung": "SIGNATURE Drop Clasp Diamond Pavé",
+  "Inaktiv": 0,
+  "LetzterEK": 51.33,
+  "Lieferantenname": "BREUNING CO. LTD.",
+  "Lieferfrist": 35,
+  "MakeOrBuy": "K",
+  "Matchcode": "rg",
+  "Mengeneinheit": "piece",
+  "UVP - Euro ": 1050,
+  "VK 1 - Euro": 477,
+  "verfügbar in": 42,
+  "_ARTIKELGRUPPENEU": "101.001.00.02",
+  "_BESTSELLER": 1,
+  "_MARKETINGFOCUS": 1,
+  "_PARETOCLUSTER": "AA",
+  "_REGULARREPLENISHMENT": 1,
+  "_SILHOUETTE": "SIGNATURE Accessory Drop Clasp"
+           */}
+
+      {selectedItem && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <button className="close-button" onClick={closeModal}>
+              &times;
+            </button>
+            <div className="big-art-nr-container">
+            <p>{selectedItem["Artikelnummer"]}</p>
+            </div>
+            <div className="item-info-container">
+              
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default JewelryTable;
+export default ItemsTable;
