@@ -1,0 +1,1 @@
+add nice indicator for classname .copy-on-click-p

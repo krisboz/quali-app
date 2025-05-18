@@ -109,12 +109,12 @@
       background: white;
       padding: 2rem;
       border-radius: 8px;
-      max-width: 600px;
-      width: 90%;
+      max-width: 800px;
+      width: 100%;
       position: relative;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
       overflow-y: auto;
-      max-height: 80vh;
+      max-height: 85vh;
 
       h3 {
         margin-top: 0;
@@ -148,13 +148,4 @@
       }
     }
   }
-}
-
-
-.big-art-nr-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-    font-weight: bold;
 }

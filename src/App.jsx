@@ -13,6 +13,7 @@ import GoldTestManager from "./pages/goldTests/GoldTestManager";
 import DiamondScreening from "./pages/diamondScreening/DiamondScreening";
 import Items from "./pages/items/Items";
 import Stichproben from "./pages/stichprobe/Stichproben";
+import "./App.scss";
 
 function AppRoutes() {
   const { isAuthenticated } = useContext(AuthContext);
@@ -44,8 +45,8 @@ function AppRoutes() {
         <Route path="profile" element={<UserProfile />} />
         <Route path="gold-tests" element={<GoldTestManager />} />
         <Route path="diamond-screening" element={<DiamondScreening />} />
-        <Route path="items" element={<Items/>}/>
-         <Route path="stichproben" element={<Stichproben/>}/>
+        <Route path="items" element={<Items />} />
+        <Route path="stichproben" element={<Stichproben />} />
 
         <Route path="" element={<Navigate to="dashboard" replace />} />
       </Route>

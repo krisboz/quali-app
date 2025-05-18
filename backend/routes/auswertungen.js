@@ -198,15 +198,17 @@ router.get("/", authenticateToken, (req, res) => {
     limit = 100,
     pagesOff,
   } = req.query;
-
   try {
-    const usePaging = !(pagesOff === "true" || pagesOff === "1");
+    const usePaging = !pagesOff || pagesOff === "false";
+    console.log(usePaging);
 
     if (usePaging) {
       page = parseInt(page, 10);
       limit = parseInt(limit, 10);
       if (isNaN(page) || isNaN(limit) || page < 1 || limit < 1) {
-        return res.status(400).json({ message: "Invalid pagination parameters." });
+        return res
+          .status(400)
+          .json({ message: "Invalid pagination parameters." });
       }
     }
 
@@ -239,7 +241,9 @@ router.get("/", authenticateToken, (req, res) => {
     if (termin) {
       const [year, month, day] = termin.split("-");
       if (!year || !month || !day) {
-        return res.status(400).json({ message: "Invalid 'termin' format. Expected YYYY-MM-DD." });
+        return res
+          .status(400)
+          .json({ message: "Invalid 'termin' format. Expected YYYY-MM-DD." });
       }
       const formatted = `${day}.${month}.${year}`;
       whereClauses.push('"Termin" = ?');
@@ -310,7 +314,6 @@ router.get("/", authenticateToken, (req, res) => {
     res.status(500).json({ message: "Unexpected server error." });
   }
 });
-
 
 router.get("/diamond_items", authenticateToken, (req, res) => {
   try {

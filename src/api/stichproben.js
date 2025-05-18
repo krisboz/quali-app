@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const API_BASE_URL = "https://reimagined-journey-5r599v49g9r2577-5000.app.github.dev/api/stichproben";
-
+//const API_BASE_URL = "https://reimagined-journey-5r599v49g9r2577-5000.app.github.dev/api/stichproben";
+const API_BASE_URL = "http://localhost:5000/api/stichproben";
 // Helper to flatten form input
 const flattenStichprobeForm = (formInput) => {
   const { basic, status, mitarbeiter, formData } = formInput;
@@ -11,7 +11,14 @@ const flattenStichprobeForm = (formInput) => {
     remarks: section.remarks || "",
   });
 
-  const sections = ["allgemein", "oberflaeche", "masse", "mechanik", "steine", "weiter"];
+  const sections = [
+    "allgemein",
+    "oberflaeche",
+    "masse",
+    "mechanik",
+    "steine",
+    "weiter",
+  ];
   const flattened = {
     artikelnr: basic.artikelnr,
     firma: basic.firma,
@@ -33,7 +40,7 @@ export const submitStichprobe = async (formData) => {
   try {
     const token = localStorage.getItem("token");
     const flattenedData = flattenStichprobeForm(formData);
-    console.log({flattenedData})
+    console.log({ flattenedData });
     const response = await axios.post(API_BASE_URL, flattenedData, {
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -84,4 +91,3 @@ export const deleteStichprobe = async (id) => {
     throw error.response?.data?.message || "Failed to delete Stichprobe";
   }
 };
-

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "../styles/ItemsTable.scss";
+import ItemView from "./ItemView";
 
 const ItemsTable = ({ items }) => {
   const [filterText, setFilterText] = useState("");
@@ -72,7 +73,10 @@ const ItemsTable = ({ items }) => {
         ) || [];
       return (
         <>
-          <button className="back-button" onClick={() => setSelectedSubgroup(null)}>
+          <button
+            className="back-button"
+            onClick={() => setSelectedSubgroup(null)}
+          >
             ← Back to {selectedGroup}
           </button>
           {renderTable(subgroupItems)}
@@ -84,7 +88,10 @@ const ItemsTable = ({ items }) => {
       const subgroups = groupBySubgroup(groups[selectedGroup]);
       return (
         <>
-          <button className="back-button" onClick={() => setSelectedGroup(null)}>
+          <button
+            className="back-button"
+            onClick={() => setSelectedGroup(null)}
+          >
             ← Back to groups
           </button>
           <div className="subgroup-container">
@@ -132,13 +139,17 @@ const ItemsTable = ({ items }) => {
             setViewMode((prev) => (prev === "default" ? "grouped" : "default"))
           }
         >
-          {viewMode === "default" ? "Switch to Grouped View" : "Switch to Default View"}
+          {viewMode === "default"
+            ? "Switch to Grouped View"
+            : "Switch to Default View"}
         </button>
       </div>
 
-      {viewMode === "default" ? renderTable(filteredItems) : renderGroupedView()}
-          
-          {/**
+      {viewMode === "default"
+        ? renderTable(filteredItems)
+        : renderGroupedView()}
+
+      {/**
            * 
   "Artikelgruppe": "100.15.05",
   "Artikelnummer": "A-Dr-p-rg",
@@ -163,19 +174,7 @@ const ItemsTable = ({ items }) => {
            */}
 
       {selectedItem && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <button className="close-button" onClick={closeModal}>
-              &times;
-            </button>
-            <div className="big-art-nr-container">
-            <p>{selectedItem["Artikelnummer"]}</p>
-            </div>
-            <div className="item-info-container">
-              
-            </div>
-          </div>
-        </div>
+        <ItemView selectedItem={selectedItem} closeModal={closeModal} />
       )}
     </div>
   );
