@@ -5,6 +5,7 @@ import { FaCircleXmark as Rejected } from "react-icons/fa6";
 import { IoWarning as NeedsReview } from "react-icons/io5";
 import { jwtDecode } from "jwt-decode";
 import { submitStichprobe } from "../../api/stichproben";
+import { toast } from "react-toastify";
 
 // Reusable section component
 const Section = ({
@@ -61,6 +62,23 @@ const StichprobeForm = ({ clickedItem = null, closeForm = null }) => {
     orderNumber: "",
   });
 
+  const resetState = () => {
+    setFormData({
+      allgemein: { checks: [], remarks: "" },
+      oberflaeche: { checks: [], remarks: "" },
+      masse: { checks: [], remarks: "" },
+      mechanik: { checks: [], remarks: "" },
+      steine: { checks: [], remarks: "" },
+      weiter: { checks: [], remarks: "" },
+    });
+    setStatus("");
+    setManualData({
+      firma: "",
+      artikelnr: "",
+      orderNumber: "",
+    });
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -112,6 +130,9 @@ const StichprobeForm = ({ clickedItem = null, closeForm = null }) => {
     try {
       const result = await submitStichprobe(filledForm);
       console.log("Submitted with id:", result.id);
+      resetState();
+      closeForm && closeForm();
+      toast.success("Stichprobe successfully submitted");
     } catch (e) {
       console.error("Submit failed:", e);
     }
