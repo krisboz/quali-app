@@ -1,7 +1,59 @@
 import { useState, useEffect } from "react";
-import jsPDF from "jspdf";
+import { pdf, Document, Page, Text, Image } from "@react-pdf/renderer"; // Add Image import
 import "./EtiketGenerator.scss";
 
+const LabelsDocument = ({ values, neuware }) => (
+  <Document>
+    {values.flatMap((item, itemIndex) =>
+      Array.from({ length: item.quantity }, (_, i) => (
+        <Page
+          key={`${itemIndex}-${i}`}
+          size={[107.716, 70.866]}
+          style={{ padding: 0, margin: 0 }}
+        >
+          {neuware && (
+            <Image
+              src="./logo.webp" // Path to your PNG file
+              style={{
+                position: "absolute",
+                left: 2,  // Adjust positioning as needed
+                top: 2,
+                width: 5,  // Set appropriate size
+                height: 5,
+              }}
+            />
+          )}
+          <Text
+            style={{
+              position: "absolute",
+              left: 5.67,
+              top: 28.35,
+              fontSize: 12,
+              fontFamily: "Helvetica",
+            }}
+          >
+            {item.code}
+          </Text>
+          {item.size && (
+            <Text
+              style={{
+                position: "absolute",
+                left: 5.67,
+                top: 56.69,
+                fontSize: 10,
+                fontFamily: "Helvetica",
+              }}
+            >
+              Size: {item.size}
+            </Text>
+          )}
+        </Page>
+      ))
+    )}
+  </Document>
+);
+
+// Rest of the component remains the same...
 const EtiketGenerator = ({ toggleFunction, dataToPrint }) => {
   const [inputValue, setInputValue] = useState("");
   const [valuesToPrint, setValuesToPrint] = useState([]);
@@ -9,6 +61,7 @@ const EtiketGenerator = ({ toggleFunction, dataToPrint }) => {
   const [quantity, setQuantity] = useState(1);
   const [editingIndex, setEditingIndex] = useState(null);
   const [isRing, setIsRing] = useState(false);
+  const [isNeuware, setIsNeuware] = useState(false);
 
   useEffect(() => {
     if (dataToPrint) {
@@ -47,43 +100,16 @@ const EtiketGenerator = ({ toggleFunction, dataToPrint }) => {
     setValuesToPrint((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const splitSku = (sku) => {
-    const lastHyphenIndex = sku.lastIndexOf("-");
-    if (lastHyphenIndex === -1) return [sku];
-    const suffix = sku.slice(lastHyphenIndex);
-    return suffix.toLowerCase().endsWith("g")
-      ? [sku.slice(0, lastHyphenIndex), suffix]
-      : [sku];
-  };
-
-  const handlePrintLabels = () => {
-    const doc = new jsPDF("h", "mm", [38, 25]);
-
-    valuesToPrint.forEach((item, itemIndex) => {
-      const { code, size, quantity } = item;
-      const isRingItem = code.toLowerCase().startsWith("r-");
-
-      for (let i = 0; i < quantity; i++) {
-        doc.setFont("Helvetica", "normal");
-        doc.setFontSize(12);
-
-        // Main SKU part
-        doc.text(code, 2, 10, { maxWidth: 34 });
-
-        // Ring size if applicable
-        if (isRingItem && size) {
-          doc.setFontSize(10);
-          doc.text(`Size: ${size}`, 2, 20);
-        }
-
-        // Add new page if not last label
-        if (i < quantity - 1 || itemIndex < valuesToPrint.length - 1) {
-          doc.addPage();
-        }
-      }
-    });
-
-    window.open(doc.output("bloburl"), "_blank");
+  const handlePrintLabels = async () => {
+    try {
+      const blob = await pdf(
+        <LabelsDocument values={valuesToPrint} neuware={isNeuware} />
+      ).toBlob();
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank");
+    } catch (error) {
+      console.error("Failed to generate PDF:", error);
+    }
   };
 
   const handleQuantitySubmit = (e, index) => {
@@ -101,7 +127,9 @@ const EtiketGenerator = ({ toggleFunction, dataToPrint }) => {
 
   return (
     <div className="etiket-generator">
-      <div className="close-btn-container"><button onClick={toggleFunction}>X</button></div>
+      <div className="close-btn-container">
+        <button onClick={toggleFunction}>X</button>
+      </div>
       <form onSubmit={handleAddValue}>
         <input
           value={inputValue}
@@ -126,6 +154,15 @@ const EtiketGenerator = ({ toggleFunction, dataToPrint }) => {
           onChange={(e) => setQuantity(e.target.value)}
         />
 
+        <label className="neuware-checkbox">
+          <input
+            type="checkbox"
+            checked={isNeuware}
+            onChange={(e) => setIsNeuware(e.target.checked)}
+          />
+          Neuware
+        </label>
+
         <button type="submit">Hinzufügen</button>
       </form>
 
@@ -140,7 +177,7 @@ const EtiketGenerator = ({ toggleFunction, dataToPrint }) => {
           <div key={index} className="preview-item">
             <div className="sku-info">
               <div>{item.code}</div>
-              {item.size !== " " && <div>Größe: {item.size}</div>}
+              {item.size && <div>Größe: {item.size}</div>}
             </div>
 
             <div className="item-actions">

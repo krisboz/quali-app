@@ -1,7 +1,7 @@
 import axios from "axios";
 
-//const API_BASE_URL = "https://reimagined-journey-5r599v49g9r2577-5000.app.github.dev/api/stichproben";
-const API_BASE_URL = "http://localhost:5000/api/stichproben";
+const API_BASE_URL = "https://reimagined-journey-5r599v49g9r2577-5000.app.github.dev/api/stichproben";
+//const API_BASE_URL = "http://localhost:5000/api/stichproben";
 // Helper to flatten form input
 const flattenStichprobeForm = (formInput) => {
   const { basic, status, mitarbeiter, formData } = formInput;

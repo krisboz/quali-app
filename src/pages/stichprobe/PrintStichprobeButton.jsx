@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
   },
   topTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "bold",
     textTransform: "uppercase",
   },
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
   },
   statusBadge: {
     textAlign: "center",
-    marginBottom: 20,
+    marginBottom: 10,
     paddingVertical: 4,
     color: "white",
     fontSize: 12,
@@ -179,7 +179,7 @@ const StichprobePDF = ({ entry }) => (
     <Page size="A4" style={styles.page}>
       <View style={styles.topHeader}>
         <Text style={styles.logoPlaceholder}>LOGO-PLACE</Text>
-        <Text style={styles.topTitle}>Stichprobe</Text>
+        <Text style={styles.topTitle}>Prüfprotokoll</Text>
         <Text style={styles.topDate}>
           {new Date(entry.created_at).toLocaleDateString()}
         </Text>
