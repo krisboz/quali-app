@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import './NativeLabelGenerator.scss'; // Make sure to import the SCSS
-import logo from "./logo.webp"
+import logo from "./logo.png"
 
 const suffixRegex = /-(r|y|w)g$/;
 
@@ -158,13 +158,13 @@ const NativeLabelGenerator = ({ items }) => {
                 {label.reservierung ? (
                   <>
                     <div className="label-line">
-                      <strong>Auftrags-Nr:</strong> {label.auftragsnummer}
+                      <strong> {label.auftragsnummer} </strong>
                     </div>
-                    <div className={`label-line`}>
-                      {label['Artikel-Nr. fertig']}
+                    <div className={`label-line reservierung-art-nr`}>
+                      <strong>{label['Artikel-Nr. fertig']}</strong>
                     </div>
                     {label['Artikel-Nr. fertig'].startsWith('R-') && (
-                      <div className="label-line">{label.size}</div>
+                      <div className="label-line">Size: {label.size}</div>
                     )}
                     <div className="label-line">{label.kundenname}</div>
                   </>
@@ -176,7 +176,7 @@ const NativeLabelGenerator = ({ items }) => {
                       {formatArtikelnummer(label['Artikel-Nr. fertig'])}
                     </div>
                     {label['Artikel-Nr. fertig'].startsWith('R-') && label.size && (
-                      <div className="label-line">{label.size}</div>
+                      <div className="label-line">Size: {label.size}</div>
                     )}
                   </>
                 )}

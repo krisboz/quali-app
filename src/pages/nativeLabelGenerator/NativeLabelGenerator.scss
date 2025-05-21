@@ -20,11 +20,11 @@
 
   .label-card {
     position: relative;
-    width: 152px; // 38.1mm at 4px/mm
-    height: 102px; // 25.4mm at 4px/mm
+      width: 38.1mm;
+  height: 25.4mm;
+  font-size: 10pt;
     padding: 6px;
     box-sizing: border-box;
-    font-size: 10px;
     display: flex;
     align-items: flex-start;
     justify-content: center;
@@ -50,7 +50,10 @@
       }
 
       .big-art-nr {
-        font-size: 20px;
+        font-size: 14pt;
+      }
+      .reservierung-art-nr {
+        font-size: 12pt;
       }
 
       .break-artikel {
@@ -132,8 +135,7 @@
     transform-origin: top left;
 
     /* Shrink just a tiny bit so 100% scaling fits */
-    transform: scale(0.94);
-    zoom: 0.94;
+ 
   }
 
   .native-label-generator .label-card {
