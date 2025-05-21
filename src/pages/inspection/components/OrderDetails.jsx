@@ -5,6 +5,7 @@ import InspectionInput from "./InspectionInput";
 import { searchQualityReportsByAuftragsnummer } from "../../../api/api";
 import { toast } from "react-toastify";
 import EtiketGenerator from "./../../../components/EtiketGenerator/EtiketGenerator";
+import NativeLabelGenerator from "../../nativeLabelGenerator/NativeLabelGenerator";
 import { PiEyedropperSampleFill as SampleIcon } from "react-icons/pi";
 import StichprobeForm from "../../stichprobe/StichprobeForm";
 
@@ -124,10 +125,11 @@ const handleStichProbeClick = (item) => {
   return (
     <div className="detailed-order-preview">
       {printItems && (
-        <EtiketGenerator
+        <NativeLabelGenerator items={chosenOrder.items}/>
+        /*<EtiketGenerator
           toggleFunction={togglePrintItems}
           dataToPrint={generateInputForEtiketGenerator()}
-        />
+        />*/
       )}
       <div className="close-button-container">
         <button onClick={(e) => setChosenOrder(null)}>
