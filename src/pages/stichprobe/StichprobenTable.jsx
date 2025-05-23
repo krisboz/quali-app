@@ -12,8 +12,6 @@ const StichprobenTable = ({ data, setData }) => {
   const [editingId, setEditingId] = useState(null);
   const [editFormData, setEditFormData] = useState({});
 
-  console.log({ data });
-
   const handleEditClick = (item) => {
     setEditingId(item.id);
     setEditFormData({
@@ -83,93 +81,96 @@ const StichprobenTable = ({ data, setData }) => {
             </td>
           </tr>
         )}
-        {data.map((item) => (
-          <tr key={item.id}>
-            {editingId === item.id ? (
-              <>
-                <td>
-                  <input
-                    type="text"
-                    name="artikelnr"
-                    value={editFormData.artikelnr}
-                    onChange={handleInputChange}
-                  />
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    name="firma"
-                    value={editFormData.firma}
-                    onChange={handleInputChange}
-                  />
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    name="orderNumber"
-                    value={editFormData.orderNumber}
-                    onChange={handleInputChange}
-                  />
-                </td>
-                <td>
-                  <select
-                    name="status"
-                    value={editFormData.status}
-                    onChange={handleInputChange}
+        {Array.isArray(data) &&
+          data.map((item) => (
+            <tr key={item.id}>
+              {editingId === item.id ? (
+                <>
+                  <td>
+                    <input
+                      type="text"
+                      name="artikelnr"
+                      value={editFormData.artikelnr}
+                      onChange={handleInputChange}
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      name="firma"
+                      value={editFormData.firma}
+                      onChange={handleInputChange}
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      name="orderNumber"
+                      value={editFormData.orderNumber}
+                      onChange={handleInputChange}
+                    />
+                  </td>
+                  <td>
+                    <select
+                      name="status"
+                      value={editFormData.status}
+                      onChange={handleInputChange}
+                    >
+                      <option value="approved">approved</option>
+                      <option value="rejected">rejected</option>
+                      <option value="needs_review">needs_review</option>
+                    </select>
+                  </td>
+                  <td>{editFormData.mitarbeiter}</td>
+                  <td>
+                    <button onClick={handleSaveClick}>Save</button>{" "}
+                    <button onClick={handleCancelClick}>Cancel</button>
+                  </td>
+                </>
+              ) : (
+                <>
+                  <td
+                    onClick={() =>
+                      navigator.clipboard.writeText(item.artikelnr)
+                    }
+                    className="copy-on-click-p"
                   >
-                    <option value="approved">approved</option>
-                    <option value="rejected">rejected</option>
-                    <option value="needs_review">needs_review</option>
-                  </select>
-                </td>
-                <td>{editFormData.mitarbeiter}</td>
-                <td>
-                  <button onClick={handleSaveClick}>Save</button>{" "}
-                  <button onClick={handleCancelClick}>Cancel</button>
-                </td>
-              </>
-            ) : (
-              <>
-                <td
-                  onClick={() => navigator.clipboard.writeText(item.artikelnr)}
-                  className="copy-on-click-p"
-                >
-                  {item.artikelnr}
-                </td>
-                <td>{item.firma}</td>
-                <td
-                  onClick={() =>
-                    navigator.clipboard.writeText(item.orderNumber)
-                  }
-                  className="copy-on-click-p"
-                >
-                  {item.orderNumber}
-                </td>
-                <td>
-                  <span className={`status-pill ${item.status}`}>
-                    {item.status.replace("_", " ")}
-                  </span>
-                </td>
-                <td>{item.mitarbeiter}</td>
-                <td className="action-container">
-                  <button
-                    onClick={() => handleEditClick(item)}
-                    className="action-svg-button edit-stichproben"
+                    {item.artikelnr}
+                  </td>
+                  <td>{item.firma}</td>
+                  <td
+                    onClick={() =>
+                      navigator.clipboard.writeText(item.orderNumber)
+                    }
+                    className="copy-on-click-p"
                   >
-                    <Edit />
-                  </button>{" "}
-                  <button
-                    onClick={() => handleDeleteClick(item.id)}
-                    className="action-svg-button delete-stichproben"
-                  >
-                    <Delete />
-                  </button>
-                  <PrintStichprobeButton entry={item} />{" "}
-                </td>
-              </>
-            )}
-          </tr>
-        ))}
+                    {item.orderNumber}
+                  </td>
+                  <td>
+                    <span className={`status-pill ${item.status}`}>
+                      {item.status.replace("_", " ")}
+                    </span>
+                  </td>
+                  <td>{item.mitarbeiter}</td>
+                  <td className="action-container">
+                    <button
+                      onClick={() => handleEditClick(item)}
+                      className="action-svg-button edit-stichproben"
+                    >
+                      <Edit />
+                    </button>{" "}
+                    <button
+                      onClick={() => handleDeleteClick(item.id)}
+                      className="action-svg-button delete-stichproben"
+                    >
+                      <Delete />
+                    </button>
+                    <PrintStichprobeButton entry={item} />{" "}
+                  </td>
+                </>
+              )}
+            </tr>
+          ))}
       </tbody>
     </table>
   );

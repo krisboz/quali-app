@@ -22,7 +22,8 @@ router.get("/", authenticateToken, (req, res) => {
     params.push(status);
   }
 
-  const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+  const whereClause =
+    conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
   const sql = `SELECT * FROM stichproben ${whereClause}`;
 
   db.all(sql, params, (err, rows) => {
@@ -30,6 +31,7 @@ router.get("/", authenticateToken, (req, res) => {
       console.error("Fetch error:", err);
       return res.status(500).json({ message: "Database error" });
     }
+    console.log("MEEEE", rows);
     res.json(rows);
   });
 });
@@ -37,9 +39,15 @@ router.get("/", authenticateToken, (req, res) => {
 // POST: create new stichprobe
 router.post("/", authenticateToken, (req, res) => {
   const data = req.body;
-  console.log("data getting passed", data)
+  console.log("data getting passed", data);
 
-  const requiredFields = ["artikelnr", "firma", "orderNumber", "status", "mitarbeiter"];
+  const requiredFields = [
+    "artikelnr",
+    "firma",
+    "orderNumber",
+    "status",
+    "mitarbeiter",
+  ];
   for (const field of requiredFields) {
     if (!data[field]) {
       return res.status(400).json({ message: `Missing field: ${field}` });
