@@ -251,6 +251,7 @@ router.get("/", authenticateToken, (req, res) => {
     }
 
     if (terminFrom && terminTo) {
+      console.log(terminFrom, terminTo)
       whereClauses.push(`
         DATE(
           SUBSTR("Termin", 7, 4) || '-' || 

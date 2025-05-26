@@ -68,6 +68,25 @@ export const fetchQualityReports = async (terminFrom, terminTo) => {
   }
 };
 
+export const filterInspectionsByDateOfInspection = async (inspectionFrom, inspectionTo) => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const params = {};
+    if (inspectionFrom) params.inspectionFrom = inspectionFrom;
+    if (inspectionTo) params.inspectionTo = inspectionTo;
+
+    const response = await axios.get(`${API_BASE_URL}/quality-reports`, {
+      headers: { Authorization: `Bearer ${token}` },
+      params,
+    });
+
+    return response.data;
+  } catch (error) {
+    throw error.response?.data?.message || "Failed to fetch quality reports";
+  }
+};
+
 export const searchQualityReportsByAuftragsnummer = async (auftragsnummer) => {
   try {
     const token = localStorage.getItem("token");

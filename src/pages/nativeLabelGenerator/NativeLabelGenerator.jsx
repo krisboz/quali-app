@@ -105,6 +105,10 @@ const NativeLabelGenerator = ({ items }) => {
           doc.setTextColor(0, 0, 0);
           doc.text(suffix, 33, 6, { align: "right" });
         }
+        if(label.size !== " ") {
+                    doc.text(`${label.size}`, 17, 6, );
+
+        }
 
         const marginLeft = 2;
         let startY = 10;
@@ -116,10 +120,7 @@ const NativeLabelGenerator = ({ items }) => {
           doc.setFontSize(9);
 
           doc.text(label.auftragsnummer || "", marginLeft, startY + 1);
-          if (label["Artikel-Nr. fertig"].startsWith("R-") && label.size) {
-            doc.setFontSize(9);
-            doc.text(`ø${label.size}`, marginLeft + 26, startY + 1);
-          }
+       
           doc.setFontSize(10);
           doc.setFont("helvetica", "bold"); // Set bold font
           doc.text(label["Artikel-Nr. fertig"], marginLeft, startY + 6, {
@@ -131,9 +132,10 @@ const NativeLabelGenerator = ({ items }) => {
         } else {
           // Print base artikelnummer without suffix
           doc.setFontSize(12);
-          doc.text(`${base}-${suffix.toLowerCase()}`, marginLeft, startY + 3, {
+          doc.text(`${base}-${suffix.toLowerCase()}`, marginLeft, startY + 5, {
             maxWidth: 34,
           });
+         
         }
       }
     });

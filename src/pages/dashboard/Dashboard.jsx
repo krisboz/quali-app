@@ -3,10 +3,16 @@ import { useEffect, useState } from "react";
 import "./styles/Dashboard.scss";
 import ReportPreview from "./ReportPreview/ReportPreview";
 import ReportGenerator from "../../components/ReportGenerator/ReportGenerator";
+import OrdersComingThisWeek from "./components/OrdersComingThisWeek";
+import InspectionsMadeThisWeek from "./components/InspectionsMadeThisWeek";
+import GoldTestsPreview from "./components/GoldTestsPreview";
+
 const Dashboard = () => {
   const [user, setUser] = useState(null);
   const [showPreviews, setShowPreviews] = useState(false);
   const [generateReport, setGenerateReport] = useState(false);
+  const [recentInspections, setRecentInspections] = useState([]);
+  const [recentOrders, setRecentOrders] = useState([])
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -81,8 +87,18 @@ const Dashboard = () => {
           <p>{calcDate()}</p>{" "}
         </div>
       </div>
+      <div>
+        <GoldTestsPreview />
+      </div>
+      <div className="dashboard-data-container-orders-inspections">
+          <InspectionsMadeThisWeek/>
+      <OrdersComingThisWeek/>
 
-      <div className="report-preview-header">
+      </div>
+
+{/**
+ * THEY WERE THE OLD ONES WITH THE REPORT PREVIEWS AND SHIT 
+ *     <div className="report-preview-header">
         <h2>Report Previews</h2>
         <p>
           Use the button underneath to generate report previews and decide which
@@ -104,6 +120,8 @@ const Dashboard = () => {
         {showPreviews && <ReportPreview />}
         {generateReport && <ReportGenerator/>}
       </div>
+ */}
+  
     </div>
   );
 };

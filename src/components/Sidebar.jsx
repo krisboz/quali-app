@@ -125,7 +125,7 @@ const Sidebar = () => {
               })}
             >
               <StichprobenIcon />
-              Stichproben
+              Prüfprotokoll
             </NavLink>
           </li>
 

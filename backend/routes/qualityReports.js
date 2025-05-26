@@ -22,20 +22,26 @@ const s3Client = new S3Client({
  * Get all quality reports
  */
 router.get("/", authenticateToken, (req, res) => {
-  const { terminFrom, terminTo } = req.query;
+  const { terminFrom, terminTo, inspectionFrom, inspectionTo } = req.query;
 
   let whereClause = "";
   let params = [];
+  let orderByField = "liefertermin"; // Default
 
-  if (terminFrom && terminTo) {
+  if (inspectionFrom && inspectionTo) {
+    whereClause = "WHERE DATE(dateOfInspection) BETWEEN DATE(?) AND DATE(?)";
+    params = [inspectionFrom, inspectionTo];
+    orderByField = "dateOfInspection";
+  } else if (terminFrom && terminTo) {
     whereClause = "WHERE DATE(liefertermin) BETWEEN DATE(?) AND DATE(?)";
     params = [terminFrom, terminTo];
+    orderByField = "liefertermin";
   }
 
   const sql = `
     SELECT * FROM quality_reports 
     ${whereClause}
-    ORDER BY DATE(liefertermin) DESC
+    ORDER BY DATE(${orderByField}) DESC
   `;
 
   db.all(sql, params, (err, rows) => {
@@ -45,6 +51,7 @@ router.get("/", authenticateToken, (req, res) => {
     res.json(rows);
   });
 });
+
 
 /**
  * Search quality reports by auftragsnummer
