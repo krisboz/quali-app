@@ -318,6 +318,7 @@ router.get("/", authenticateToken, (req, res) => {
 
 router.get("/diamond_items", authenticateToken, (req, res) => {
   try {
+    console.log("YEP")
     const { month, year } = req.query;
 
     if (!month || !year) {
@@ -344,14 +345,16 @@ router.get("/diamond_items", authenticateToken, (req, res) => {
 
       // Filter items with "-p-" or "Cl" in Artikel-Nr. fertig (case-insensitive)
       const filteredItems = rows.filter((row) => {
-        const artikelNr = row[" Artikel-Nr. fertig"]?.toLowerCase() || "";
+        const artikelNr = row["Artikel-Nr. fertig"]?.toLowerCase() || "";
         return (
-          artikelNr.includes("-p-") ||
-          artikelNr.includes("-cl-") ||
-          artikelNr.includes("-prg") ||
-          artikelNr.includes("-pyg") ||
-          artikelNr.includes("-pwg") ||
-          artikelNr.includes("-pl-")
+       (
+  artikelNr.includes("-p-") && !artikelNr.startsWith("08-p-")
+) ||
+artikelNr.includes("-cl-") ||
+artikelNr.includes("-prg") ||
+artikelNr.includes("-pyg") ||
+artikelNr.includes("-pwg") ||
+artikelNr.includes("-pl-")
         );
       });
 

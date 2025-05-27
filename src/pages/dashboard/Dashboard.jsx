@@ -6,6 +6,7 @@ import ReportGenerator from "../../components/ReportGenerator/ReportGenerator";
 import OrdersComingThisWeek from "./components/OrdersComingThisWeek";
 import InspectionsMadeThisWeek from "./components/InspectionsMadeThisWeek";
 import GoldTestsPreview from "./components/GoldTestsPreview";
+import DiamondScreeningPreview from "./components/DiamondScreeningPreview";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -86,15 +87,20 @@ const Dashboard = () => {
           <p>{calcDayInWeek()}</p>
           <p>{calcDate()}</p>{" "}
         </div>
+
+        
       </div>
-      <div>
-        <GoldTestsPreview />
-      </div>
-      <div className="dashboard-data-container-orders-inspections">
-          <InspectionsMadeThisWeek/>
+        <div className="dashboard-data-container-orders-inspections">
       <OrdersComingThisWeek/>
 
       </div>
+      <div className="dashboard-data-container-gold-diamonds">
+        <DiamondScreeningPreview/>
+        <GoldTestsPreview />
+                  <InspectionsMadeThisWeek/>
+
+      </div>
+    
 
 {/**
  * THEY WERE THE OLD ONES WITH THE REPORT PREVIEWS AND SHIT 

@@ -1,0 +1,212 @@
+.diamond-wrapper {
+  padding: 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  min-width: 25vw;
+  max-width: 25vw;
+  max-height: 60vh;
+  overflow-y: scroll;
+
+  scrollbar-width: thin;
+  scrollbar-color: #888 transparent;
+
+
+/* WebKit browsers (Chrome, Safari, Edge) */
+.diamond-wrapper::-webkit-scrollbar {
+  width: 8px; /* thinner scrollbar */
+  border-radius: 8px;
+}
+
+.diamond-wrapper::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 8px;
+}
+
+.diamond-wrapper::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 8px; /* rounded corners */
+  border: 2px solid transparent; /* adds space around thumb */
+  background-clip: content-box; /* ensures border doesn’t cover thumb */
+}
+
+.diamond-wrapper::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+
+}
+}
+
+.diamond-title {
+   display:flex;
+  justify-content: start;
+  margin-bottom: 2rem;
+  padding: 1rem 0 0 2rem;
+  border-bottom: 1px solid rgb(172, 172, 172);
+  h2 {
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+        font-size: 1.5rem;
+
+  }
+
+   .week-control.reset {
+      background: none;
+
+      padding: 0;
+      border-radius: 100%;
+      width:30px;
+      height:30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      color: black;
+      transition: .2s ease-in-out;
+
+      &:hover {
+        transform: rotate(360deg);
+        border: none;
+      }
+    }
+
+}
+
+.diamond-controls {
+  display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+
+    .week-control {
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: .3rem .9rem;
+      transition: .2s ease-in-out;
+
+      
+    }
+
+    .previous {
+      svg {
+        transition: .2s ease-in-out;
+      }
+      &:hover {
+         svg {
+        
+              transform: translateX(-5px);
+        }
+      }
+    }
+      .next {
+      svg {
+        transition: .2s ease-in-out;
+      }
+      &:hover {
+         svg {
+        
+              transform: translateX(5px);
+        }
+      }
+    }
+
+}
+
+.diamond-empty {
+  color: #999999;
+  font-size: 13px;
+}
+
+.diamond-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  .diamond-item {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fafafa;
+    margin-bottom: 0.5rem;
+
+    .diamond-beleg {
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+    }
+
+    .diamond-firma {
+      color: #555;
+      font-size: 13px;
+    }
+
+    .diamond-count {
+      font-size: 12px;
+      color: #888;
+    }
+  }
+}
+
+.diamond-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.diamond-modal {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+.diamond-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+
+  h3 {
+    margin: 0;
+  }
+
+  .diamond-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+}
+
+.diamond-modal-list {
+  list-style: none;
+  padding: 0;
+
+  .diamond-modal-item {
+    border-bottom: 1px solid #eee;
+    padding: 0.75rem 0;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    div {
+      margin-bottom: 0.25rem;
+      font-size: 14px;
+    }
+  }
+}

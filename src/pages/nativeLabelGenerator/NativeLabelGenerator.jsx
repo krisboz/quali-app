@@ -100,13 +100,9 @@ const NativeLabelGenerator = ({ items }) => {
         }
 
         // Draw suffix top-right if present
-        if (suffix) {
-          doc.setFontSize(10);
-          doc.setTextColor(0, 0, 0);
-          doc.text(suffix, 33, 6, { align: "right" });
-        }
+      doc.setFontSize(9)
         if(label.size !== " ") {
-                    doc.text(`${label.size}`, 17, 6, );
+                    doc.text(`Size:${label.size}`,25, 6, );
 
         }
 

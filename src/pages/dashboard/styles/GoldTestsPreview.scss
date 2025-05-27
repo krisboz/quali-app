@@ -1,7 +1,7 @@
 .gold-tests-preview {
   padding: 1.5rem;
   border-radius: 12px;
-  max-width: 20vw;
+  min-width: 25vw;
   max-height: 60vh;
   border: 1px solid rgb(190, 190, 190);
   box-shadow: 2px 2px 12px 2px rgba(0, 0, 0, 0.205);
@@ -9,6 +9,8 @@
   &__title {
     font-size: 1.5rem;
     margin-bottom: 0.5rem;
+      border-bottom: 1px solid rgb(172, 172, 172);
+
   }
 
   &__summary {
