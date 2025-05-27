@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import "../styles/ItemView.scss";
 import { searchAuswertungen } from "../../../api/api";
 import { fetchStichproben } from "../../../api/stichproben";
@@ -23,26 +23,27 @@ function orderByLieferanten(orders) {
 }
 
 const ItemView = ({ selectedItem, closeModal }) => {
-  console.log("PROŽDRLJIVAC", { selectedItem });
 
   const [orders, setOrders] = useState([]);
   const [stichproben, setStichproben] = useState([]);
   const [orderLieferanten, setOrderLieferanten] = useState(null);
 
+  const modalRef = useRef(null);
+
   useEffect(() => {
-    /**
-     *     beleg,
-    firma,
-    werkauftrag,
-    artikelnr,
-    termin,
-    terminFrom,
-    terminTo,
-    artikelnrfertig,
-    page = 1,
-    limit = 100,
-    pagesOff,
-     */
+    const handleClickOutside = (event) => {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        closeModal();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
     const fetchOrders = async () => {
       try {
         const orders = await searchAuswertungen({
@@ -54,20 +55,18 @@ const ItemView = ({ selectedItem, closeModal }) => {
         console.log({ grouped });
         setOrderLieferanten(grouped);
 
-        console.log(orders);
       } catch (error) {
         console.log("Error", error);
       }
     };
 
     const fetchStich = async () => {
-      //artikelnr
       try {
         const fetchedStichproben = await fetchStichproben({
           artikelnr: selectedItem.Artikelnummer,
         });
+
         setStichproben(fetchedStichproben);
-        console.log(fetchedStichproben);
       } catch (error) {
         console.log("error", error);
       }
@@ -76,9 +75,10 @@ const ItemView = ({ selectedItem, closeModal }) => {
     fetchOrders();
     fetchStich();
   }, []);
+
   return (
     <div className="modal-overlay">
-      <div className="modal-content">
+      <div className="modal-content" ref={modalRef}>
         <button className="close-button" onClick={closeModal}>
           &times;
         </button>

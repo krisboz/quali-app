@@ -149,29 +149,6 @@ const ItemsTable = ({ items }) => {
         ? renderTable(filteredItems)
         : renderGroupedView()}
 
-      {/**
-           * 
-  "Artikelgruppe": "100.15.05",
-  "Artikelnummer": "A-Dr-p-rg",
-  "Bestand": 19,
-  "Bezeichnung": "SIGNATURE Drop Clasp Diamond Pavé",
-  "Inaktiv": 0,
-  "LetzterEK": 51.33,
-  "Lieferantenname": "BREUNING CO. LTD.",
-  "Lieferfrist": 35,
-  "MakeOrBuy": "K",
-  "Matchcode": "rg",
-  "Mengeneinheit": "piece",
-  "UVP - Euro ": 1050,
-  "VK 1 - Euro": 477,
-  "verfügbar in": 42,
-  "_ARTIKELGRUPPENEU": "101.001.00.02",
-  "_BESTSELLER": 1,
-  "_MARKETINGFOCUS": 1,
-  "_PARETOCLUSTER": "AA",
-  "_REGULARREPLENISHMENT": 1,
-  "_SILHOUETTE": "SIGNATURE Accessory Drop Clasp"
-           */}
 
       {selectedItem && (
         <ItemView selectedItem={selectedItem} closeModal={closeModal} />

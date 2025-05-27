@@ -4,6 +4,9 @@ import "./StichprobenDisplayTable.scss";
 import PrintStichprobeButton from "./PrintStichprobeButton";
 
 const StichprobenDisplayTable = ({ data }) => {
+  if(!data) {
+    return <div>No Prüfprotokolle gemacht</div>
+  }
   return (
     <table>
       <thead>

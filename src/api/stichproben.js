@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = `${import.meta.env_VITE_API_BASE_URL}/api/stichproben`;
+const API_BASE_URL = `${import.meta.env.VITE_BASE_API_URL}/api/stichproben`;
 //const API_BASE_URL = "http://localhost:5000/api/stichproben";
 // Helper to flatten form input
 const flattenStichprobeForm = (formInput) => {

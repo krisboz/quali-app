@@ -15,6 +15,7 @@ const DiamondScreeningPreview = () => {
   const [comingItems, setComingItems] = useState([]);
   const [groupedItems, setGroupedItems] = useState([]);
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [itemCount, setItemCount] = useState(null)
 
   const [selectedBeleg, setSelectedBeleg] = useState(null);
   const [modalItems, setModalItems] = useState([]);
@@ -45,7 +46,7 @@ const DiamondScreeningPreview = () => {
       const terminDate = parse(item.Termin, "dd.MM.yyyy", new Date());
       return isWithinInterval(terminDate, { start, end });
     });
-
+    setItemCount(filtered.length)
     const grouped = Object.values(
       filtered.reduce((acc, item) => {
         const key = item.Beleg;
@@ -87,7 +88,7 @@ const DiamondScreeningPreview = () => {
       <div className="diamond-title">
         <h2> Diamond Items Due This Week  <button className="week-control reset" onClick={resetToNow}><Reset/></button>
 </h2>
-
+      <p>Items: {itemCount}</p>
       </div>
 
       <div className="diamond-controls">
@@ -124,7 +125,7 @@ const DiamondScreeningPreview = () => {
            <table className="diamond-modal-table">
   <thead>
     <tr>
-      <th>Firma</th>
+      <th>Werkauftrag</th>
       <th>Artikel-Nr.</th>
       <th>Menge Offen</th>
     </tr>
@@ -132,7 +133,7 @@ const DiamondScreeningPreview = () => {
   <tbody>
     {modalItems.map((item, index) => (
       <tr key={index}>
-        <td>{item.Firma}</td>
+        <td>{item.Werkauftrag}</td>
         <td>{item["Artikel-Nr. fertig"]}</td>
         <td>{item["Menge offen"]}</td>
       </tr>

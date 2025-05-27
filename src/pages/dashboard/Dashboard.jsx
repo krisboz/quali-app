@@ -7,6 +7,13 @@ import OrdersComingThisWeek from "./components/OrdersComingThisWeek";
 import InspectionsMadeThisWeek from "./components/InspectionsMadeThisWeek";
 import GoldTestsPreview from "./components/GoldTestsPreview";
 import DiamondScreeningPreview from "./components/DiamondScreeningPreview";
+import { Link } from "react-router-dom";
+import { FaMagnifyingGlass as InspectionIcon } from "react-icons/fa6";
+import { TbReportAnalytics as GenerateReport } from "react-icons/tb";
+import { MdPreview as PreviewIcon } from "react-icons/md";
+
+
+
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -88,9 +95,37 @@ const Dashboard = () => {
           <p>{calcDate()}</p>{" "}
         </div>
 
+     
+
         
       </div>
+      
+      <div className="control-bar">
+        <p>
+          Controls
+        </p>
+        <button className="dashboard-control" onClick={toggleShowPreviews}>
+          <PreviewIcon/> {!showPreviews ? "Show Report Previews" : "Hide Report Previews"}
+        </button>
+        <button className="dashboard-control" onClick={toggleGenerateReports}>
+         <GenerateReport/> {!generateReport ? "Generate Report" : "Hide Report Generation"}
+        </button>
+      </div>
+       <div className="report-preview-container">
+        {showPreviews && <ReportPreview />}
+        {generateReport && <ReportGenerator/>}
+      </div>
+
         <div className="dashboard-data-container-orders-inspections">
+          <div className="short-intro">
+            <h2>QualiTrack – Quality Control, Simplified</h2>
+            <p>A custom-built, in-house solution designed to optimize and streamline our quality control processes.
+
+</p>
+            <p>Track defects, manage gold and diamond tests, generate Prüfprotokolle, and produce monthly quality reports — all from a single, easy-to-use system tailored for our workflow.</p>
+            <p>Found a defective item? What are you waiting for?</p>
+            <Link className="hero-inspection-button" to="/app/inspection"><InspectionIcon/> Report it!</Link>
+          </div>
       <OrdersComingThisWeek/>
 
       </div>
@@ -122,10 +157,7 @@ const Dashboard = () => {
         </button>
       </div>
 
-      <div className="report-preview-container">
-        {showPreviews && <ReportPreview />}
-        {generateReport && <ReportGenerator/>}
-      </div>
+     
  */}
   
     </div>
