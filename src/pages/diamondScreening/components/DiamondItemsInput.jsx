@@ -159,8 +159,14 @@ const DiamondItemsInput = ({ items }) => {
                   checked={screenedItems.some((s) => s.id === item.id)}
                 />
               </td>
-              <td>{item[" Artikel-Nr. fertig"]}</td>
-              <td>{item.Beleg}</td>
+              <td  onClick={(e) =>
+                      navigator.clipboard.writeText(item["Artikel-Nr. fertig"])
+                    }
+                    className="copy-on-click-p">{item["Artikel-Nr. fertig"]}</td>
+              <td onClick={(e) =>
+                      navigator.clipboard.writeText(item.Beleg)
+                    }
+                    className="copy-on-click-p">{item.Beleg}</td>
               <td>{item.Firma}</td>
               <td>{item.Termin}</td>
               <td>
