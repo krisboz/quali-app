@@ -6,6 +6,7 @@ import CreateTestForm from "./components/CreateTestForm";
 import TestsList from "./components/TestsList";
 import Pagination from "./components/Pagination";
 import GoldTestsTable from "./components/GoldTestsTable";
+import { AiOutlineGold as GoldIcon } from "react-icons/ai";
 
 //TODO handle that if there is a remark its a bad one and if none its passed
 const GoldTestManager = () => {
@@ -133,11 +134,13 @@ const GoldTestManager = () => {
 
   // Render
   return (
-    <div style={{ padding: "20px", maxWidth: "1200px", margin: "0 auto" }}>
+    
+    <div style={{ padding: "20px", margin: "0 auto" }}>
       {state.error && (
         <div style={{ color: "red", margin: "10px 0" }}>{state.error}</div>
       )}
-
+      
+      <h1 className="page-title"><GoldIcon/> Gold Tests</h1>
       <GoldTestsTable />
 
       <CreateTestForm

@@ -5,6 +5,8 @@ import { getDiamondItems } from "../../api/auswertung";
 import { MdFormatListBulletedAdd as ListAddIcon } from "react-icons/md";
 import { FaThLarge as GroupedIcon } from "react-icons/fa";
 import { IoAddOutline as AddIcon } from "react-icons/io5";
+import { FaRegGem } from "react-icons/fa";
+
 
 
 
@@ -38,6 +40,8 @@ const DiamondScreening = () => {
 
   return (
     <div>
+              <h1 className="page-title"><FaRegGem/> Diamond Screening</h1>
+
       <div className="diamond-screening-container">
         <div className="title-container">
         <h2>Diamond Screening</h2>

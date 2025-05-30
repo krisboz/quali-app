@@ -4,6 +4,8 @@ import { searchAuswertungen } from "../../api/auswertung";
 import OrderPreviewBlocks from "./components/OrderPreviewBlocks";
 import { toast } from "react-toastify";
 import Loading from "../../components/Loading";
+import { FaMagnifyingGlass as InspectionIcon } from "react-icons/fa6";
+
 
 const groupResultsByOrderNumber = (results) => {
     const grouped = {};
@@ -66,7 +68,12 @@ const Inspection = () => {
     return(<div className="inspection-page page">
 
             <div className="order-input-container">
-                <h1>Quality Inspection</h1>
+                <h1 className="page-title"><InspectionIcon/> Quality Inspection</h1>
+                <div className="short-description">
+                    <p>Enter the order number below to find the order you're working on. Select the correct order from the list, then click on any individual item to begin the quality control process.</p>
+
+<p><strong>Note:</strong> You only need to complete a report for items that are <strong>defective</strong>. If everything looks good, there's no need to take any action.</p>
+                </div>
                 
                 <form onSubmit={handleOrderLookUp} className="inspection-order-form">
                     <label> Order number: 

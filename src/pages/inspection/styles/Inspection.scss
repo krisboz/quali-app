@@ -5,6 +5,14 @@
     gap: 2rem;
 }
 
+.short-description {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap:1rem;
+}
+
 .inspection-order-form {
     display: flex;
     align-items: center;
