@@ -53,7 +53,7 @@ const Sidebar = () => {
               })}
             >
               <DashboardIcon />
-              Dashboard
+              <p>Dashboard</p>
             </NavLink>
           </li>
 
@@ -65,7 +65,7 @@ const Sidebar = () => {
               })}
             >
               <InspectionIcon />
-              Inspection
+              <p>Inspection</p>
             </NavLink>
           </li>
 
@@ -77,7 +77,7 @@ const Sidebar = () => {
               })}
             >
               <GoldIcon />
-              Gold Tests
+              <p>Gold Tests</p>
             </NavLink>
           </li>
 
@@ -89,7 +89,7 @@ const Sidebar = () => {
               })}
             >
               <FaRegGem />
-              Diamond Screening
+              <p>Diamond Screening</p>
             </NavLink>
           </li>
 
@@ -101,7 +101,7 @@ const Sidebar = () => {
               })}
             >
               <QualityReportsIcon />
-              Quality Reports
+             <p> Quality Reports</p>
             </NavLink>
           </li>
 
@@ -113,7 +113,7 @@ const Sidebar = () => {
               })}
             >
               <ItemsIcon />
-              Items
+              <p>Items</p>
             </NavLink>
           </li>
 
@@ -125,7 +125,7 @@ const Sidebar = () => {
               })}
             >
               <StichprobenIcon />
-              Prüfprotokoll
+              <p>Prüfprotokoll</p>
             </NavLink>
           </li>
 
@@ -137,7 +137,7 @@ const Sidebar = () => {
               })}
             >
               <OrdersIcon />
-              Orders
+              <p>Orders</p>
             </NavLink>
           </li>
 

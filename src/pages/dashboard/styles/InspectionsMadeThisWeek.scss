@@ -5,7 +5,7 @@
   border-radius: 8px;
   height: 60vh;
   min-width: 30vw;
-  max-width: 30vw;
+  max-width: 380px;
   overflow-y: scroll;
   color: #222;
   background: #fff;
@@ -169,5 +169,13 @@
         }
       }
     }
+  }
+}
+
+@media screen and (max-width: 1400px) { 
+  .inspections-dashboard {
+    height: 60vh;
+  min-width: 50vw;
+  max-width: 500px;
   }
 }

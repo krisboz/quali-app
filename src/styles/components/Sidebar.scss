@@ -6,6 +6,7 @@
     width: 300px;
     background: #f5f5f5;
     padding: .5rem;
+    transition: .2s ease-in-out;
 }
 
 .bottom-controls {
@@ -111,4 +112,63 @@ nav {
             transform: scale(1.2);
         }
     }
+}
+
+@media screen and (max-width: 1299px) {
+  /* Your styles for screens less than 1300px */
+  .sidebar {
+    width : 220px;
+
+    nav {
+        li{
+            a{
+                width: 180px;
+                font-size: .9rem;
+            }
+        }
+    }
+  }
+}
+
+/* For screens less than 768px */
+@media screen and (max-width: 767px) {
+  /* Your styles for screens less than 768px */
+
+  .sidebar {
+    width: 100px;
+      &:hover {
+            width:200px;
+            li{
+            
+            a {
+                width :170px;
+                font-size: 1.2rem;
+                display: flex;
+                align-items: center;
+                justify-content: start;
+                p{
+                    display:block;
+                    font-size: .8rem;
+                }
+            }
+        }
+        }
+    nav {
+        li{
+            
+            a {
+                width :50px;
+                font-size: 1.2rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                p{
+                    display:none;
+                }
+            }
+        }
+    
+      
+    }
+  }
 }

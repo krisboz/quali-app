@@ -133,8 +133,14 @@ const DiamondScreeningPreview = () => {
   <tbody>
     {modalItems.map((item, index) => (
       <tr key={index}>
-        <td>{item.Werkauftrag}</td>
-        <td>{item["Artikel-Nr. fertig"]}</td>
+        <td onClick={(e) =>
+                      navigator.clipboard.writeText(item.Werkauftrag)
+                    }
+                    className="copy-on-click-p">{item.Werkauftrag}</td>
+        <td onClick={(e) =>
+                      navigator.clipboard.writeText(item["Artikel-Nr. fertig"])
+                    }
+                    className="copy-on-click-p">{item["Artikel-Nr. fertig"]}</td>
         <td>{item["Menge offen"]}</td>
       </tr>
     ))}

@@ -161,16 +161,22 @@ const OrdersComingThisWeek = () => {
               borderRadius: "12px",
               maxWidth: "600px",
               width: "90%",
-              maxHeight: "80vh",
+              maxHeight: "60vh",
               overflowY: "auto",
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h2>{selectedGroup.Firma} — {selectedGroup.Beleg}</h2>
+            <h2>{selectedGroup.Firma} — <span onClick={(e) =>
+                      navigator.clipboard.writeText(selectedGroup.Beleg)
+                    }
+                    className="copy-on-click-p">{selectedGroup.Beleg}</span></h2>
             <ul>
               {selectedGroup.items.map((item) => (
                 <li key={item.id} style={{ marginBottom: "8px" }}>
-                  <strong>{item["Artikel-Nr. fertig"]}</strong> — Termin: {item.Termin}
+                  <strong onClick={(e) =>
+                      navigator.clipboard.writeText(item["Artikel-Nr. fertig"])
+                    }
+                    className="copy-on-click-p">{item["Artikel-Nr. fertig"]}</strong> — Termin: {item.Termin}
                 </li>
               ))}
             </ul>
