@@ -12,16 +12,7 @@ const StichprobenTable = ({ data, setData }) => {
   const [editingId, setEditingId] = useState(null);
   const [editFormData, setEditFormData] = useState({});
 
-  const handleEditClick = (item) => {
-    setEditingId(item.id);
-    setEditFormData({
-      artikelnr: item.artikelnr,
-      firma: item.firma,
-      orderNumber: item.orderNumber,
-      status: item.status,
-      mitarbeiter: user?.username || "",
-    });
-  };
+
 
   const handleCancelClick = () => {
     setEditingId(null);
@@ -84,50 +75,7 @@ const StichprobenTable = ({ data, setData }) => {
         {Array.isArray(data) &&
           data.map((item) => (
             <tr key={item.id}>
-              {editingId === item.id ? (
-                <>
-                  <td>
-                    <input
-                      type="text"
-                      name="artikelnr"
-                      value={editFormData.artikelnr}
-                      onChange={handleInputChange}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      name="firma"
-                      value={editFormData.firma}
-                      onChange={handleInputChange}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      name="orderNumber"
-                      value={editFormData.orderNumber}
-                      onChange={handleInputChange}
-                    />
-                  </td>
-                  <td>
-                    <select
-                      name="status"
-                      value={editFormData.status}
-                      onChange={handleInputChange}
-                    >
-                      <option value="approved">approved</option>
-                      <option value="rejected">rejected</option>
-                      <option value="needs_review">needs_review</option>
-                    </select>
-                  </td>
-                  <td>{editFormData.mitarbeiter}</td>
-                  <td>
-                    <button onClick={handleSaveClick}>Save</button>{" "}
-                    <button onClick={handleCancelClick}>Cancel</button>
-                  </td>
-                </>
-              ) : (
+            
                 <>
                   <td
                     onClick={() =>
@@ -153,12 +101,7 @@ const StichprobenTable = ({ data, setData }) => {
                   </td>
                   <td>{item.mitarbeiter}</td>
                   <td className="action-container">
-                    <button
-                      onClick={() => handleEditClick(item)}
-                      className="action-svg-button edit-stichproben"
-                    >
-                      <Edit />
-                    </button>{" "}
+                
                     <button
                       onClick={() => handleDeleteClick(item.id)}
                       className="action-svg-button delete-stichproben"
@@ -168,7 +111,7 @@ const StichprobenTable = ({ data, setData }) => {
                     <PrintStichprobeButton entry={item} />{" "}
                   </td>
                 </>
-              )}
+              
             </tr>
           ))}
       </tbody>

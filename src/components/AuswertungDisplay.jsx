@@ -122,9 +122,7 @@ const AuswertungDisplay = () => {
                             <th>Werkauftrag</th>
                             <th>Termin</th>
                             <th>Artikel-Nr.</th>
-                            <th>Artikel-Nr. fertig</th>
                             <th>Beschreibung</th>
-                            <th>Beschreibung 2</th>
                             <th>Einzelpreis</th>
                             <th>Farbe</th>
                             <th>G-Preis</th>
@@ -136,13 +134,20 @@ const AuswertungDisplay = () => {
                     <tbody>
                         {results.map((row, index) => (
                             <tr key={index}>
-                                <td>{row.Beleg}</td>
+                                <td    onClick={(e) =>
+                      navigator.clipboard.writeText(row.Beleg)
+                    }
+                    className="copy-on-click-p">{row.Beleg}</td>
                                 <td>{row.Firma?.trim()}</td>
-                                <td>{row["Werkauftrag"]}</td>
+                                <td    onClick={(e) =>
+                      navigator.clipboard.writeText(row.Werkauftrag)
+                    }
+                    className="copy-on-click-p">{row["Werkauftrag"]}</td>
                                 <td>{row.Termin}</td>
-                                <td>{row["Artikel-Nr."]}</td>
-                                <td>{row["Artikel-Nr. fertig"]}</td>
-                                <td>{row.Beschreibung}</td>
+                                <td    onClick={(e) =>
+                      navigator.clipboard.writeText(row["Artikel-Nr. fertig"])
+                    }
+                    className="copy-on-click-p">{row["Artikel-Nr. fertig"]}</td>
                                 <td>{row["Beschreibung 2"]}</td>
                                 <td>{row.Einzelpreis}</td>
                                 <td>{row.Farbe}</td>

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import StichprobenTable from "./StichprobenTable";
 import StichprobeForm from "./StichprobeForm";
 import { fetchStichproben } from "../../api/stichproben";
+import { PiEyedropperSampleFill as StichprobenIcon } from "react-icons/pi";
+
 import "./Stichproben.scss";
 
 const Stichproben = () => {
@@ -28,12 +30,15 @@ const Stichproben = () => {
   if (error) return <p>{error}</p>;
 
   return (
-    <section>
-      <h1>Stichproben Übersicht</h1>
+    <>
+          <h1><StichprobenIcon/> Prüfprotokoll</h1>
+  <section>
       <button onClick={() => setFormOpen((prev) => !prev)}>Add Manually</button>
       {formOpen && <StichprobeForm closeForm={() => setFormOpen(false)} />}
       <StichprobenTable data={data} setData={setData} />
     </section>
+    </>
+  
   );
 };
 

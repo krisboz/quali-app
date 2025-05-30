@@ -6,9 +6,12 @@ import {
   Text,
   View,
   StyleSheet,
+  Image,
   Font,
 } from "@react-pdf/renderer";
 import { FaDownload as Download } from "react-icons/fa6";
+import logo from "./logo2.png";
+
 
 const STATUS_COLORS = {
   approved: "#4caf50",
@@ -178,8 +181,11 @@ const StichprobePDF = ({ entry }) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <View style={styles.topHeader}>
-        <Text style={styles.logoPlaceholder}>LOGO-PLACE</Text>
-        <Text style={styles.topTitle}>Prüfprotokoll</Text>
+<View style={{ flexDirection: "row", alignItems: "center", justifyContent:"center" }}>
+  <Image src={logo} style={{ width: 25, height: 25, marginRight: 5 }} />
+  <Text style={{ fontSize: 14, fontWeight: "normal" }}>TAMARA COMOLLI</Text>
+</View>
+<Text style={styles.topTitle}>Prüfprotokoll</Text>
         <Text style={styles.topDate}>
           {new Date(entry.created_at).toLocaleDateString()}
         </Text>
@@ -188,19 +194,19 @@ const StichprobePDF = ({ entry }) => (
       <View style={styles.infoRow}>
         <View style={styles.infoItem}>
           <Text>Firma</Text>
-          <Text>{entry.firma}</Text>
+          <Text style={{fontWeight:"bold"}}>{entry.firma}</Text>
         </View>
         <View style={styles.infoItem}>
           <Text>Artikel-Nr</Text>
-          <Text>{entry.artikelnr}</Text>
+          <Text style={{fontWeight:"bold"}}>{entry.artikelnr}</Text>
         </View>
         <View style={styles.infoItem}>
           <Text>Auftragsnummer</Text>
-          <Text>{entry.orderNumber}</Text>
+          <Text style={{fontWeight:"bold"}}>{entry.orderNumber}</Text>
         </View>
         <View style={styles.infoItem}>
-          <Text>Erstellt am</Text>
-          <Text>{new Date(entry.created_at).toLocaleDateString()}</Text>
+          <Text>Mitarbeiter</Text>
+          <Text> {entry.mitarbeiter.toUpperCase()}</Text>
         </View>
       </View>
 
@@ -236,7 +242,7 @@ const StichprobePDF = ({ entry }) => (
                         { color: isChecked ? "#4caf50" : "#f44336" },
                       ]}
                     >
-                      {isChecked ? "✓" : "✗"}
+                      {isChecked ? "O" : "X"}
                     </Text>
                     <Text style={{ color: isChecked ? "black" : "#999" }}>
                       {check}
@@ -256,8 +262,7 @@ const StichprobePDF = ({ entry }) => (
       })}
 
       <View style={styles.footer}>
-        <Text>Prüfer: {entry.mitarbeiter}</Text>
-        <Text>__________________________</Text>
+        <Text>__________________________ </Text>
         <Text>Unterschrift</Text>
       </View>
     </Page>

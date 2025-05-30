@@ -83,7 +83,6 @@ const QualityReports = () => {
 
   return (
     <div className="quality-reports-container">
-      <h2>Quality Reports</h2>
       <QualityReportsFilter 
         filters={filters} 
         setFilters={setFilters} 
@@ -144,7 +143,10 @@ const QualityReports = () => {
                   )}
                 </td>
 
-                <td>
+                <td onClick={(e) =>
+                      navigator.clipboard.writeText(report.auftragsnummer)
+                    }
+                    className="copy-on-click-p">
                   {editingReport === report.id ? (
                     <input
                       type="text"
@@ -158,7 +160,10 @@ const QualityReports = () => {
                   )}
                 </td>
 
-                <td>
+                <td onClick={(e) =>
+                      navigator.clipboard.writeText(report.artikelnr)
+                    }
+                    className="copy-on-click-p">
                   {editingReport === report.id ? (
                     <input
                       type="text"

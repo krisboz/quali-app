@@ -125,7 +125,7 @@ const handleStichProbeClick = (item) => {
   return (
     <div className="detailed-order-preview">
       {printItems && (
-        <NativeLabelGenerator items={chosenOrder.items}/>
+        <NativeLabelGenerator items={chosenOrder.items} closeForm={togglePrintItems}/>
         /*<EtiketGenerator
           toggleFunction={togglePrintItems}
           dataToPrint={generateInputForEtiketGenerator()}
@@ -185,7 +185,7 @@ const handleStichProbeClick = (item) => {
       {stichprobeActive && selectedStichprobeItem && (
   <div className="stichprobe-form-wrapper">
     <button onClick={toggleStichprobeActive} className="close-stichprobe-form">Schließen</button>
-    <StichprobeForm clickedItem={selectedStichprobeItem} />
+    <StichprobeForm clickedItem={selectedStichprobeItem} closeForm={toggleStichprobeActive}/>
   </div>
 )}
     </div>

@@ -4,6 +4,8 @@ import "../styles/components/QualityInput.scss";
 import { IoMdRemoveCircleOutline as RemoveButton, IoMdAddCircleOutline as AddButton, IoIosCloseCircleOutline as CloseButton } from "react-icons/io";
 import { submitQualityReport } from "../api/api";
 import QualityReports from "./QualityReports";
+import { TbReportSearch as QualityReportsIcon } from "react-icons/tb";
+
 import { toast } from "react-toastify";
 
 const QualityInput = () => {
@@ -87,6 +89,7 @@ const QualityInput = () => {
 
     return (
         <>
+        <h1 className="page-title"> <QualityReportsIcon/> Quality Reports</h1>
             {isExpanded ? (
                 <div className="quality-input-overlay">
                     <div ref={inputRef} className="quality-input">
